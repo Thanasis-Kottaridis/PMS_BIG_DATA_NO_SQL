@@ -1,0 +1,19 @@
+{
+    "lat": 48.21438,
+    "lon": -4.4774585,
+    "mmsi": 37100300,
+    "nav_metadata": {
+        "course": 358.9,
+        "definition": " under way using engine",
+        "geom": "0101000020E6100000F3C98AE1EAE811C04F75C8CD701B4840",
+        "heading": 511,
+        "id_status": 0,
+        "speed": 2.1,
+        "turn": -127.0
+    },
+    "nav_status": {
+        "definition": " under way using engine",
+        "id_status": 0
+    },
+    "ts": 1444177613
+}
