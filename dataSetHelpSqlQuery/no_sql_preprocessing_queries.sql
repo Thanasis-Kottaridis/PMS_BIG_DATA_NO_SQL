@@ -1,3 +1,4 @@
+/* fetch navigational dynamic data with detaild navigational status*/
 SELECT mmsi, lat, lon, ts, id_status, definition, turn, speed, course, heading, geom
 FROM ais_data.dynamic_ships D INNER JOIN ais_status_codes_types.navigational_status S
 ON D.status = S.id_status

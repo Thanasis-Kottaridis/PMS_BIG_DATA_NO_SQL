@@ -17,3 +17,749 @@
     },
     "ts": 1444177613
 }
+
+
+
+//SHIP TYPE OUTPUT
+{
+    "2": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "4": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "5": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "7": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "8": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "9": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "10": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "11": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "14": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "16": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "17": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "18": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "19": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "20": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "23": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "24": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "25": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "26": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "32": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    },
+    "36": {
+        "ais_type_summary": [
+            4,
+            "Fishing",
+            "Fishing",
+            3,
+            "Fishery Protection/Research"
+        ],
+        "detailed_type": [
+            4,
+            "Fishing",
+            "Fishing",
+            5,
+            "Fish Factory"
+        ],
+        "id_detailedtype": [
+            4,
+            "Fishing",
+            "Fishing",
+            4,
+            "Fish Carrier"
+        ],
+        "id_shiptype": [
+            2,
+            "Wing In Grnd",
+            "Wing in Grnd",
+            1,
+            "Wing In Ground Effect Vessel"
+        ],
+        "type_name": [
+            4,
+            "Fishing",
+            "Fishing",
+            2,
+            "Trawler"
+        ]
+    }
+}
