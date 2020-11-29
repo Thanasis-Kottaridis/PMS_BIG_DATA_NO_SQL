@@ -35,15 +35,26 @@ def executeQuery(query) :
 
 
 # create json object from AIS Collection
-def preprocessDynamicData(dynamic_data, column_names) :
+def preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_status_column_names):
     ais_collection = []
+    nav_status_dict = {}
+
+    for row in nav_status_data:
+        nav_status_dict[row[0]] = dict(zip(nav_status_column_names, row))
 
     # converts query records into list of dicts
-    for row in dynamic_data :
+    for row in dynamic_data:
         main_data = dict(zip(column_names[:4], row[:4]))
-        navigational_status = dict(zip(column_names[4:6], row[4 :6]))
-        navigational_metadata = dict(zip(column_names[4 :], row[4 :]))
-        main_data["nav_status"] = navigational_status
+        navigational_metadata = dict(zip(column_names[4:-1], row[4:-1]))
+
+        # sets up navigational status if ais status code is not null or empty
+        #
+        try:
+            main_data["nav_status"] = nav_status_dict[row[-1]]
+        except:
+            print("INVALID ")
+
+
         main_data["nav_metadata"] = navigational_metadata
         ais_collection.append(main_data)
 
@@ -117,21 +128,28 @@ if __name__ == '__main__':
     # first fetch all dynamicData
     # but we order the columns in order to get all the main attributes at first 4 columns
     # and the navigational_metadata form rest columns
-    # TODO UNCOMMENT THIS :P
     column_names, dynamic_data = executeQuery(
-        "SELECT mmsi, lat, lon, ts, id_status, definition, turn, speed, course, heading, geom"
-        " FROM ais_data.dynamic_ships D INNER JOIN ais_status_codes_types.navigational_status S"
-        " ON D.status = S.id_status ORDER BY mmsi"
-        " LIMIT 100"
+        """
+        SELECT mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
+        FROM ais_data.dynamic_ships D 
+        LIMIT 100
+        """
+
     )
     print(column_names)
     print(len(dynamic_data))
 
+    # then we are fetching navigational status data in order to append them into
+    nav_status_column_names, nav_status_data = executeQuery(
+        """SELECT * FROM ais_status_codes_types.navigational_status"""
+    )
+    print(nav_status_column_names)
+    print(len(nav_status_data))
+
     # convert dynamic data into a desire formatted dict
-    ais_collection = preprocessDynamicData(dynamic_data, column_names)
+    ais_collection = preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_status_column_names)
     print("prin collection count: \n\n")
     print(ais_collection)
-    # TODO ----------------------------------
 
     # fetch ship metadata extracted from static_ships using postgres
     ship_meta_column_names, ship_metadata = executeQuery(
@@ -140,7 +158,7 @@ if __name__ == '__main__':
 	        SELECT DISTINCT ON (sourcemmsi) sourcemmsi, imo, callsign, shipname, shiptype
 	        FROM  ais_data.static_ships
 	    ) SELECT mmsi, imo, callsign, shipname, shiptype
-	    FROM (select distinct mmsi from ais_data.dynamic_ships ) as MMSI 
+	    FROM (select distinct mmsi from ais_data.dynamic_ships ) as MMSI
 	    INNER JOIN static_metadata meta ON MMSI.mmsi = meta.sourcemmsi
         """
     )
@@ -185,6 +203,5 @@ if __name__ == '__main__':
     # function to dump data
     with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
         jsonf.write(ais_collection_json)
-
 
 

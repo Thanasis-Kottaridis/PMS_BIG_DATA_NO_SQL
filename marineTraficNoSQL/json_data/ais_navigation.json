@@ -1,222 +1,780 @@
 [
     {
-        "mmsi": 923166,
-        "lat": 50.33638,
-        "lon": -4.1613665,
-        "ts": 1448991801,
+        "mmsi": 227002630,
+        "lat": 48.03902,
+        "lon": -4.848675,
+        "ts": 1452782416,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": 127.0,
-            "speed": 8.9,
-            "course": 84.2,
-            "heading": 91,
-            "geom": "0101000020E610000010AE80423DA510C0A583F57F0E2B4940"
-        },
-        "ship_metadata": {}
-    },
-    {
-        "mmsi": 923166,
-        "lat": 50.334972,
-        "lon": -4.1660385,
-        "ts": 1448977419,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -126.0,
-            "speed": 10.8,
-            "course": 227.6,
-            "heading": 225,
-            "geom": "0101000020E6100000F1811DFF05AA10C0B189CC5CE02A4940"
-        },
-        "ship_metadata": {}
-    },
-    {
-        "mmsi": 923166,
-        "lat": 50.339893,
-        "lon": -4.14547,
-        "ts": 1448977129,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": 0.0,
-            "speed": 9.1,
-            "course": 256.9,
-            "heading": 256,
-            "geom": "0101000020E61000004D327216F69410C0D591239D812B4940"
+            "speed": 0.0,
+            "course": 326.9,
+            "heading": 201,
+            "geom": "0101000020E610000030BB270F0B6513C0E9F17B9BFE044840"
         },
-        "ship_metadata": {}
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
     },
     {
-        "mmsi": 1234500,
-        "lat": 47.833645,
-        "lon": -4.17316,
-        "ts": 1444808008,
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782417,
         "nav_status": {
-            "id_status": 8,
-            "definition": " under way sailing"
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
         },
         "nav_metadata": {
-            "id_status": 8,
-            "definition": " under way sailing",
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 69.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.38238,
+        "lon": -4.473305,
+        "ts": 1452782417,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E61000001422E010AAE411C07E52EDD3F1304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227635210,
+        "lat": 48.382458,
+        "lon": -4.496695,
+        "ts": 1452782418,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
             "turn": -127.0,
             "speed": 0.0,
-            "course": 305.7,
+            "course": 351.1,
             "heading": 511,
-            "geom": "0101000020E6100000C5E6E3DA50B110C0A9BC1DE1B4EA4740"
+            "geom": "0101000020E6100000CD58349D9DFC11C0FA0B3D62F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.381313,
+        "lon": -4.485093,
+        "ts": 1452782419,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 297.2,
+            "heading": 511,
+            "geom": "0101000020E6100000F9122A38BCF011C0134548DDCE304840"
+        },
+        "ship_metadata": {
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
+            "ship_type": {
+                "id_detailedtype": 52,
+                "detailed_type": "Logistics Naval Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228793000,
+        "lat": 48.36887,
+        "lon": -4.516753,
+        "ts": 1452782424,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 315.0,
+            "heading": 511,
+            "geom": "0101000020E61000008670CCB2271112C0DE3CD521372F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "LPC ",
+            "shipname": "FRENCH WARSHIP ",
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228762000,
+        "lat": 48.36962,
+        "lon": -4.51498,
+        "ts": 1452782424,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E61000005760C8EA560F12C048F949B54F2F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.366955,
+        "lon": -4.4867015,
+        "ts": 1452782424,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 5.7,
+            "course": 340.8,
+            "heading": 511,
+            "geom": "0101000020E610000015A8C5E061F211C0450DA661F82E4840"
         },
         "ship_metadata": {
             "imo": 0,
             "callsign": " ",
-            "shipname": "TEST ",
+            "shipname": "FRENCHWARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.38215,
+        "lon": -4.497055,
+        "ts": 1452782425,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 323.2,
+            "heading": 511,
+            "geom": "0101000020E6100000CC4065FCFBFC11C04D158C4AEA304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 234056000,
+        "lat": 48.209255,
+        "lon": -4.4699616,
+        "ts": 1452782426,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -126.0,
+            "speed": 0.9,
+            "course": 41.5,
+            "heading": 349,
+            "geom": "0101000020E6100000DB80199D3DE111C022C32ADEC81A4840"
+        },
+        "ship_metadata": {
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.38238,
+        "lon": -4.4733033,
+        "ts": 1452782426,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E6100000035BCA9EA9E411C07E52EDD3F1304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227002630,
+        "lat": 48.03902,
+        "lon": -4.8486714,
+        "ts": 1452782426,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 317.5,
+            "heading": 201,
+            "geom": "0101000020E6100000BF33901D0A6513C0E9F17B9BFE044840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782427,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 137.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 227635210,
+        "lat": 48.382454,
+        "lon": -4.49669,
+        "ts": 1452782428,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 355.0,
+            "heading": 511,
+            "geom": "0101000020E61000003F00A94D9CFC11C0B91CAF40F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227580520,
+        "lat": 48.379513,
+        "lon": -4.4970684,
+        "ts": 1452782429,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 128.1,
+            "heading": 511,
+            "geom": "0101000020E61000000C80A77FFFFC11C014B4C9E193304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD6565 ",
+            "shipname": "LOUARN ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.381313,
+        "lon": -4.4851,
+        "ts": 1452782429,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 298.4,
+            "heading": 511,
+            "geom": "0101000020E61000008D28ED0DBEF011C0134548DDCE304840"
+        },
+        "ship_metadata": {
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
+            "ship_type": {
+                "id_detailedtype": 52,
+                "detailed_type": "Logistics Naval Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228174600,
+        "lat": 47.974213,
+        "lon": -4.6927915,
+        "ts": 1452782429,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 9.3,
+            "course": 131.8,
+            "heading": 133,
+            "geom": "0101000020E610000082C98D226BC512C0452BF702B3FC4740"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FUJT ",
+            "shipname": "FV/LA PEROUSE ",
             "ship_type": {
                 "id_detailedtype": 30,
                 "detailed_type": "Cutter Suction Dredger",
                 "id_shiptype": 7,
                 "type_name": "Dredger",
                 "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21763,
-        "lon": -4.476422,
-        "ts": 1444178064,
+        "mmsi": 228762000,
+        "lat": 48.36962,
+        "lon": -4.5149817,
+        "ts": 1452782433,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E61000006827DE5C570F12C048F949B54F2F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227705102,
+        "lat": 48.379795,
+        "lon": -4.4974933,
+        "ts": 1452782434,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 87.7,
+            "heading": 511,
+            "geom": "0101000020E61000009EEA35E26EFD11C09817601F9D304840"
+        },
+        "ship_metadata": {
+            "imo": 262144,
+            "callsign": "FGD5860 ",
+            "shipname": "BINDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.3672,
+        "lon": -4.48683,
+        "ts": 1452782434,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
+            "speed": 5.6,
+            "course": 339.9,
             "heading": 511,
-            "geom": "0101000020E61000003161342BDBE711C07250C24CDB1B4840"
+            "geom": "0101000020E6100000C3D8429083F211C0AC8BDB68002F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382168,
+        "lon": -4.4970584,
+        "ts": 1452782436,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 46.3,
+            "heading": 511,
+            "geom": "0101000020E6100000F0CE90E0FCFC11C0F3C98AE1EA304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
                 "id_shiptype": 9,
                 "type_name": "Military Ops",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21874,
-        "lon": -4.4751415,
-        "ts": 1444182534,
+        "mmsi": 228041600,
+        "lat": 48.38238,
+        "lon": -4.4733,
+        "ts": 1452782437,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
+            "turn": 0.0,
             "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E6100000B9E34D7E8BE611C0DC291DACFF1B4840"
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E610000086C954C1A8E411C07E52EDD3F1304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218567,
-        "lon": -4.4756517,
-        "ts": 1444284932,
+        "mmsi": 227002630,
+        "lat": 48.03902,
+        "lon": -4.8486733,
+        "ts": 1452782437,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
+            "turn": 0.0,
             "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E6100000B0253F3D11E711C00F7EE200FA1B4840"
+            "course": 311.3,
+            "heading": 201,
+            "geom": "0101000020E61000001EF4119D0A6513C0E9F17B9BFE044840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21674,
-        "lon": -4.4767184,
-        "ts": 1444177873,
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782438,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 83.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.485123,
+        "ts": 1452782438,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 2.1,
-            "course": 28.7,
+            "speed": 0.0,
+            "course": 299.8,
             "heading": 511,
-            "geom": "0101000020E6100000159B45DE28E811C016DEE522BE1B4840"
+            "geom": "0101000020E61000004E266E15C4F011C07FFB3A70CE304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -225,908 +783,376 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21763,
-        "lon": -4.476422,
-        "ts": 1444178053,
+        "mmsi": 227635210,
+        "lat": 48.382454,
+        "lon": -4.4966884,
+        "ts": 1452782438,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 0.5,
+            "heading": 511,
+            "geom": "0101000020E6100000D43549E29BFC11C0B91CAF40F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228174600,
+        "lat": 47.973946,
+        "lon": -4.6923566,
+        "ts": 1452782439,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000003161342BDBE711C07250C24CDB1B4840"
+            "turn": 127.0,
+            "speed": 9.5,
+            "course": 133.4,
+            "heading": 136,
+            "geom": "0101000020E6100000D4ADE820F9C412C0F6083543AAFC4740"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FUJT ",
+            "shipname": "FV/LA PEROUSE ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 30,
+                "detailed_type": "Cutter Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444235203,
+        "mmsi": 228793000,
+        "lat": 48.368866,
+        "lon": -4.5167685,
+        "ts": 1452782442,
         "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
         },
         "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
             "turn": -127.0,
             "speed": 0.0,
-            "course": 0.0,
+            "course": 247.0,
             "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
+            "geom": "0101000020E61000007369FCC22B1112C09C4D4700372F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
+            "imo": 0,
+            "callsign": "LPC ",
+            "shipname": "FRENCH WARSHIP ",
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444257347,
+        "mmsi": 228762000,
+        "lat": 48.369625,
+        "lon": -4.514985,
+        "ts": 1452782442,
         "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
         },
         "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
+            "turn": 0.0,
             "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E6100000E5B8533A580F12C05A643BDF4F2F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444270670,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218525,
-        "lon": -4.4756517,
-        "ts": 1444284353,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E6100000B0253F3D11E711C0E02D90A0F81B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.213646,
-        "lon": -4.4777083,
-        "ts": 1444177532,
+        "mmsi": 999999999,
+        "lat": 48.367474,
+        "lon": -4.486942,
+        "ts": 1452782445,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 1.4,
-            "course": 17.2,
+            "speed": 5.6,
+            "course": 340.1,
             "heading": 511,
-            "geom": "0101000020E61000006C1C565D2CE911C0EA758BC0581B4840"
+            "geom": "0101000020E6100000013274ECA0F211C0AE105663092F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
                 "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21554,
-        "lon": -4.4771085,
-        "ts": 1444177742,
+        "mmsi": 234056000,
+        "lat": 48.209328,
+        "lon": -4.469907,
+        "ts": 1452782445,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.1,
-            "course": 12.8,
-            "heading": 511,
-            "geom": "0101000020E6100000109370218FE811C06B7D91D0961B4840"
+            "turn": -126.0,
+            "speed": 0.8,
+            "course": 37.2,
+            "heading": 342,
+            "geom": "0101000020E610000059A5F44C2FE111C08C118942CB1A4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382183,
+        "lon": -4.4970684,
+        "ts": 1452782446,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 253.0,
+            "heading": 511,
+            "geom": "0101000020E61000000C80A77FFFFC11C0280B5F5FEB304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
                 "id_shiptype": 9,
                 "type_name": "Military Ops",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.217194,
-        "lon": -4.4765882,
-        "ts": 1444177922,
+        "mmsi": 228041600,
+        "lat": 48.382385,
+        "lon": -4.4732985,
+        "ts": 1452782447,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 1.4,
-            "course": 10.9,
-            "heading": 511,
-            "geom": "0101000020E610000056A3B2BC06E811C097715303CD1B4840"
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E6100000C2FBAA5CA8E411C090BDDEFDF1304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.201324,
-        "lon": -4.4806833,
-        "ts": 1444176973,
+        "mmsi": 227002630,
+        "lat": 48.039017,
+        "lon": -4.8486714,
+        "ts": 1452782447,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 7.0,
-            "course": 6.4,
-            "heading": 511,
-            "geom": "0101000020E6100000F5EE343E38EC11C030F31DFCC4194840"
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 274.8,
+            "heading": 201,
+            "geom": "0101000020E6100000BF33901D0A6513C0787E5182FE044840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444238984,
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782447,
         "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
         },
         "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
+            "turn": 0.0,
             "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
+            "course": 182.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444250866,
+        "mmsi": 227635210,
+        "lat": 48.382454,
+        "lon": -4.496685,
+        "ts": 1452782448,
         "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
         },
         "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
             "turn": -127.0,
             "speed": 0.0,
-            "course": 0.0,
+            "course": 2.3,
             "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
+            "geom": "0101000020E6100000B1A71DFE9AFC11C0B91CAF40F4304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
                 "id_shiptype": 9,
                 "type_name": "Military Ops",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444254827,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444256987,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444263469,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444269590,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444275530,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218525,
-        "lon": -4.4756517,
-        "ts": 1444283992,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E6100000B0253F3D11E711C0E02D90A0F81B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.211773,
-        "lon": -4.4783,
-        "ts": 1444177352,
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.485113,
+        "ts": 1452782448,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 3.1,
-            "course": 17.5,
-            "heading": 511,
-            "geom": "0101000020E61000000BB5A679C7E911C08196AE601B1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.21355,
-        "lon": -4.47774,
-        "ts": 1444177522,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.0,
-            "course": 20.3,
-            "heading": 511,
-            "geom": "0101000020E6100000D3F6AFAC34E911C0C8073D9B551B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.213936,
-        "lon": -4.4776134,
-        "ts": 1444177563,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.3,
-            "course": 14.2,
-            "heading": 511,
-            "geom": "0101000020E61000008586B47C13E911C0F1B73D41621B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.215267,
-        "lon": -4.4771934,
-        "ts": 1444177712,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.2,
-            "course": 26.3,
-            "heading": 511,
-            "geom": "0101000020E6100000DB77FB62A5E811C03A747ADE8D1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.216854,
-        "lon": -4.476695,
-        "ts": 1444177884,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.0,
-            "course": 15.6,
-            "heading": 511,
-            "geom": "0101000020E6100000B9AAECBB22E811C0DE0033DFC11B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.217113,
-        "lon": -4.476607,
-        "ts": 1444177913,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.0,
-            "course": 26.5,
-            "heading": 511,
-            "geom": "0101000020E6100000BE2D58AA0BE811C0AA44D95BCA1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.189007,
-        "lon": -4.484103,
-        "ts": 1444176562,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 6.5,
-            "course": 9.8,
-            "heading": 511,
-            "geom": "0101000020E6100000FB9463B2B8EF11C087DBA16131184840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.200714,
-        "lon": -4.4808483,
-        "ts": 1444176954,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 6.2,
-            "course": 10.8,
-            "heading": 511,
-            "geom": "0101000020E61000004A592B7F63EC11C0B7EC10FFB0194840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444252306,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
             "turn": -127.0,
             "speed": 0.0,
-            "course": 0.0,
+            "course": 299.9,
             "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
+            "geom": "0101000020E610000032755776C1F011C07FFB3A70CE304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -1135,558 +1161,343 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444235924,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444246725,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444250325,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444253206,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444254107,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444255367,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444255907,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444259508,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444262388,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444264908,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444268509,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444272289,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444275170,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444276250,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218525,
-        "lon": -4.4756517,
-        "ts": 1444282371,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E6100000B0253F3D11E711C0E02D90A0F81B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.207344,
-        "lon": -4.4792233,
-        "ts": 1444177172,
+        "mmsi": 227580520,
+        "lat": 48.379505,
+        "lon": -4.49705,
+        "ts": 1452782449,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 7.3,
-            "course": 8.5,
+            "speed": 0.0,
+            "course": 356.6,
             "heading": 511,
-            "geom": "0101000020E6100000BFEC4383B9EA11C0CB82893F8A1A4840"
+            "geom": "0101000020E61000003EE8D9ACFAFC11C091D5AD9E93304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGD6565 ",
+            "shipname": "LOUARN ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228762000,
+        "lat": 48.36963,
+        "lon": -4.5149884,
+        "ts": 1452782453,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E610000008477F1E590F12C06CCF2C09502F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228793000,
+        "lat": 48.368866,
+        "lon": -4.5167685,
+        "ts": 1452782453,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 50.1,
+            "heading": 511,
+            "geom": "0101000020E61000007369FCC22B1112C09C4D4700372F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "LPC ",
+            "shipname": "FRENCH WARSHIP ",
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.367676,
+        "lon": -4.48705,
+        "ts": 1452782453,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 5.6,
+            "course": 341.6,
+            "heading": 511,
+            "geom": "0101000020E61000003411363CBDF211C016C3D501102F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 234056000,
+        "lat": 48.209354,
+        "lon": -4.46988,
+        "ts": 1452782454,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -126.0,
+            "speed": 0.8,
+            "course": 36.1,
+            "heading": 340,
+            "geom": "0101000020E61000008C2D043928E111C0B5A4A31CCC1A4840"
+        },
+        "ship_metadata": {
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382195,
+        "lon": -4.4970717,
+        "ts": 1452782455,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 320.5,
+            "heading": 511,
+            "geom": "0101000020E610000089111D5D00FD11C0EDD808C4EB304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227002630,
+        "lat": 48.039013,
+        "lon": -4.8486733,
+        "ts": 1452782455,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 353.6,
+            "heading": 201,
+            "geom": "0101000020E61000001EF4119D0A6513C0368FC360FE044840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227705102,
+        "lat": 48.37979,
+        "lon": -4.4974866,
+        "ts": 1452782456,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 332.1,
+            "heading": 511,
+            "geom": "0101000020E6100000FECA94206DFD11C086AC6EF59C304840"
+        },
+        "ship_metadata": {
+            "imo": 262144,
+            "callsign": "FGD5860 ",
+            "shipname": "BINDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782456,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 21.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.382393,
+        "lon": -4.4732985,
+        "ts": 1452782457,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E6100000C2FBAA5CA8E411C0139CFA40F2304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.4850965,
+        "ts": 1452782458,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 300.2,
+            "heading": 511,
+            "geom": "0101000020E6100000C39D0B23BDF011C07FFB3A70CE304840"
+        },
+        "ship_metadata": {
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -1695,33 +1506,369 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21164,
-        "lon": -4.4783382,
-        "ts": 1444177342,
+        "mmsi": 227635210,
+        "lat": 48.382454,
+        "lon": -4.496685,
+        "ts": 1452782459,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 1.6,
+            "heading": 511,
+            "geom": "0101000020E6100000B1A71DFE9AFC11C0B91CAF40F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227008170,
+        "lat": 48.3191,
+        "lon": -4.7600484,
+        "ts": 1452782463,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 3.4,
-            "course": 20.2,
-            "heading": 511,
-            "geom": "0101000020E6100000C4B5357DD1E911C04243FF04171B4840"
+            "turn": 0.0,
+            "speed": 12.9,
+            "course": 71.0,
+            "heading": 68,
+            "geom": "0101000020E61000002D82B5204A0A13C0A913D044D8284840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGA2273 ",
+            "shipname": "MOLENEZ ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228793000,
+        "lat": 48.368866,
+        "lon": -4.5167584,
+        "ts": 1452782463,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 74.3,
+            "heading": 511,
+            "geom": "0101000020E6100000AFBB2F1D291112C09C4D4700372F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "LPC ",
+            "shipname": "FRENCH WARSHIP ",
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228762000,
+        "lat": 48.369633,
+        "lon": -4.5149884,
+        "ts": 1452782464,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E610000008477F1E590F12C0DD425722502F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 234056000,
+        "lat": 48.20938,
+        "lon": -4.46986,
+        "ts": 1452782464,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -126.0,
+            "speed": 0.7,
+            "course": 35.9,
+            "heading": 337,
+            "geom": "0101000020E610000053CBD6FA22E111C0DF37BEF6CC1A4840"
+        },
+        "ship_metadata": {
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.368,
+        "lon": -4.487235,
+        "ts": 1452782465,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 5.6,
+            "course": 341.3,
+            "heading": 511,
+            "geom": "0101000020E6100000C2DD59BBEDF211C0C976BE9F1A2F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382088,
+        "lon": -4.4970164,
+        "ts": 1452782466,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 303.3,
+            "heading": 511,
+            "geom": "0101000020E6100000784DFEDDF1FC11C0D7187442E8304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227002630,
+        "lat": 48.039013,
+        "lon": -4.8486834,
+        "ts": 1452782466,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 247.1,
+            "heading": 201,
+            "geom": "0101000020E6100000E1A1DE420D6513C0368FC360FE044840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782467,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 145.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.382393,
+        "lon": -4.4733,
+        "ts": 1452782467,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E610000086C954C1A8E411C0139CFA40F2304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227635210,
+        "lat": 48.382454,
+        "lon": -4.4966865,
+        "ts": 1452782467,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.1,
+            "course": 0.1,
+            "heading": 511,
+            "geom": "0101000020E61000007575C7629BFC11C0B91CAF40F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.48509,
+        "ts": 1452782468,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 298.7,
+            "heading": 511,
+            "geom": "0101000020E61000007077D66EBBF011C07FFB3A70CE304840"
+        },
+        "ship_metadata": {
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -1730,33 +1877,343 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.212036,
-        "lon": -4.4782085,
-        "ts": 1444177374,
+        "mmsi": 227580520,
+        "lat": 48.3795,
+        "lon": -4.4970584,
+        "ts": 1452782468,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 2.5,
-            "course": 13.4,
+            "speed": 0.0,
+            "course": 252.0,
             "heading": 511,
-            "geom": "0101000020E610000047AD307DAFE911C08EC9E2FE231B4840"
+            "geom": "0101000020E6100000F0CE90E0FCFC11C07F6ABC7493304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGD6565 ",
+            "shipname": "LOUARN ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227008170,
+        "lat": 48.319332,
+        "lon": -4.7593317,
+        "ts": 1452782472,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 11.5,
+            "course": 71.0,
+            "heading": 65,
+            "geom": "0101000020E6100000AB43C93F8E0913C07C48F8DEDF284840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGA2273 ",
+            "shipname": "MOLENEZ ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.368195,
+        "lon": -4.487322,
+        "ts": 1452782473,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 5.6,
+            "course": 340.4,
+            "heading": 511,
+            "geom": "0101000020E6100000397CD28904F311C07EC68503212F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 228762000,
+        "lat": 48.369633,
+        "lon": -4.51499,
+        "ts": 1452782473,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E61000007311DF89590F12C0DD425722502F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 234056000,
+        "lat": 48.20942,
+        "lon": -4.46984,
+        "ts": 1452782474,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -126.0,
+            "speed": 0.6,
+            "course": 37.5,
+            "heading": 335,
+            "geom": "0101000020E61000001A69A9BC1DE111C06D904946CE1A4840"
+        },
+        "ship_metadata": {
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382072,
+        "lon": -4.4970083,
+        "ts": 1452782476,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 321.8,
+            "heading": 511,
+            "geom": "0101000020E6100000BB5C69BEEFFC11C0D15B3CBCE7304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227002630,
+        "lat": 48.039013,
+        "lon": -4.848688,
+        "ts": 1452782476,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.1,
+            "course": 285.3,
+            "heading": 201,
+            "geom": "0101000020E6100000D50792770E6513C0368FC360FE044840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782477,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 319.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.382385,
+        "lon": -4.4732985,
+        "ts": 1452782477,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E6100000C2FBAA5CA8E411C090BDDEFDF1304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227635210,
+        "lat": 48.382454,
+        "lon": -4.49669,
+        "ts": 1452782478,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 356.9,
+            "heading": 511,
+            "geom": "0101000020E61000003F00A94D9CFC11C0B91CAF40F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.485083,
+        "ts": 1452782478,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 298.4,
+            "heading": 511,
+            "geom": "0101000020E6100000DD611399B9F011C07FFB3A70CE304840"
+        },
+        "ship_metadata": {
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -1765,33 +2222,336 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.213467,
-        "lon": -4.4777684,
-        "ts": 1444177513,
+        "mmsi": 227008170,
+        "lat": 48.319485,
+        "lon": -4.758565,
+        "ts": 1452782483,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.5,
-            "course": 359.2,
-            "heading": 511,
-            "geom": "0101000020E6100000BE3F941E3CE911C03BE3FBE2521B4840"
+            "turn": 0.0,
+            "speed": 12.3,
+            "course": 66.0,
+            "heading": 65,
+            "geom": "0101000020E61000009B8F6B43C50813C002486DE2E4284840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGA2273 ",
+            "shipname": "MOLENEZ ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228793000,
+        "lat": 48.368874,
+        "lon": -4.516743,
+        "ts": 1452782483,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 42.2,
+            "heading": 511,
+            "geom": "0101000020E61000006ABFB513251112C01F2C6343372F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "LPC ",
+            "shipname": "FRENCH WARSHIP ",
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228762000,
+        "lat": 48.369633,
+        "lon": -4.51499,
+        "ts": 1452782483,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E61000007311DF89590F12C0DD425722502F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.368435,
+        "lon": -4.487457,
+        "ts": 1452782484,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 5.6,
+            "course": 338.2,
+            "heading": 511,
+            "geom": "0101000020E610000039D384ED27F311C0D3D9C9E0282F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382084,
+        "lon": -4.49701,
+        "ts": 1452782485,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 334.6,
+            "heading": 511,
+            "geom": "0101000020E6100000CD237F30F0FC11C09529E620E8304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 234056000,
+        "lat": 48.209465,
+        "lon": -4.4698167,
+        "ts": 1452782485,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -126.0,
+            "speed": 0.5,
+            "course": 41.8,
+            "heading": 333,
+            "geom": "0101000020E6100000657506A117E111C00D54C6BFCF1A4840"
+        },
+        "ship_metadata": {
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 227002630,
+        "lat": 48.039013,
+        "lon": -4.8486934,
+        "ts": 1452782486,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 286.0,
+            "heading": 201,
+            "geom": "0101000020E6100000FE52F5E10F6513C0368FC360FE044840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782486,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 301.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
+        },
+        "ship_metadata": {
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
+            }
+        }
+    },
+    {
+        "mmsi": 227635210,
+        "lat": 48.382458,
+        "lon": -4.4966917,
+        "ts": 1452782488,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 358.5,
+            "heading": 511,
+            "geom": "0101000020E610000051C7BEBF9CFC11C0FA0B3D62F4304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227580520,
+        "lat": 48.379505,
+        "lon": -4.497075,
+        "ts": 1452782489,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 251.1,
+            "heading": 511,
+            "geom": "0101000020E610000005A3923A01FD11C091D5AD9E93304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD6565 ",
+            "shipname": "LOUARN ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
+                "id_shiptype": 9,
+                "type_name": "Military Ops",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.4850817,
+        "ts": 1452782489,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 297.7,
+            "heading": 511,
+            "geom": "0101000020E6100000668DD541B9F011C07FFB3A70CE304840"
+        },
+        "ship_metadata": {
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -1800,383 +2560,310 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.213757,
-        "lon": -4.477675,
-        "ts": 1444177544,
+        "mmsi": 227008170,
+        "lat": 48.319683,
+        "lon": -4.757865,
+        "ts": 1452782492,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 1.8,
-            "course": 19.2,
-            "heading": 511,
-            "geom": "0101000020E61000009A779CA223E911C04225AE635C1B4840"
+            "turn": 127.0,
+            "speed": 12.5,
+            "course": 68.0,
+            "heading": 68,
+            "geom": "0101000020E6100000D52137C30D0813C0280B5F5FEB284840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGA2273 ",
+            "shipname": "MOLENEZ ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228762000,
+        "lat": 48.369633,
+        "lon": -4.5149918,
+        "ts": 1452782493,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E61000002BD5AA025A0F12C0DD425722502F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227705102,
+        "lat": 48.37978,
+        "lon": -4.4974732,
+        "ts": 1452782494,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 302.1,
+            "heading": 511,
+            "geom": "0101000020E6100000BE8B529D69FD11C062D68BA19C304840"
+        },
+        "ship_metadata": {
+            "imo": 262144,
+            "callsign": "FGD5860 ",
+            "shipname": "BINDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
                 "id_shiptype": 9,
                 "type_name": "Military Ops",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.21384,
-        "lon": -4.4776435,
-        "ts": 1444177553,
+        "mmsi": 999999999,
+        "lat": 48.368675,
+        "lon": -4.4875865,
+        "ts": 1452782494,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 2.3,
-            "course": 2.2,
+            "speed": 5.6,
+            "course": 338.3,
             "heading": 511,
-            "geom": "0101000020E61000008196AE601BE911C0CF49EF1B5F1B4840"
+            "geom": "0101000020E610000069E21DE049F311C029ED0DBE302F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            }
+        }
+    },
+    {
+        "mmsi": 234056000,
+        "lat": 48.209473,
+        "lon": -4.469792,
+        "ts": 1452782495,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.5,
+            "course": 46.5,
+            "heading": 332,
+            "geom": "0101000020E610000092B06F2711E111C09032E202D01A4840"
+        },
+        "ship_metadata": {
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
+            "ship_type": {
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.382385,
+        "lon": -4.4733033,
+        "ts": 1452782497,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E6100000035BCA9EA9E411C090BDDEFDF1304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.2151,
-        "lon": -4.47725,
-        "ts": 1444177693,
+        "mmsi": 227635210,
+        "lat": 48.38246,
+        "lon": -4.496693,
+        "ts": 1452782497,
         "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 2.2,
-            "course": 4.1,
-            "heading": 511,
-            "geom": "0101000020E610000062105839B4E811C04FAF9465881B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.21518,
-        "lon": -4.4772115,
-        "ts": 1444177702,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.1,
-            "course": 8.0,
-            "heading": 511,
-            "geom": "0101000020E6100000B519A721AAE811C06B60AB048B1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.18348,
-        "lon": -4.4863815,
-        "ts": 1444176374,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 6.7,
-            "course": 7.8,
-            "heading": 511,
-            "geom": "0101000020E61000008884EFFD0DF211C02CBCCB457C174840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.206146,
-        "lon": -4.4793916,
-        "ts": 1444177134,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 6.3,
-            "course": 7.2,
-            "heading": 511,
-            "geom": "0101000020E610000090E8AFA1E5EA11C0C119FCFD621A4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.172207,
-        "lon": -4.4909515,
-        "ts": 1444175983,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 7.1,
-            "course": 25.8,
-            "heading": 511,
-            "geom": "0101000020E610000047B071FDBBF611C0369204E10A164840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.21703,
-        "lon": -4.4766335,
-        "ts": 1444177903,
-        "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
-        },
-        "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 2.4,
+            "speed": 0.0,
             "course": 359.0,
             "heading": 511,
-            "geom": "0101000020E61000004AB6BA9C12E811C01D2098A3C71B4840"
+            "geom": "0101000020E6100000C79BFC169DFC11C09B030473F4304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FGE4002 ",
+            "shipname": "TERENEZ ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
                 "id_shiptype": 9,
                 "type_name": "Military Ops",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.184593,
-        "lon": -4.485882,
-        "ts": 1444176412,
+        "mmsi": 227002630,
+        "lat": 48.039013,
+        "lon": -4.84869,
+        "ts": 1452782497,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 6.3,
-            "course": 18.6,
-            "heading": 511,
-            "geom": "0101000020E61000003CDC0E0D8BF111C0070951BEA0174840"
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 219.9,
+            "heading": 201,
+            "geom": "0101000020E6100000DBC4C9FD0E6513C0368FC360FE044840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
+            "imo": 0,
+            "callsign": "FV6852 ",
+            "shipname": "ENEZ SUN 3 ",
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.1887,
-        "lon": -4.48419,
-        "ts": 1444176553,
+        "mmsi": 246388000,
+        "lat": 48.384167,
+        "lon": -4.455165,
+        "ts": 1452782497,
         "nav_status": {
-            "id_status": 0,
-            "definition": " under way using engine"
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 6.4,
-            "course": 9.2,
-            "heading": 511,
-            "geom": "0101000020E61000007233DC80CFEF11C0AA60545227184840"
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 278.0,
+            "heading": 214,
+            "geom": "0101000020E6100000A72215C616D211C0E9995E622C314840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 9155925,
+            "callsign": "PDHI ",
+            "shipname": "KONINGSBORG ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 246,
+                "country": "Netherlands (Kingdom of the)"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.195896,
-        "lon": -4.482145,
-        "ts": 1444176793,
+        "mmsi": 228051000,
+        "lat": 48.3813,
+        "lon": -4.485077,
+        "ts": 1452782498,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 7.1,
-            "course": 7.1,
+            "speed": 0.0,
+            "course": 297.2,
             "heading": 511,
-            "geom": "0101000020E61000003DB83B6BB7ED11C067B5C01E13194840"
+            "geom": "0101000020E6100000CC2A6C06B8F011C07FFB3A70CE304840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 8617342,
+            "callsign": "FHFO ",
+            "shipname": "SAINT DENIS ",
             "ship_type": {
                 "id_detailedtype": 52,
                 "detailed_type": "Logistics Naval Vessel",
@@ -2185,1268 +2872,254 @@
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.20042,
-        "lon": -4.480923,
-        "ts": 1444176943,
+        "mmsi": 228236700,
+        "lat": 48.098213,
+        "lon": -4.3256817,
+        "ts": 1452782499,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 7.2,
-            "course": 14.5,
-            "heading": 511,
-            "geom": "0101000020E6100000AB93331477EC11C06FBBD05CA7194840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444257527,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
             "turn": -127.0,
             "speed": 0.0,
-            "course": 0.0,
+            "course": 304.2,
             "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
+            "geom": "0101000020E61000006B9FE9807F4D11C062855B3E920C4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": "FMIE ",
+            "shipname": "LES CALANQUES ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 30,
+                "detailed_type": "Cutter Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444232862,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444235743,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444235923,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444239704,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444243665,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444247986,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444249245,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444252487,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444252666,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444253386,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444253566,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444254828,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444255007,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444255547,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444255727,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444258788,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444259328,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444259868,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444261668,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444263648,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444264368,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444266169,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444266349,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444270849,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444271750,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444272831,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444274990,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444275531,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444276071,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444277331,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218647,
-        "lon": -4.4752665,
-        "ts": 1444277872,
-        "nav_status": {
-            "id_status": 1,
-            "definition": " at anchor"
-        },
-        "nav_metadata": {
-            "id_status": 1,
-            "definition": " at anchor",
-            "turn": -127.0,
-            "speed": 0.0,
-            "course": 0.0,
-            "heading": 511,
-            "geom": "0101000020E61000009C89E942ACE611C02B2FF99FFC1B4840"
-        },
-        "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
-            }
-        }
-    },
-    {
-        "mmsi": 37100300,
-        "lat": 48.218567,
-        "lon": -4.4756517,
-        "ts": 1444284942,
+        "mmsi": 227008170,
+        "lat": 48.319916,
+        "lon": -4.756932,
+        "ts": 1452782502,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
+            "turn": -126.0,
+            "speed": 13.0,
+            "course": 70.0,
+            "heading": 64,
+            "geom": "0101000020E6100000F92EA52E190713C0CBBBEA01F3284840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGA2273 ",
+            "shipname": "MOLENEZ ",
+            "mmsi_country": {
+                "country_code": 227,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 228793000,
+        "lat": 48.368874,
+        "lon": -4.516743,
+        "ts": 1452782502,
+        "nav_status": {
+            "id_status": 3,
+            "definition": " restricted manoeuvrability"
+        },
+        "nav_metadata": {
             "turn": -127.0,
             "speed": 0.0,
-            "course": 0.0,
+            "course": 244.9,
             "heading": 511,
-            "geom": "0101000020E6100000B0253F3D11E711C00F7EE200FA1B4840"
+            "geom": "0101000020E61000006ABFB513251112C01F2C6343372F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
-            "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
-                "ais_type_summary": "Special Craft"
-            },
+            "imo": 0,
+            "callsign": "LPC ",
+            "shipname": "FRENCH WARSHIP ",
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 228,
+                "country": "France"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.206467,
-        "lon": -4.4793367,
-        "ts": 1444177143,
+        "mmsi": 228762000,
+        "lat": 48.369633,
+        "lon": -4.5149918,
+        "ts": 1452782502,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 154.6,
+            "heading": 319,
+            "geom": "0101000020E61000002BD5AA025A0F12C0DD425722502F4840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FATT ",
+            "shipname": "FRENCH WARSHIP ",
+            "ship_type": {
+                "id_detailedtype": 35,
+                "detailed_type": "Trailing Suction Dredger",
+                "id_shiptype": 7,
+                "type_name": "Dredger",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 999999999,
+        "lat": 48.368958,
+        "lon": -4.48773,
+        "ts": 1452782505,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
             "turn": -127.0,
-            "speed": 6.1,
-            "course": 5.7,
+            "speed": 5.6,
+            "course": 340.2,
             "heading": 511,
-            "geom": "0101000020E61000001B17693DD7EA11C0045ABA826D1A4840"
+            "geom": "0101000020E6100000C11C3D7E6FF311C07DCC07043A2F4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 0,
+            "callsign": " ",
+            "shipname": "FRENCHWARSHIP ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
-                "id_shiptype": 9,
-                "type_name": "Military Ops",
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
                 "ais_type_summary": "Special Craft"
-            },
-            "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
             }
         }
     },
     {
-        "mmsi": 37100300,
-        "lat": 48.211346,
-        "lon": -4.4784164,
-        "ts": 1444177323,
+        "mmsi": 234056000,
+        "lat": 48.20948,
+        "lon": -4.4697733,
+        "ts": 1452782505,
         "nav_status": {
             "id_status": 0,
             "definition": " under way using engine"
         },
         "nav_metadata": {
-            "id_status": 0,
-            "definition": " under way using engine",
-            "turn": -127.0,
-            "speed": 3.0,
-            "course": 10.1,
-            "heading": 511,
-            "geom": "0101000020E6100000F07A1FFDE5E911C0F911BF620D1B4840"
+            "turn": 0.0,
+            "speed": 0.5,
+            "course": 51.9,
+            "heading": 332,
+            "geom": "0101000020E6100000D02280400CE111C042959A3DD01A4840"
         },
         "ship_metadata": {
-            "imo": 7312402,
-            "callsign": "HP7085 ",
-            "shipname": "KADOKA ",
+            "imo": 7703106,
+            "callsign": "GKCT ",
+            "shipname": "VN PARTISAN ",
             "ship_type": {
-                "id_detailedtype": 52,
-                "detailed_type": "Logistics Naval Vessel",
+                "id_detailedtype": 70,
+                "detailed_type": "Hovercraft",
+                "id_shiptype": 14,
+                "type_name": "High-Speed Craft",
+                "ais_type_summary": "High-Speed Craft"
+            },
+            "mmsi_country": {
+                "country_code": 234,
+                "country": "United Kingdom of Great Britain and Northern Ireland"
+            }
+        }
+    },
+    {
+        "mmsi": 228041600,
+        "lat": 48.382393,
+        "lon": -4.4733086,
+        "ts": 1452782506,
+        "nav_status": {
+            "id_status": 0,
+            "definition": " under way using engine"
+        },
+        "nav_metadata": {
+            "turn": 0.0,
+            "speed": 0.0,
+            "course": 231.6,
+            "heading": 8,
+            "geom": "0101000020E610000085A97702ABE411C0139CFA40F2304840"
+        },
+        "ship_metadata": {
+            "imo": 9694505,
+            "callsign": "FIIZ ",
+            "shipname": "PIERRE DE FERMAT ",
+            "ship_type": {
+                "id_detailedtype": 90,
+                "detailed_type": "Waste Disposal Vessel",
+                "id_shiptype": 24,
+                "type_name": "Special Craft",
+                "ais_type_summary": "Special Craft"
+            },
+            "mmsi_country": {
+                "country_code": 228,
+                "country": "France"
+            }
+        }
+    },
+    {
+        "mmsi": 227574020,
+        "lat": 48.382133,
+        "lon": -4.4970317,
+        "ts": 1452782506,
+        "nav_status": {
+            "id_status": 15,
+            "definition": " not defined = default (also used by AIS-SART under test)"
+        },
+        "nav_metadata": {
+            "turn": -127.0,
+            "speed": 0.0,
+            "course": 274.7,
+            "heading": 511,
+            "geom": "0101000020E6100000174DC2E0F5FC11C077DCF0BBE9304840"
+        },
+        "ship_metadata": {
+            "imo": 0,
+            "callsign": "FGD5859 ",
+            "shipname": "TIBIDY ",
+            "ship_type": {
+                "id_detailedtype": 60,
+                "detailed_type": "Naval Patrol Vessel",
                 "id_shiptype": 9,
                 "type_name": "Military Ops",
                 "ais_type_summary": "Special Craft"
             },
             "mmsi_country": {
-                "country_code": 371,
-                "country": "Panama (Republic of)"
+                "country_code": 227,
+                "country": "France"
             }
         }
     }
