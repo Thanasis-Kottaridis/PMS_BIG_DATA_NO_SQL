@@ -196,24 +196,23 @@ def fetchMMSICountryData():
     return mmsi_countries_dict
 
 
-"""
-    #SECTION 4
-    This helper func creates the AIS_navigation json by combining ais_collection with ship metadata and mmsi country codes
-    the idea is iterate in ais_collection find the mmsi and check if it exists in ship_metadata then append ship_metadata
-    then append ship_metadata into ais_collection document. Before appending ship_metadata into document we have to enrich 
-    metadata with country dict.
-"""
-
-
 def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
+    """
+        #SECTION 4
+        This helper func creates the AIS_navigation json by combining ais_collection with ship metadata and mmsi country codes
+        the idea is iterate in ais_collection find the mmsi and check if it exists in ship_metadata then append ship_metadata
+        then append ship_metadata into ais_collection document. Before appending ship_metadata into document we have to enrich
+        metadata with country dict.
+    """
     for ais_document in ais_collection:
         mmsi = ais_document["mmsi"]
         mmsi_country_code = str(mmsi)[:3]
 
         # Creates a 4D morton and store it at _id field as string because mongo can store only 64 bit ints
         # and 4D morton is 124
-        lon, lat = mortonCodeManager.lonLatToInt(ais_document["lon"], ais_document["lat"])
-        ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
+        #TODO ADD THIS  FOR ADDING MORTON AT _id
+        # lon, lat = mortonCodeManager.lonLatToInt(ais_document["lon"], ais_document["lat"])
+        # ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
 
         ship_metadata_dict = {}
 
