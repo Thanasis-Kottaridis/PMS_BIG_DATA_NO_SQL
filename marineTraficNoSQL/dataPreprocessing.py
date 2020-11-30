@@ -10,8 +10,7 @@
 import psycopg2
 import json
 import mongoDBManager
-
-
+import mortonCodeManager
 
 jsonFilePath = r'json_data/ais_navigation.json'
 
@@ -94,7 +93,6 @@ def preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_statu
         navigational_metadata = dict(zip(column_names[4 :-1], row[4 :-1]))
 
         # sets up navigational status if ais status code is not null or empty
-        #
         try:
             main_data["nav_status"] = nav_status_dict[row[-1]]
         except :
@@ -211,6 +209,11 @@ def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
     for ais_document in ais_collection:
         mmsi = ais_document["mmsi"]
         mmsi_country_code = str(mmsi)[:3]
+
+        # Creates a 4D morton and store it at _id field as string because mongo can store only 64 bit ints
+        # and 4D morton is 124
+        lon, lat = mortonCodeManager.lonLatToInt(ais_document["lon"], ais_document["lat"])
+        ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
 
         ship_metadata_dict = {}
 
