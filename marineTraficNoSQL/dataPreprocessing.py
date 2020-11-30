@@ -9,6 +9,9 @@
 
 import psycopg2
 import json
+import mongoDBManager
+
+
 
 jsonFilePath = r'json_data/ais_navigation.json'
 
@@ -43,11 +46,12 @@ def executeQuery(query):
             print("PostgreSQL connection is closed")
 
 
-""" 
-    #SECTION 1
-    This helper func is used to fetch and format all the ship_dynamic data from postgreSQl
-"""
 def fetchAISCollection():
+    """
+        #SECTION 1
+        This helper func is used to fetch and format all the ship_dynamic data from postgreSQl
+    """
+
     # first fetch all dynamicData
     # but we order the columns in order to get all the main attributes at first 4 columns
     # and the navigational_metadata form rest columns
@@ -55,7 +59,6 @@ def fetchAISCollection():
         """
         SELECT mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
         FROM ais_data.dynamic_ships D 
-        LIMIT 100
         """
         # LIMIT 100
     )
@@ -106,13 +109,12 @@ def preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_statu
     return ais_collection
 
 
-""" 
-    SECTION 2
-    This helper func is used to fetch and format all the ship metadata from static_ship table on postgreSQL
-"""
-
-
 def fetchShipMetadata():
+    """
+        SECTION 2
+        This helper func is used to fetch and format all the ship metadata from static_ship table on postgreSQL
+    """
+
     # fetch ship metadata extracted from static_ships using postgres
     ship_meta_column_names, ship_metadata = executeQuery(
         """
@@ -174,12 +176,12 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
     return ship_meta_dict
 
 
-"""
-    SECTION 3
-    fetch all mmsi country data and convert them into dict
-"""
-
 def fetchMMSICountryData():
+    """
+        SECTION 3
+        fetch all mmsi country data and convert them into dict
+    """
+
     # fetch mmsi_country
     mmsi_country_column_names, mmsi_countries = executeQuery(
         """
@@ -194,7 +196,6 @@ def fetchMMSICountryData():
         mmsi_countries_dict[str(row[0])] = dict(zip(mmsi_country_column_names, row))
 
     return mmsi_countries_dict
-    print(json.dumps(mmsi_countries_dict, sort_keys=False, indent=4))
 
 
 """
@@ -228,7 +229,7 @@ def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
         # adds ship metadata into ais_document
         ais_document["ship_metadata"] = ship_metadata_dict
 
-    print(json.dumps(ais_collection, sort_keys=False, indent=4))
+    # print(json.dumps(ais_collection, sort_keys=False, indent=4))
     # return json.dumps(ais_collection, sort_keys=False, indent=4)
     return ais_collection
 
@@ -245,8 +246,13 @@ def preprocessAisDynamic():
     mmsi_countries_dict = fetchMMSICountryData()
     print(json.dumps(mmsi_countries_dict, sort_keys=False, indent=4))
 
-    # update ais_collection by adding on it all extracted metadata
-    ais_collection = createAISCollection(ais_collection, ship_metadata_dict, mmsi_countries_dict)
+    # perform batch insertion to mongo db
+    for i in range(0 , len(ais_collection), 1000000) :
+        # update ais_collection by adding on it all extracted metadata
+        ais_batch = createAISCollection(ais_collection[i : i+1000000], ship_metadata_dict, mmsi_countries_dict)
+        mongoDBManager.insertData(ais_batch)
+        print("----------------------BATCH ", i/1000000, " INSERTED ----------------------")
+
     # TODO:- CHECK IF THIS BLOCK OF CODE NEEDED!
     # CODE TO EXTRACT DATA TO JSON FILE
     # ais_collection_json = json.dumps(ais_collection, sort_keys=False, indent=4)
@@ -257,4 +263,4 @@ def preprocessAisDynamic():
     #     jsonf.write(ais_collection_json)
 
     # return dict/json
-    return ais_collection
+    # return ais_collection

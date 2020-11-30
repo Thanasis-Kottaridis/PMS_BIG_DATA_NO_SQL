@@ -22,18 +22,18 @@ def insertData(insertDoc, isMany= True):
     connection = connectMongoDB()
 
     # connecting or switching to the database
-    db = connection.marin_trafic
+    db = connection.marine_trafic
 
     # creating or switching to ais_navigation collection
     collection = db.ais_navigation
 
     # insert data based on whether it is many or not
     if isMany:
-        collection.insert_many(insertDoc)
+        collection.insert(insertDoc)
     else:
         collection.insert_one(insertDoc)
 
-    printData(collection)
+    # printData(collection)
 
 
 def printData(collection):
