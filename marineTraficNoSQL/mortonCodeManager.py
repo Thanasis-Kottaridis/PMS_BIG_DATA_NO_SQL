@@ -186,6 +186,7 @@ def intToLat(val):
 
 
 if __name__ == '__main__':
+    """TEST:- init method"""
     # x = long y = lat
     lon, lat = lonLatToInt(-4.4774585, 48.21438)
     morton = EncodeMorton4D(lon, lat, 37100300, 1444177613)

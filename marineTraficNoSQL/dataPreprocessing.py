@@ -56,8 +56,8 @@ def fetchAISCollection():
     # and the navigational_metadata form rest columns
     column_names, dynamic_data = executeQuery(
         """
-        SELECT mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
-        FROM ais_data.dynamic_ships D 
+        SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
+        FROM ais_data.dynamic_ships D   
         """
         # LIMIT 100
     )
@@ -211,8 +211,8 @@ def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
         # Creates a 4D morton and store it at _id field as string because mongo can store only 64 bit ints
         # and 4D morton is 124
         #TODO ADD THIS  FOR ADDING MORTON AT _id
-        # lon, lat = mortonCodeManager.lonLatToInt(ais_document["lon"], ais_document["lat"])
-        # ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
+        lon, lat = mortonCodeManager.lonLatToInt(ais_document["lon"], ais_document["lat"])
+        ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
 
         ship_metadata_dict = {}
 

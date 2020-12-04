@@ -1,10 +1,29 @@
 /* fetch navigational dynamic data with detaild navigational status*/
-SELECT mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
+SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
 FROM ais_data.dynamic_ships D 
+ORDER BY mmsi, lat, lon, ts
 -- INNER JOIN ais_status_codes_types.navigational_status S
 -- ON D.status = S.id_status
 -- ORDER BY mmsi 
 LIMIT 100
+
+/*get all dublcated mmsi, lat, lon, ts */
+with dublicate_data as(
+	select mmsi, lat, lon, ts, count(*) as total
+	FROM ais_data.dynamic_ships D
+	GROUP BY mmsi, lat, lon, ts
+	HAVING COUNT(*)>1
+	ORDER BY mmsi, lat, lon, ts
+) /*  pernoume oses eggrafes exoun idia  mmsi, lat, lon, ts alla diaforetiko status*/
+SELECT D.mmsi, D.lat, D.lon, D.ts, D.status, count(*) as total
+FROM ais_data.dynamic_ships D, dublicate_data DD
+WHERE  D.mmsi = DD.mmsi and D.lat = DD.lat 
+and D.lon = DD.lon and D.ts = DD.ts
+GROUP BY D.mmsi, D.lat, D.lon, D.ts, D.status
+HAVING COUNT(*) = 0
+ORDER BY D.mmsi, D.lat, D.lon, D.ts
+
+
 
 SELECT * FROM ais_status_codes_types.navigational_status
 
