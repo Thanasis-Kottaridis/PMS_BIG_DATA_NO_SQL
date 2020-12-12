@@ -57,7 +57,7 @@ def fetchAISCollection():
     column_names, dynamic_data = executeQuery(
         """
         SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
-        FROM ais_data.dynamic_ships D   
+        FROM ais_data.dynamic_ships D 
         """
         # LIMIT 100
     )
@@ -249,11 +249,11 @@ def preprocessAisDynamic():
     print(json.dumps(mmsi_countries_dict, sort_keys=False, indent=4))
 
     # perform batch insertion to mongo db
-    for i in range(0 , len(ais_collection), 1000000) :
+    for i in range(0 , len(ais_collection), 100000) :
         # update ais_collection by adding on it all extracted metadata
-        ais_batch = createAISCollection(ais_collection[i : i+1000000], ship_metadata_dict, mmsi_countries_dict)
+        ais_batch = createAISCollection(ais_collection[i : i+100000], ship_metadata_dict, mmsi_countries_dict)
         mongoDBManager.insertData(ais_batch)
-        print("----------------------BATCH ", i/1000000, " INSERTED ----------------------")
+        print("----------------------BATCH ", i/100000, " INSERTED ----------------------")
 
     # TODO:- CHECK IF THIS BLOCK OF CODE NEEDED!
     # CODE TO EXTRACT DATA TO JSON FILE

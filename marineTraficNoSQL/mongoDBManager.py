@@ -11,7 +11,7 @@ from pymongo import MongoClient
 
 def connectMongoDB():
     try:
-        connect = MongoClient()
+        connect = MongoClient("mongodb://mongoadmin:mongoadmin@83.212.117.74/admin")
         print("Connected Successfully!")
         return connect
     except:
