@@ -1,0 +1,41 @@
+// vres ena limani
+db.port.find({"properties.libelle_po": "Brest"}).pretty()
+
+// vres ola ta karavia me elliniki simea
+db.ais_navigation.find({ 'ship_metadata.mmsi_country.country': 'Greece' }).pretty();
+
+// vres tis troxes olon ton karavion me elliniki simea.
+
+//step 1
+// vres ola ta ellinika karavia kai groupariseta (kane kai to sum ton points pou exoun)
+db.ais_navigation2.aggregate([{$match: {'ship_metadata.mmsi_country.country': 'Greece'}}, {$group: {_id: "$mmsi", total: {$sum: 1}}}])
+
+// step 2
+// kane push ta navigational data gia kathe plio se mia lista oste eki na exoume to tranjactory
+db.ais_navigation2.aggregate([{$match: {'ship_metadata.mmsi_country.country': 'Greece' }}, {$group: {_id: "$mmsi", total: {$sum: 1}, tranjectory: {$push: "$location"}}}])
+
+// VRES OLES TIS TROXES GIA TA PLIA ME ELLINIKI SIMEA STIN Celtic sea
+
+// dokimazontas to query me xerato polygon
+db.ais_navigation2.aggregate({$match: {"ship_metadata.mmsi_country.country": "Greece", location: {$geoWithin: { $geometry : { "type" : "Polygon", "coordinates" : [ [ [ -6.81537294430575, 52.21828603757075 ], [ -6.814207554235082, 52.218363046517425 ], [ -6.813260435920199, 52.21829867394473 ], [ -6.812489748403038, 52.21828865999373 ], [ -6.811812638942001, 52.218389749187736 ], [ -6.8111548424219, 52.21852064101489 ], [ -6.81061685088676, 52.218660115971716 ], [ -6.810236811779276, 52.218777656463715 ], [ -6.809991836453918, 52.218936801392346 ], [ -6.809731245300554, 52.21917855714483 ], [ -6.809260368371184, 52.21946835558029 ], [ -6.808624148385604, 52.219781637113016 ], [ -6.807970643430309, 52.22018313404453 ], [ -6.807559012937958, 52.22055244424001 ], [ -6.807311654409176, 52.2208424809958 ], [ -6.807131409586731, 52.22105550790559 ], [ -6.806821346727617, 52.22121894349954 ], [ -6.806283831833156, 52.221463203864005 ], [ -6.805716752625898, 52.221928835047834 ], [ -6.805561542231231, 52.222511053442474 ], [ -6.805818677289921, 52.2230799196027 ], [ -6.806283831833156, 52.223520755578534 ], [ -6.807314157222407, 52.223751544997924 ], [ -6.809160470778949, 52.22384464731266 ], [ -6.8104716535438, 52.22353434523387 ], [ -6.811538458133185, 52.22347235676398 ], [ -6.812122941020704, 52.223335504230306 ], [ -6.812357902395149, 52.22308254202579 ], [ -6.812584042319514, 52.222701311316655 ], [ -6.812993764450511, 52.222207069101046 ], [ -6.813722610110233, 52.22174847151484 ], [ -6.814514875061292, 52.22147703183967 ], [ -6.815174102402722, 52.22129714494744 ], [ -6.815787553352692, 52.221116543094126 ], [ -6.816444158271111, 52.22086334256932 ], [ -6.817037343898136, 52.220593214105634 ], [ -6.817508339538051, 52.220233321610635 ], [ -6.817815542553063, 52.219820857446734 ], [ -6.818071007570751, 52.219467043469336 ], [ -6.818266153260225, 52.21916687495147 ], [ -6.81837236858982, 52.21885943451542 ], [ -6.81826305419645, 52.21848845517815 ], [ -6.817998766829447, 52.218080043359464 ], [ -6.817570328907408, 52.21782255216914 ], [ -6.817051053163425, 52.2178461548763 ], [ -6.816366911003968, 52.21804225474642 ], [ -6.81537294430575, 52.21828603757075 ] ] ] } }}}})
+
+
+// step 1
+// vres ena poligono tou celtic sea kai kratato se mia metavliti (mono to array apo points)
+ var poly = db.world_seas.aggregate([{$match: {"properties.NAME": "Celtic Sea"}},{$project: {_id: 0, coordinates: { "$arrayElemAt": [ "$geometry.coordinates", 29 ] } }}])
+
+// step 2 
+// kane aggegate me geoWithin sto poly
+db.ais_navigation2.aggregate({$match: {"ship_metadata.mmsi_country.country": "Greece", location: {$geoWithin: {$geometry}}}})
+
+// VRES OLES TIS TROXES GIA TA PLIA ME ELLINIKI SIMEA STIN Celtic sea
+//EPAIKSE!
+//step1 
+var poly = db.world_seas.findOne({"properties.NAME": "Celtic Sea"})
+
+//step 2 
+//kane aggegate me geoWithin sto poly.geometry
+ db.ais_navigation2.aggregate({$match: {"ship_metadata.mmsi_country.country": "Greece", location: {$geoWithin: {$geometry: poly.geometry}}}})
+
+ // step 3 full query gia na parw ta tranjectory se array
+db.ais_navigation2.aggregate([{$match: {"ship_metadata.mmsi_country.country": "Greece", location: {$geoWithin: {$geometry: poly.geometry}}}}, {$group: {_id: "$mmsi", total: {$sum: 1}, tranjectory: {$push: "$location"}}}])

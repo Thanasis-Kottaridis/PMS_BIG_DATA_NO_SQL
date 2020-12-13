@@ -252,7 +252,7 @@ def preprocessAisDynamic():
     for i in range(0 , len(ais_collection), 100000) :
         # update ais_collection by adding on it all extracted metadata
         ais_batch = createAISCollection(ais_collection[i : i+100000], ship_metadata_dict, mmsi_countries_dict)
-        mongoDBManager.insertData(ais_batch)
+        mongoDBManager.insertAISData(ais_batch)
         print("----------------------BATCH ", i/100000, " INSERTED ----------------------")
 
     # TODO:- CHECK IF THIS BLOCK OF CODE NEEDED!
