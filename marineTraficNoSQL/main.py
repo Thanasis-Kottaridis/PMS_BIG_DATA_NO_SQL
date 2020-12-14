@@ -6,7 +6,7 @@ import numpy as np
 
 if __name__ == '__main__' :
     # insert ais_navigation data to mongo
-    # ais_navigation_json = dataPreprocessing.preprocessAisDynamic()
+    ais_navigation_json = dataPreprocessing.preprocessAisDynamic()
 
     # insert ports geo point data in mongo
     # 1) load json file from datasetJSON
@@ -20,14 +20,14 @@ if __name__ == '__main__' :
     # 2) upload it
     # with open("geospatial/datasetJSON/WPI.json") as f :
     #     data = json.load(f)
-    #     mongoDBManager.insertFullDetailedPortsData(data)
+    #     mongoDBManager.insertFullDetailedPortsData(data["features"])
 
     # insert world seas data in mongo
     # 1) load json file from datasetJSON
     # 2) upload it
-    with open("geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
-        data = json.load(f)
-        mongoDBManager.insertWorldSeas(data)
+    # with open("geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
+    #     data = json.load(f)
+    #     mongoDBManager.insertWorldSeas(data)
 
     # insert ports data in mongo
     # 1) load json file from datasetJSON
