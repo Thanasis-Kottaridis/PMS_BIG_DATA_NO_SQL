@@ -97,12 +97,12 @@ db.ais_navigation2.aggregate([{$match: {"ship_metadata.mmsi_country.country": "G
  var nautical_mile_in_meters = 1852
 
  // step 3 ektelesi tou query me (thelei index gia na treksei auto to query) 
-db.ais_navigation2.find({location: {$nearSphere: {$geometry: port_point.geometry, $maxDistance: 10000*nautical_mile_in_meters}}})
+db.ais_navigation2.find({location: {$nearSphere: {$geometry: port_point.geometry, $maxDistance: 30*nautical_mile_in_meters}}})
 // TO IDIO ME AGGREGATION
-db.ais_navigation2.aggregate([{$geoNear: {near: port_point.geometry, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*1000, spherical: true, key: "location"}}])
+db.ais_navigation2.aggregate([{$geoNear: {near: port_point.geometry, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*30, spherical: true, key: "location"}}])
 
 // step 4 grouparisma ana mmsi gia na apantisei sto erotima
-db.ais_navigation2.aggregate([{$geoNear: {near: port_point.geometry, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*1000, spherical: true, key: "location"}},{$group: {_id: "$mmsi"}}])
+db.ais_navigation2.aggregate([{$geoNear: {near: port_point.geometry, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*30, spherical: true, key: "location"}},{$group: {_id: "$mmsi"}}])
 
 
 // SPATIO-TEMPORAL RANGE QUERY ME K-NN (pali apetite index 2d or 2d sphere)
@@ -157,3 +157,46 @@ Timestamp in milliseconds: 1449075294000
 Date and time (GMT): Wednesday, December 2, 2015 4:54:54 PM
 Date and time (your time zone): Wednesday, December 2, 2015 6:54:54 PM GMT+02:00
 */
+
+//SUMPLE JSON
+//{ "_id" : "14758088531027417655349570538753974408", "mmsi" : 240265000, "ts" : 1447134195, "nav_status" : { "id_status" : 0, "definition" : " under way using engine" }, "nav_metadata" : { "turn" : 0, "speed" : 15, "course" : 245, "heading" : 246, "geom" : "0101000020E610000033C170AE610617C0B1FB8EE1B1974840" }, "ship_metadata" : { "imo" : 8613310, "callsign" : "SZUH ", "shipname" : "MSC MANDRAKI ", "ship_type" : { "id_detailedtype" : 79, "detailed_type" : "Pilot Ship", "id_shiptype" : 18, "type_name" : "Port Tender", "ais_type_summary" : "Special Craft" }, "mmsi_country" : { "country_code" : 240, "country" : "Greece" } }, "location" : { "type" : "Point", "coordinates" : [ -5.756232, 49.185116 ] } }
+// ELLINIKO KARAVI ME POLA PING STIN CELTIC SEA
+// { "_id" : 240699000, "total" : 225 }
+
+// #STEP 1  vres ola ta ping ellinikon plion gia ta parapano dates, kanta kai project me sum
+db.ais_navigation2.aggregate([{$match: {'ship_metadata.mmsi_country.country': 'Greece', 'ts': {$gte: 1448988894, $lte: 1449075294}}}, {$group: {_id: "$mmsi", total: {$sum: 1}}}])
+// result { "_id" : 240266000, "total" : 24 } kratame auto to plio.
+
+// Step 2 pare ola ta pling se mia lista gia to plio pou epileksame (mmsi: 240266000 )
+db.ais_navigation2.aggregate([{$match: {'mmsi': 240266000, 'ts': {$gte: 1448988894, $lte: 1449075294}}},{$group: {_id: "$mmsi", total: {$sum: 1}, tranjectory: {$push: "$location"}}}]).pretty()
+
+// step 3 sos https://stackoverflow.com/questions/35656520/find-overlapping-trajectories
+// this query implemented on python.
+
+
+
+/**
+ * Complex queries: find trajectories that passed through A, then through B (up to X hours later), then through C (up to 6 hours later)
+ * @SOS ARGEI POLI NA FEREI OLA TA PING POU EGINAN GIRO APO ENA SIMIO 
+ * isos na periorisw kai to A se timestamp gia logous taxititas
+ * 
+ *  1449035034,  [-7.072965,47.371117], 
+ *  1449034409,  [-7.0410814,47.4131],
+ *  1449031119   [ -6.868215, 47.6239]
+ */
+
+
+db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-7.072965,47.371117] }, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*30, spherical: true, key: "location"}, 'ts': {$gte: 1448988894, $lte: 1449075294}}},{$group: {_id: "$mmsi"}}])
+
+
+
+/**
+ * @INDEXING 
+ * 1) create a geoshpere index on location propery
+ * 2) create index on mmsi
+ * 3) create index on timestamp
+ * by default iparxei enas index sto id (morton code)
+ */
+
+db.ais_navigation2.createIndex({"location":"2dsphere"})
+db.ais_navigation2.createIndex({"mmsi": 1})

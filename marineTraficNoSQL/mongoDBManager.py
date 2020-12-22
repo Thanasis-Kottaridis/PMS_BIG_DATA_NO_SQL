@@ -6,22 +6,160 @@
 
     (establish connection link: https://kb.objectrocket.com/mongo-db/how-to-insert-data-in-mongodb-using-python-683)
 """
+import multiprocessing
 from pymongo import MongoClient
+import json
+import math
+import geopandas as gpd
+import matplotlib.pyplot as plt
+from descartes import PolygonPatch
+from shapely.geometry import LineString
+import time
+
+# CONSTS
+BLUE = '#6699cc'
+GRAY = '#999999'
+RED = '#B20000'
+nautical_mile_in_meters = 1852
 
 
-def connectMongoDB():
-    try:
+def connectMongoDB() :
+    try :
         # conect to mongo server
         # connect = MongoClient("mongodb://mongoadmin:mongoadmin@83.212.117.74/admin")
         # connect to local mongo db
         connect = MongoClient()
         print("Connected Successfully!")
         return connect
-    except:
+    except :
         print("Could not connect MongoDB")
 
 
-def insertAISData(insertDoc, isMany= True):
+def queryResultToDictList(results) :
+    """
+    this helper func converts pymongo query results into a list of dictionaries
+
+    :param results: the results of pymongo query
+    :return: returns a list of dictionaries
+    """
+
+    dictlist = []
+    for doc in results :
+        dictlist.append(doc)
+
+    return dictlist
+
+
+def queryResultsToDict(results) :
+    """
+        this helper func converts pymongo query results into a dictionary with _id as key
+
+    :param results:
+    :return:
+    """
+
+    dict = {}
+    for doc in results :
+        dict[doc["_id"]] = doc
+
+    return dict
+
+
+def pointsListToMultiPoint(pointList) :
+    multiPoint = {
+        "type" : "LineString",
+        "coordinates" : pointList
+    }
+    return multiPoint
+
+
+def pointListToMultiLineString(pointList) :
+    multiLine = []
+    for i in range(1, len(pointList)) :
+        line = [pointList[i - 1], pointList[i]]
+        if line not in multiLine :
+            multiLine.append(line)
+
+    multiLineString = {
+        "type" : "MultiLineString",
+        "coordinates" : multiLine
+    }
+    print("------------------", len(multiLine), "------------------")
+    return multiLineString
+
+
+def convertLineStringToPolygon(line, d=0.1) :
+    """
+        idea edo einai na kanw ena iterate sta poins ana 2
+        na ftiksw 2 listes stin mia tha vazw ta points tis mias mergias stin alli tis allis
+        sto proto kai to telefteo point to line tha ipologisw ta false negative
+    :param line:
+    :param d:
+    :return:
+    """
+
+    list1 = []
+    list2 = []
+
+    for i in range(0, len(line)) :
+        list1.append([line[i][0] + d, line[i][1] - d])
+        list2.append([line[i][0] - d, line[i][1] + d])
+
+    list2.reverse()
+    list1.extend(list2)
+    list1.append(list1[0])
+
+    geoPolygon = {
+        "type" : "Polygon",
+        "coordinates" : [list1]
+    }
+
+    print(json.dumps(geoPolygon, sort_keys=False, indent=4))
+    return geoPolygon
+
+
+def convertLineIntoPolygon(line, d=0.4) :
+    teta = math.atan2(line[1][0] - line[0][0], line[1][1] - line[0][1])
+
+    s = math.sin(teta)
+
+    c = math.cos(teta)
+
+    poly = [
+        [line[0][0] - d * s, line[0][1] - d * c],
+        [line[0][0] - d * c, line[0][1] + d * s],
+        [line[1][0] - d * c, line[1][1] + d * s],
+        [line[1][0] + d * s, line[1][1] + d * c],
+        [line[1][0] + d * c, line[1][1] - d * s],
+        [line[0][0] + d * c, line[0][1] - d * s],
+        [line[0][0] - d * s, line[0][1] - d * c]
+    ]
+
+    return poly
+
+
+def convertMultiLineToPoly(multiLine, d=0.2) :
+    # for each line create a polygon and add it to polyList
+    polyList = []
+
+    for line in multiLine :
+        polyList.append(convertLineIntoPolygon(line))
+
+    geoPolygon = {
+        "type" : "Polygon",
+        "coordinates" : polyList
+    }
+
+    return geoPolygon
+
+
+def plotLineString(ax, json, doShow=False, color=GRAY, alpha=1) :
+    line = LineString(json["coordinates"])
+    x, y = line.xy
+    ax.plot(x, y, color=color, linewidth=3, solid_capstyle='round', zorder=1, alpha=alpha)
+
+
+def insertAISData(insertDoc, isMany=True) :
     connection = connectMongoDB()
 
     # connecting or switching to the database
@@ -31,14 +169,15 @@ def insertAISData(insertDoc, isMany= True):
     collection = db.ais_navigation
 
     # insert data based on whether it is many or not
-    if isMany:
+    if isMany :
         collection.insert(insertDoc)
-    else:
+    else :
         collection.insert_one(insertDoc)
 
     # printData(collection)
 
-def insertPortData(insertDoc, isMany= True):
+
+def insertPortData(insertDoc, isMany=True) :
     connection = connectMongoDB()
 
     # connecting or switching to the database
@@ -54,7 +193,7 @@ def insertPortData(insertDoc, isMany= True):
         collection.insert_one(insertDoc)
 
 
-def insertFishingPortData(insertDoc, isMany= True):
+def insertFishingPortData(insertDoc, isMany=True) :
     connection = connectMongoDB()
 
     # connecting or switching to the database
@@ -70,7 +209,7 @@ def insertFishingPortData(insertDoc, isMany= True):
         collection.insert_one(insertDoc)
 
 
-def insertFullDetailedPortsData(insertDoc, isMany= True):
+def insertFullDetailedPortsData(insertDoc, isMany=True) :
     connection = connectMongoDB()
 
     # connecting or switching to the database
@@ -85,7 +224,8 @@ def insertFullDetailedPortsData(insertDoc, isMany= True):
     else :
         collection.insert_one(insertDoc)
 
-def insertWorldSeas(data, isMany= True):
+
+def insertWorldSeas(data, isMany=True) :
     connection = connectMongoDB()
 
     # connecting or switching to the database
@@ -108,8 +248,272 @@ def insertWorldSeas(data, isMany= True):
     else :
         collection.insert_one(insertDoc)
 
-def printData(collection):
+
+def getAllAisIds() :
+    connection = connectMongoDB()
+
+    # connecting or switching to the database
+    db = connection.marine_trafic
+
+    # creating or switching to ais_navigation collection
+    collection = db.world_seas
+    document_ids = collection.find().distinct('_id')  # list of all ids
+    return document_ids
+
+
+def printData(collection) :
     # Printing the data inserted
     cursor = collection.find()
-    for record in cursor:
+    for record in cursor :
         print(record)
+
+
+def findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294, collection=None) -> object :
+    """
+
+    :param mmsi:
+    :param tsFrom:
+    :param tsTo:
+    :return:
+    """
+
+    if collection is None:
+        connection = connectMongoDB()
+
+        # connecting or switching to the database
+        db = connection.marine_trafic
+
+        # creating or switching to ais_navigation collection
+        collection = db.ais_navigation2
+
+    # create mongo aggregation pipeline
+    pipeline = [
+        {"$match" : {'mmsi' : mmsi, 'ts' : {"$gte" : tsFrom, "$lte" : tsTo}}},
+        {"$group" : {"_id" : "$mmsi", "ts" : {"$push" : "$ts"}, "total" : {"$sum" : 1},
+                     "location" : {"$push" : "$location.coordinates"}}}
+    ]
+
+    results = collection.aggregate(pipeline)
+    dictlist = queryResultToDictList(results)
+
+    # print(json.dumps(dictlist, sort_keys=False, indent=4))
+
+    # convert point list into MultiPoint
+    return pointsListToMultiPoint(dictlist[0]["location"])
+
+
+def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
+    """
+        Given a trajectory and a time interval find other similar trajectories
+
+        step1:
+        convert trajectory from multiline into polygon
+        step2:
+        plot trajectory and the polygon created based on it
+        step3:
+        plot all returned trajectories
+
+    :param trajectory: is a multiLine geo json obj
+    :param tsFrom: timestamp form in unix
+    :param tsTo: timestamp to in unix
+    :return: a list of similar trajectories
+    """
+    connection = connectMongoDB()
+    # connecting or switching to the database
+    db = connection.marine_trafic
+
+    # creating or switching to ais_navigation collection
+    collection = db.ais_navigation2
+
+    # step 1
+    poly = convertLineStringToPolygon(trajectory["coordinates"])
+
+    # create mongo aggregation pipeline
+    pipeline = [
+        {"$match" : {"location" : {"$geoWithin" : {"$geometry" : poly}}, 'ts' : {"$gte" : tsFrom, "$lte" : tsTo}}},
+        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}},
+        {"$sort" : {'total' : -1}}
+    ]
+
+    # execute query
+    results = collection.aggregate(pipeline)
+    dictlist = queryResultToDictList(results)
+
+    print(json.dumps(dictlist, sort_keys=False, indent=4))
+
+    # step 2
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    ax = world.plot(figsize=(10, 6))
+    plt.axis([-30, 15, 30, 70])
+
+    plotLineString(ax, trajectory, color=RED)
+    # plot poly
+    ax.add_patch(PolygonPatch(poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2))
+    # ax.axis('scaled')
+
+    # step 3
+    for ship in dictlist :
+        trajj = pointsListToMultiPoint(ship["location"])
+
+        if 2 < len(trajj["coordinates"]) and trajj["coordinates"] != trajectory["coordinates"] :
+            plotLineString(ax, trajj, color=GRAY, alpha=0.5)
+
+    plt.show()
+
+
+def findPingsPerPoint(point, collection=None) :
+    if collection is None :
+        connection = connectMongoDB()
+        # connecting or switching to the database
+        db = connection.marine_trafic
+
+        # creating or switching to ais_navigation collection
+        collection = db.ais_navigation2
+
+    # create mongo aggregation pipeline
+    pipeline = [
+        {'$geoNear' : {"near" : point,
+                       "distanceField" : "dist.calculated",
+                       "maxDistance" : nautical_mile_in_meters * 10,
+                       "spherical" : True,
+                       "key" : "location"}},
+        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "ts" : {"$push" : "$ts"}}},
+        # {"$sort" : {'total' : -1}}
+    ]
+    # execute query
+    results = collection.aggregate(pipeline)
+    dict = queryResultsToDict(results)
+    return dict
+
+
+def findTrajectoriesFromPoints(pointsList) :
+    """
+        this function is used to take all trajectories that pass from all points in point
+        list with time less than 6 hours from one point to another
+
+        @methodology
+        Step1: Fetch all the pings received near each point grouped by mmsi
+        and containing a list of timestamps which show how many times each ship
+        did ping on near this location and convert them into a list of dicts each
+        dict for each location
+
+        Step2: for each mmsi in first location dict we have to check if exists in other 2
+        location dicts
+
+        step3: and then we have to check if times are in range
+        how to do it? (6 HOURS ARE 21600 IN UNIX TIME)
+        1) filter all point 1 timestamps to be after 12 hours interval
+        (because we dont care for points in that interval 1 of them is enough)
+        2) for each valid ts in dict 1 check if exists time in dict 2 greater than ts
+        and les or equal to ts+6h
+        3) same for step3.2 but for dict3 with ts+12h
+
+        step4: fetch trajectories for valid mmsi/time pairs
+
+        (Den xrisimopoiithike gt einai pio argo me auto ton tropo)
+        Idea: make multiple parallel requests to mongo (1 for each point)
+        we can use one thread for each processor my laptop has 4cores and server vm has 8
+    :param pointsList: list of points to execute the query
+    :return:
+    """
+    # start timer
+    # me pool request --- 1.9434340000152588 seconds ---
+    # me for kai 3 requests --- 0.32604384422302246 seconds ---
+    start_time = time.time()
+
+    connection = connectMongoDB()
+    # connecting or switching to the database
+    db = connection.marine_trafic
+
+    # creating or switching to ais_navigation collection
+    collection = db.ais_navigation2
+
+    # Step 1
+    # pool object creation
+    # pool = multiprocessing.Pool(processes=4)  # spawn 4 processes for laptop 8 for server
+    #
+    resultsList = []  # each element contains the results for each point
+    #
+    # resultsList = pool.map(findPingsPerPoint, pointsList)
+
+    for point in pointsList :
+        dictlist = findPingsPerPoint(point, collection=collection)
+        resultsList.append(dictlist)
+
+    print(json.dumps(resultsList, sort_keys=False, indent=4))
+
+    # step 2:
+    counter = 0
+    validMMSITimePair = []
+    for key in resultsList[0].keys() :
+        # checks if key exists in all dicts
+        isValidKey = True
+        for dict in resultsList[1 :] :
+            if not key in dict.keys() :
+                isValidKey = False
+                break
+
+        if isValidKey :
+            # Step 3:
+            # if ket is valid i have to filter its timestamps
+            # first order ts
+            resultsList[0][key]["ts"].sort(reverse=False)
+            validTS = [resultsList[0][key]["ts"][0]]
+            for t in resultsList[0][key]["ts"]:
+                if t >= (21600 * len(resultsList)) + validTS[-1]:
+                    validTS.append(t)
+            print(validTS)
+
+
+            # get first ts
+            isValid = True
+            for ts in validTS:
+                for count, d in enumerate(resultsList[1:]):
+                    if not any(ts < t <= ts + (21600 * (count + 1)) for t in d[key]["ts"]) :
+                        isValid = False
+                        break
+                if isValid:
+                    validMMSITimePair.append({"mmsi": key, "ts": ts})
+
+            # if isValid :
+            #     validMMSITimePair.append(key)
+
+            counter += 1
+
+    # step 4
+    trajectories = []
+    for pair in validMMSITimePair :
+        trajectories.append(
+        findShipTrajectory(mmsi=pair["mmsi"],
+                           tsFrom=pair["ts"],
+                           tsTo=pair["ts"] + (21600 * len(pointsList)),
+                           collection=collection)
+        )
+
+
+    print(json.dumps(trajectories, sort_keys=False, indent=4))
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    # step 5 plot trajectories
+    # this is a simple map that goes with geopandas
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    ax = world.plot(figsize=(10, 6))
+    plt.axis([-30, 15, 30, 70])
+
+    for trajj in trajectories:
+        if 2 < len(trajj["coordinates"]):
+            plotLineString(ax, trajj, color=GRAY, alpha=0.5)  # alpha 0.5 gia na doume overlaps
+
+    plt.show()
+
+
+if __name__ == '__main__' :
+    trajectory = findShipTrajectory()
+    givenTrajectoryFindSimilar(trajectory)
+
+    pointsList = [
+        {"type" : "Point", "coordinates" : [-7.072965, 47.371117]},
+        {"type" : "Point", "coordinates" : [-7.0410814, 47.4131]},
+        {"type" : "Point", "coordinates" : [-6.868215, 47.6239]}
+    ]
+    # findTrajectoriesFromPoints(pointsList)
