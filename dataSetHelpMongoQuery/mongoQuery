@@ -130,7 +130,7 @@ db.ais_navigation2.aggregate([{$geoNear: {near: port_point.geometry, distanceFie
 
 // step 1 
 // vrest ta 5 plisiestera ping sto simio
-db.ais_navigation2.find({location:{ $near : {$geometry: { type: "Point",  coordinates: [ -4.1660385, 50.334972 ]}}}}).limit(5)
+db.ais_navigation2.find(x).limit(5)
 
 // step 2 filtrareta by timestamp
 db.ais_navigation2.find({location:{ $near : {$geometry: { type: "Point",  coordinates: [ -4.1660385, 50.334972 ]}}}, ts: {$gte: 1450025694, $lte: 1455382494}}).limit(5)
