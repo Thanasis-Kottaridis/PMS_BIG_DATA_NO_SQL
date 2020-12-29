@@ -8,15 +8,15 @@
 """
 import multiprocessing
 from pymongo import MongoClient
-import contextily as ctx
+import numpy as np
 import json
 import math
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from descartes import PolygonPatch
 from shapely.geometry import LineString
+import shapely.geometry as sg
 import time
-
 
 # CONSTS
 BLUE = '#6699cc'
@@ -93,32 +93,22 @@ def pointListToMultiLineString(pointList) :
 
 def convertLineStringToPolygon(line, d=0.1) :
     """
-        idea edo einai na kanw ena iterate sta poins ana 2
-        na ftiksw 2 listes stin mia tha vazw ta points tis mias mergias stin alli tis allis
-        sto proto kai to telefteo point to line tha ipologisw ta false negative
+        This helper func creates a polygon from a linestring geo json
     :param line: line string geojson
     :param d: threshold distance (2*d is the width of poly)
-    :return: polygon geojson
+    :return geoPolygon: polygon geojson,
+    :return dilated:shapely outer polygon,
+    :return eroded: shapely inner poly
     """
 
-    list1 = []
-    list2 = []
+    line = LineString(line["coordinates"])
+    dilated = line.buffer(d)
+    eroded = dilated.buffer(d/2)
 
-    for i in range(0, len(line)) :
-        list1.append([line[i][0] + d, line[i][1] - d])
-        list2.append([line[i][0] - d, line[i][1] + d])
-
-    list2.reverse()
-    list1.extend(list2)
-    list1.append(list1[0])
-
-    geoPolygon = {
-        "type" : "Polygon",
-        "coordinates" : [list1]
-    }
-
+    geoPolygon = sg.mapping(dilated)
     print(json.dumps(geoPolygon, sort_keys=False, indent=4))
-    return geoPolygon
+
+    return geoPolygon, dilated, eroded
 
 
 def convertLineIntoPolygon(line, d=0.4) :
@@ -156,7 +146,7 @@ def convertMultiLineToPoly(multiLine, d=0.2) :
     return geoPolygon
 
 
-def get_cmap(n, name='hsv'):
+def get_cmap(n, name='hsv') :
     """
     Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
     RGB color; the keyword argument name must be a standard mpl colormap name.
@@ -164,14 +154,14 @@ def get_cmap(n, name='hsv'):
     return plt.cm.get_cmap(name, n)
 
 
-def createAXNFigure( showWorld=True) :
-    # plt.figure(figNum)
+def createAXNFigure() :
+    # geopandas basic world map with out details
     # world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
     world = gpd.read_file("geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
-    world.to_crs(epsg=4326, inplace=True)
+    world.to_crs(epsg=4326, inplace=True)  # convert axes tou real world coordinates
 
     ax = world.plot(figsize=(10, 6))
-    plt.axis([-20, 15, 40, 60])
+    plt.axis([-20, 15, 40, 60])  # set plot bounds
     return ax
 
 
@@ -278,16 +268,61 @@ def insertWorldSeas(data, isMany=True) :
         collection.insert_one(insertDoc)
 
 
-def getAllAisIds() :
+def insertCountries(insertDoc, isMany=True):
     connection = connectMongoDB()
 
     # connecting or switching to the database
     db = connection.marine_trafic
 
     # creating or switching to ais_navigation collection
-    collection = db.world_seas
-    document_ids = collection.find().distinct('_id')  # list of all ids
+    collection = db.countries
+
+    # insert data based on whether it is many or not
+    if isMany :
+        collection.insert(insertDoc)
+    else :
+        collection.insert_one(insertDoc)
+
+
+def getAllAisMMSI() :
+    connection = connectMongoDB()
+
+    # connecting or switching to the database
+    db = connection.marine_trafic
+
+    # creating or switching to ais_navigation collection
+    collection = db.ais_navigation2
+    document_ids = collection.find().distinct('mmsi')  # list of all ids
     return document_ids
+
+
+def getShipsByCountry(countryName, db=None):
+    start_time = time.time()
+
+    if db is None:
+        connection = connectMongoDB()
+
+        # connecting or switching to the database
+        db = connection.marine_trafic
+
+    # creating or switching to countries collection
+    collection = db.countries
+
+    # get all codes by country name
+    country = collection.find({"country": {"$in": countryName}})
+    countryCodes = []
+    for c in country:
+        countryCodes.extend(c["country_codes"])
+
+    countryCodes = np.array(countryCodes)
+
+    # get all ships by mmsi
+    ships = np.array(getAllAisMMSI())
+    vmatch = np.vectorize(lambda mmsi: int(str(mmsi)[:3]) in countryCodes)
+
+    ships_new = vmatch(ships)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    return ships[ships_new]
 
 
 def printData(collection) :
@@ -331,7 +366,7 @@ def findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294, colle
     return pointsListToMultiPoint(dictlist[0]["location"])
 
 
-def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False, logResponse=False) :
+def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False, withPoly=None, logResponse=False) :
     """
         This helper func is used to find trajectories by givent match aggregation
 
@@ -369,11 +404,29 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
     # check if plot needed
     if doPlot :
         ax = createAXNFigure()
-        for ship in dictlist :
-            trajj = pointsListToMultiPoint(ship["location"])
-            if 2 < len(trajj["coordinates"]) :
-                plotLineString(ax, trajj, color=GRAY, alpha=0.5)
 
+        # plot polygon if exists
+        if withPoly is not None:
+            # plot poly
+            ax.add_patch(PolygonPatch(withPoly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+
+        # get n (ships) + points list len  random colors
+        cmap = get_cmap(len(dictlist))
+
+        #  plot trajectories
+        for i, ship in enumerate(dictlist) :
+            trajj = pointsListToMultiPoint(ship["location"])
+
+            if 2 < len(trajj["coordinates"]):
+                plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
+
+        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
+                  ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
+
+        if len(dictlist) < 50:  # show legend
+            plt.title("Find Trajectories that pass near specific points in specific time interval")
+        plt.xlabel("Latitude")
+        plt.ylabel("Longitude")
         plt.show()
 
     return dictlist
@@ -410,7 +463,8 @@ def findPort(portName='Brest') :
     return results
 
 
-def findPointsForMatchAggr(geoNearAgg, matchAgg,  k_near=None, collection=None, doPlot=False, logResponse=False, queryTitle=None) :
+def findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=None, collection=None, doPlot=False, logResponse=False,
+                           queryTitle=None) :
     """
            This helper func is used to find points (ship pings) by givet match aggregation
 
@@ -439,11 +493,11 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg,  k_near=None, collection=None, 
     ]
 
     # adds limit aggrigation if exists
-    if k_near is not None:
-        pipeline.append({"$limit": k_near})
+    if k_near is not None :
+        pipeline.append({"$limit" : k_near})
 
     # add group aggregation in order to display them
-    pipeline.append({"$group" : {"_id" : "$mmsi","location" : {"$push" : "$location.coordinates"}}})
+    pipeline.append({"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}})
 
     # pipeline = [{
     #     "$geoNear" : {"near" : point,
@@ -470,20 +524,23 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg,  k_near=None, collection=None, 
         ax = createAXNFigure()
 
         # get n (ships) + 1 (point) random colors
-        cmap = get_cmap(len(dictlist)+1)
+        cmap = get_cmap(len(dictlist) + 1)
 
         # plot points
         point = geoNearAgg["$geoNear"]["near"]
-        ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0), label="Target Point")
+        ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
+                label="Target Point")
 
         # plot pings
         for index, ship in enumerate(dictlist) :
             isFirst = True
-            for ping in ship["location"]:
-                ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index+1), label=ship["_id"] if isFirst else None)
+            for ping in ship["location"] :
+                ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index + 1),
+                        label=ship["_id"] if isFirst else None)
                 isFirst = False
 
-        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5), ncol= 1 if len(dictlist) < 10 else int(len(dictlist)/10))
+        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
+                  ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
         plt.title(queryTitle)
         plt.xlabel("Latitude")
         plt.ylabel("Longitude")
@@ -603,7 +660,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
     collection = db.ais_navigation2
 
     # step 1
-    poly = convertLineStringToPolygon(trajectory["coordinates"])
+    poly, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(trajectory)
 
     # create mongo aggregation pipeline
     pipeline = [
@@ -621,22 +678,28 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
 
     # step 2
     ax = createAXNFigure()
-    # world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    # ax = world.plot(figsize=(10, 6))
-    # plt.axis([-30, 15, 30, 70])
 
-    plotLineString(ax, trajectory, color=RED)
+    plotLineString(ax, trajectory, color=RED, label="Given Trajectory")
     # plot poly
-    ax.add_patch(PolygonPatch(poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2))
+    ax.add_patch(PolygonPatch(poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectory Polygon with (d=0.2)"))
     # ax.axis('scaled')
 
     # step 3
-    for ship in dictlist :
+    # get n (ships) + points list len  random colors
+    cmap = get_cmap(len(dictlist))
+
+    #  plot trajectories
+    for i, ship in enumerate(dictlist) :
         trajj = pointsListToMultiPoint(ship["location"])
 
         if 2 < len(trajj["coordinates"]) and trajj["coordinates"] != trajectory["coordinates"] :
-            plotLineString(ax, trajj, color=GRAY, alpha=0.5)
+            plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
 
+    ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
+              ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
+    plt.title("Find Trajectories that pass near specific points in specific time interval")
+    plt.xlabel("Latitude")
+    plt.ylabel("Longitude")
     plt.show()
 
 
@@ -777,14 +840,15 @@ def findTrajectoriesFromPoints(pointsList) :
     cmap = get_cmap(len(trajectories) + len(pointsList))
 
     # plot points
-    for index, point in enumerate(pointsList):
-        ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=1, markersize=12, c=cmap(index), label="point {0}".format(index))
+    for index, point in enumerate(pointsList) :
+        ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=1, markersize=12, c=cmap(index),
+                label="point {0}".format(index))
 
     # plot trajectories
-    for i,trajj in enumerate(trajectories) :
+    for i, trajj in enumerate(trajectories) :
         if 2 < len(trajj["coordinates"]) :
-            plotLineString(ax, trajj, color=cmap(i+3), alpha=0.5, label=validMMSITimePair[i]["mmsi"])  # alpha 0.5 gia na doume overlaps
-
+            plotLineString(ax, trajj, color=cmap(i + 3), alpha=0.5,
+                           label=validMMSITimePair[i]["mmsi"])  # alpha 0.5 gia na doume overlaps
 
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
               ncol=1 if len(trajectories) < 10 else int(len(trajectories) / 10))
@@ -803,23 +867,35 @@ if __name__ == '__main__' :
         very slow because we dont have index on it
         local time on first run: --- 296.6688349246979 seconds ---
         local time on second run: --- 148.310476064682 seconds ---
-        
-        @SOS:- Afou exoume san use case query me country/country code prepei na 
-        kanoume store collection me ship codes
-    
-        query2: same query as above but now using country code (for greece is 237 )
-        
-        query3: vres ola ta fishing vessels me galiki simea pou kinounte me 
+        @SOS:-> After update to retrieve it by country code in mmsi  it tooks 1.2 sec
+        local time to get and filter all country codes and all mmsi --- 0.07462787628173828 seconds ---
+        local time to execute query --- 0.046157121658325195 seconds ---
+            
+        query2: find trajectories for all france fishing vessels and German tankers
+        vres ola ta fishing vessels me galiki simea pou kinounte me 
     """
-    matchAggregation = {"$match" : {'ship_metadata.mmsi_country.country' : 'Greece'}}
+    # query 1
+    shipMMSI = getShipsByCountry(["Greece"])
+    matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
+    findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+
+    # query 2
+    # shipMMSI = getShipsByCountry(["France", "German"])
+    # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
+    #TODO THIS QUERY HAS PROBLEM WITH $group
+    # Exceeded memory limit for $group, but didn't allow external sort. Pass allowDiskUse:true
     # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
 
     """
         Bullet 2: Spatial queries
         Range, k-nn, distance join queries
         
-        query1: find trajectories for all ships with greek flag in Celtic Sea 
+        query1: find trajectories for all ships with greek flag in Bay of Biscay
         (den etrekse pote poli megali perioxi + oti argi pou argei gia tin simea)
+        @SOS:- AFTER UPDATE GIA TA COUNTRIES
+        time to fetch polygon --- 0.040461063385009766 seconds ---
+        time to fetch all valid mmsi--- 0.05022907257080078 seconds ---
+        time tou find existing trajectories in spatio box--- 2.985564947128296 seconds ---
         
         RANGE QUERIES
         query2: find all ships that moved in range from 10 to 50 sea miles from Burst port
@@ -831,12 +907,14 @@ if __name__ == '__main__' :
         find k closest ship sigmas to a point (test point:" coordinates" : [-4.1660385,50.334972]) (k=5)
     """
     # query1
-    poly = findPolyFromSeas()
-    # matchAggregation = {"$match": {"ship_metadata.mmsi_country.country": "Greece", "location": {"$geoWithin": {"$geometry": poly["geometry"]}}}}
-    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+    poly = findPolyFromSeas(seaName="Bay of Biscay")
+    shipMMSI = getShipsByCountry(["Greece"])
+    matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
+                                   "location": {"$geoWithin": {"$geometry": poly["geometry"]}}}}
+    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     # query2 # ARGEI POLI
-    port_point = findPort()
+    # port_point = findPort()
     matchAggregation = {
         "$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-4.475309812300752, 48.38273389573341]},
                       "distanceField" : "dist.calculated",
@@ -861,23 +939,27 @@ if __name__ == '__main__' :
 
         query2: find k closest ship sigmas to a point (test point:" coordinates" : [-4.1660385,50.334972]) (k=5)
         in one day interval (this point is at the entry of p)
+        
+        query3: find trajectories for all ships with greek flag in Celtic Sea  for one hour interval
+        (den etrekse pote poli megali perioxi + oti argi pou argei gia tin simea)
+        times:
+        time to get Celtic Sea from world seas collection --- 0.040419816970825195 seconds ---
+        time to get all greek ships mmsi--- 0.052060842514038086 seconds ---
+        time to get trajectories in spatio temporal box--- 1.3465988636016846 seconds ---
     """
     # query1
-    port_point = findPort()
+    # port_point = findPort()
     geoNearAgg = {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-4.47530, 48.3827]},
-                      "distanceField" : "dist.calculated",
-                      "minDistance" : nautical_mile_in_meters * 10,
-                      "maxDistance" : nautical_mile_in_meters * 30,
-                      "spherical" : True, "key" : "location"}}
+                                "distanceField" : "dist.calculated",
+                                "minDistance" : nautical_mile_in_meters * 10,
+                                "maxDistance" : nautical_mile_in_meters * 30,
+                                "spherical" : True, "key" : "location"}}
 
-    matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (2*one_hour_in_unix_time)}}}
+    matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (2 * one_hour_in_unix_time)}}}
 
     # findPointsForMatchAggr(geoNearAgg,matchAgg,doPlot=True,
     #                        queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port for 2 hours interval")
 
-
-    # findPointsForMatchAggr(point, doPlot=True, queryTitle="Find all ships that moved in range from 10 to 50 sea miles "
-    #                                                       "from Burst port")
 
     # query 2
     point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
@@ -889,16 +971,16 @@ if __name__ == '__main__' :
 
     matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1449075294}}}
 
-    findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=20, doPlot=True,
-                           queryTitle="find k closest ship sigmas to a point (k=5) in one day interval")
+    # findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=20, doPlot=True,
+    #                        queryTitle="find k closest ship sigmas to a point (k=5) in one day interval")
 
-    # findShipsNearPoint(point,
-    #                    tsFrom=1448988894,
-    #                    tsTo=1449075294,
-    #                    k_near=5,
-    #                    doPlot=True,
-    #                    logResponse=True,
-    #                    queryTitle="find k closest ship sigmas to a point (k=5) in one day interval")
+    #query 3:
+    # poly = findPolyFromSeas()
+    # shipMMSI = getShipsByCountry(["Greece"])
+    # matchAggregation = {"$match": {'mmsi' : {'$in' : shipMMSI.tolist()},
+    #                                "location": {"$geoWithin": {"$geometry": poly["geometry"]}},
+    #                                'ts' : {"$gte" : 1448988894, "$lte" : 1449075294}}}
+    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     """
         Bullet 4.2:

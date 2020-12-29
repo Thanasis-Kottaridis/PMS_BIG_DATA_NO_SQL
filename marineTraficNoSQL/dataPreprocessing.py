@@ -174,7 +174,7 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
     return ship_meta_dict
 
 
-def fetchMMSICountryData():
+def fetchMMSICountryData(isForAIS=True):
     """
         SECTION 3
         fetch all mmsi country data and convert them into dict
@@ -188,11 +188,20 @@ def fetchMMSICountryData():
         """
     )
 
-    # convert them into a dict of dicts using country code as key (row[0])
     mmsi_countries_dict = {}
-    for row in mmsi_countries :
-        mmsi_countries_dict[str(row[0])] = dict(zip(mmsi_country_column_names, row))
 
+    if isForAIS:
+        # convert them into a dict of dicts using country code as key (row[0])
+        for row in mmsi_countries :
+            mmsi_countries_dict[str(row[0])] = dict(zip(mmsi_country_column_names, row))
+    else:
+        # convert them into dic of dicts using country name as key
+        for row in mmsi_countries:
+            if str(row[1]) in mmsi_countries_dict.keys():
+                # append code
+                mmsi_countries_dict[str(row[1])]['country_codes'].append(row[0])
+            else: # create new dict
+                mmsi_countries_dict[str(row[1])] = {'country': row[1], 'country_codes': [row[0]]}
     return mmsi_countries_dict
 
 
@@ -266,3 +275,4 @@ def preprocessAisDynamic():
 
     # return dict/json
     # return ais_collection
+

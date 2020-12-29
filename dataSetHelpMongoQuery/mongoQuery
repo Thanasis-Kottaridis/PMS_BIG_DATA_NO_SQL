@@ -130,7 +130,7 @@ db.ais_navigation2.aggregate([{$geoNear: {near: port_point.geometry, distanceFie
 
 // step 1 
 // vrest ta 5 plisiestera ping sto simio
-db.ais_navigation2.find(x).limit(5)
+db.ais_navigation2.find({location:{ $near : {$geometry: { type: "Point",  coordinates: [ -4.1660385, 50.334972 ]}}}}).limit(5)
 
 // step 2 filtrareta by timestamp
 db.ais_navigation2.find({location:{ $near : {$geometry: { type: "Point",  coordinates: [ -4.1660385, 50.334972 ]}}}, ts: {$gte: 1450025694, $lte: 1455382494}}).limit(5)
@@ -173,6 +173,31 @@ db.ais_navigation2.aggregate([{$match: {'mmsi': 240266000, 'ts': {$gte: 14489888
 // step 3 sos https://stackoverflow.com/questions/35656520/find-overlapping-trajectories
 // this query implemented on python.
 
+
+// TEST TRAJECTORY lineString
+trajectory = {
+  "coordinates" : [
+
+      [
+          -3.7298584,
+          49.9193987
+      ],
+      [
+          -3.449707,
+          49.6818469
+      ],
+      [
+          -2.7355957,
+          49.1314084
+      ],
+      [
+          -3.449707,
+          49.6818469
+      ]
+
+  ],
+  "type" : "LineString"
+}
 
 
 /**
