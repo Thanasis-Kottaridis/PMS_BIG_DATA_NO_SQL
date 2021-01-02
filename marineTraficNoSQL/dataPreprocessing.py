@@ -58,6 +58,7 @@ def fetchAISCollection():
         """
         SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
         FROM ais_data.dynamic_ships D 
+        LIMIT 100
         """
         # LIMIT 100
     )

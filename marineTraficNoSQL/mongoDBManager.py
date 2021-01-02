@@ -424,7 +424,7 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
                   ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
 
         if len(dictlist) < 50:  # show legend
-            plt.title("Find Trajectories that pass near specific points in specific time interval")
+            plt.title("Trajectories")
         plt.xlabel("Latitude")
         plt.ylabel("Longitude")
         plt.show()
@@ -463,7 +463,7 @@ def findPort(portName='Brest') :
     return results
 
 
-def findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=None, collection=None, doPlot=False, logResponse=False,
+def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=None, allowDiskUse=False, doPlot=False, logResponse=False,
                            queryTitle=None) :
     """
            This helper func is used to find points (ship pings) by givet match aggregation
@@ -488,9 +488,13 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=None, collection=None, d
 
     # adds main aggregations to pipeline
     pipeline = [
-        geoNearAgg,
-        matchAgg,
+        geoNearAgg
     ]
+
+    # adds match agg if exists
+    if matchAgg is not None:
+        pipeline.append(matchAgg)
+
 
     # adds limit aggrigation if exists
     if k_near is not None :
@@ -511,7 +515,7 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=None, collection=None, d
     # ]
 
     # execute query
-    results = collection.aggregate(pipeline)
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
     dictlist = queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
@@ -599,7 +603,7 @@ def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=No
 
         # plot pings
         for index, ship in enumerate(dictlist) :
-            ax.plot(ship["location"][0], ship["location"][1], 'ro', alpha=0.5)
+            ax.plot(ship["location"]["coordinates"][0], ship["location"]["coordinates"][1], 'ro', alpha=0.5)
 
         plt.title(queryTitle)
         plt.xlabel("Latitude")
@@ -875,9 +879,9 @@ if __name__ == '__main__' :
         vres ola ta fishing vessels me galiki simea pou kinounte me 
     """
     # query 1
-    shipMMSI = getShipsByCountry(["Greece"])
-    matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
-    findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+    # shipMMSI = getShipsByCountry(["Greece"])
+    # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
+    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
 
     # query 2
     # shipMMSI = getShipsByCountry(["France", "German"])
@@ -901,6 +905,7 @@ if __name__ == '__main__' :
         query2: find all ships that moved in range from 10 to 50 sea miles from Burst port
         (this query can be used for any point and for any min and max range )
         [-4.47530,48.3827]
+        time on first run --- 335.2350790500641 seconds ---
 
         
         query3: 
@@ -908,7 +913,7 @@ if __name__ == '__main__' :
     """
     # query1
     poly = findPolyFromSeas(seaName="Bay of Biscay")
-    shipMMSI = getShipsByCountry(["Greece"])
+    shipMMSI = getShipsByCountry(["France"])
     matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
                                    "location": {"$geoWithin": {"$geometry": poly["geometry"]}}}}
     # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
@@ -921,11 +926,12 @@ if __name__ == '__main__' :
                       "minDistance" : nautical_mile_in_meters * 10,
                       "maxDistance" : nautical_mile_in_meters * 30,
                       "spherical" : True, "key" : "location"}}
-    # findPointsForMatchAggr(matchAggregation)
+    # den to kanei plot
+    # findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
 
     # query 3
     point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
-    # findShipsNearPoint(point, k_near=5)
+    # findShipsNearPoint(point, doPlot=True, k_near=20)
 
     """
         Bullet 3: Spatio-temporal queries
@@ -938,7 +944,7 @@ if __name__ == '__main__' :
         second run --- 220.98046803474426 seconds --- (great improvement))
 
         query2: find k closest ship sigmas to a point (test point:" coordinates" : [-4.1660385,50.334972]) (k=5)
-        in one day interval (this point is at the entry of p)
+        in one day interval (this point is at the entry of playmouth)
         
         query3: find trajectories for all ships with greek flag in Celtic Sea  for one hour interval
         (den etrekse pote poli megali perioxi + oti argi pou argei gia tin simea)
@@ -974,20 +980,20 @@ if __name__ == '__main__' :
     # findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=20, doPlot=True,
     #                        queryTitle="find k closest ship sigmas to a point (k=5) in one day interval")
 
-    #query 3:
-    # poly = findPolyFromSeas()
-    # shipMMSI = getShipsByCountry(["Greece"])
-    # matchAggregation = {"$match": {'mmsi' : {'$in' : shipMMSI.tolist()},
-    #                                "location": {"$geoWithin": {"$geometry": poly["geometry"]}},
-    #                                'ts' : {"$gte" : 1448988894, "$lte" : 1449075294}}}
+    # query 3:
+    poly = findPolyFromSeas()
+    shipMMSI = getShipsByCountry(["France"])
+    matchAggregation = {"$match": {'mmsi' : {'$in' : shipMMSI.tolist()},
+                                   "location": {"$geoWithin": {"$geometry": poly["geometry"]}},
+                                   'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (6*one_hour_in_unix_time)}}}
     # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     """
         Bullet 4.2:
         Given a trajectory, find similar trajectories (threshold-based, k-most similar)
     """
-    # trajectory = findShipTrajectory()
-    # givenTrajectoryFindSimilar(trajectory)
+    trajectory = findShipTrajectory()
+    givenTrajectoryFindSimilar(trajectory)
 
     """
         Bullet 4.3:
