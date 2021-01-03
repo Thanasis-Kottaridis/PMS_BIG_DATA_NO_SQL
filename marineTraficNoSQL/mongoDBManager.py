@@ -17,6 +17,7 @@ from descartes import PolygonPatch
 from shapely.geometry import LineString
 import shapely.geometry as sg
 import time
+import geopy.distance
 
 # CONSTS
 BLUE = '#6699cc'
@@ -103,7 +104,7 @@ def convertLineStringToPolygon(line, d=0.1) :
 
     line = LineString(line["coordinates"])
     dilated = line.buffer(d)
-    eroded = dilated.buffer(d/2)
+    eroded = dilated.buffer(d / 2)
 
     geoPolygon = sg.mapping(dilated)
     print(json.dumps(geoPolygon, sort_keys=False, indent=4))
@@ -268,7 +269,7 @@ def insertWorldSeas(data, isMany=True) :
         collection.insert_one(insertDoc)
 
 
-def insertCountries(insertDoc, isMany=True):
+def insertCountries(insertDoc, isMany=True) :
     connection = connectMongoDB()
 
     # connecting or switching to the database
@@ -296,10 +297,10 @@ def getAllAisMMSI() :
     return document_ids
 
 
-def getShipsByCountry(countryName, db=None):
+def getShipsByCountry(countryName, db=None) :
     start_time = time.time()
 
-    if db is None:
+    if db is None :
         connection = connectMongoDB()
 
         # connecting or switching to the database
@@ -309,16 +310,16 @@ def getShipsByCountry(countryName, db=None):
     collection = db.countries
 
     # get all codes by country name
-    country = collection.find({"country": {"$in": countryName}})
+    country = collection.find({"country" : {"$in" : countryName}})
     countryCodes = []
-    for c in country:
+    for c in country :
         countryCodes.extend(c["country_codes"])
 
     countryCodes = np.array(countryCodes)
 
     # get all ships by mmsi
     ships = np.array(getAllAisMMSI())
-    vmatch = np.vectorize(lambda mmsi: int(str(mmsi)[:3]) in countryCodes)
+    vmatch = np.vectorize(lambda mmsi : int(str(mmsi)[:3]) in countryCodes)
 
     ships_new = vmatch(ships)
     print("--- %s seconds ---" % (time.time() - start_time))
@@ -406,9 +407,10 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
         ax = createAXNFigure()
 
         # plot polygon if exists
-        if withPoly is not None:
+        if withPoly is not None :
             # plot poly
-            ax.add_patch(PolygonPatch(withPoly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+            ax.add_patch(
+                PolygonPatch(withPoly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
 
         # get n (ships) + points list len  random colors
         cmap = get_cmap(len(dictlist))
@@ -417,13 +419,13 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
         for i, ship in enumerate(dictlist) :
             trajj = pointsListToMultiPoint(ship["location"])
 
-            if 2 < len(trajj["coordinates"]):
+            if 2 < len(trajj["coordinates"]) :
                 plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
 
         ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
                   ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
 
-        if len(dictlist) < 50:  # show legend
+        if len(dictlist) < 50 :  # show legend
             plt.title("Trajectories")
         plt.xlabel("Latitude")
         plt.ylabel("Longitude")
@@ -463,7 +465,8 @@ def findPort(portName='Brest') :
     return results
 
 
-def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=None, allowDiskUse=False, doPlot=False, logResponse=False,
+def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=None, allowDiskUse=False, doPlot=False,
+                           logResponse=False,
                            queryTitle=None) :
     """
            This helper func is used to find points (ship pings) by givet match aggregation
@@ -492,9 +495,8 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
     ]
 
     # adds match agg if exists
-    if matchAgg is not None:
+    if matchAgg is not None :
         pipeline.append(matchAgg)
-
 
     # adds limit aggrigation if exists
     if k_near is not None :
@@ -638,15 +640,58 @@ def findTrajectoryByVesselsFlag(country='Greece', collection=None) :
     return dictlist
 
 
-def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
+def ext_givenTrajectoryFindSimilar(dictlist, trajectory, k_most) :
+    """
+    givenTrajectoryFindSimilar query extension for calculating k most similar trajectories
+
+    :param dictlist: this list contains trajectories in dict format (the format returned from mongo quert)
+    :param k_most: number of most similar trajectories
+    :return: the dict list that contains only k most similar trajectories order by similarity.
+    """
+
+    # finds mean distance for all trajectories
+    # 1) converts dict list to np array
+    np_dictList = np.array(dictlist)
+
+    # 2) extract mean dist for each trajectory
+    # 5 is min pings to consider trajectory
+    fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
+    dist_mean = []
+    for ship in dictlist :
+        if len(ship["location"]) > 2 :
+            start_time2 = time.time()
+            ps1 = np.array(trajectory)
+            ps2 = np.array(ship["location"])
+            r = fv(ps1[:, np.newaxis], ps2)
+            dist_mean.append(np.mean(r))
+            print("--- %s seconds ---" % (time.time() - start_time2))
+
+    # 3) apply a np short on dist_mean, and then apply the same short to np_dictList
+    # https://stackoverflow.com/questions/1903462/how-can-i-zip-sort-parallel-numpy-arrays
+    sort_path = np.argsort(np.array(dist_mean))
+    np_dictList = np_dictList[sort_path]
+    dictlist = np_dictList[:k_most]
+
+    print(dist_mean)
+    print(sort_path)
+
+    return dictlist
+
+
+def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k_most=0, d=0.1) :
     """
         Given a trajectory and a time interval find other similar trajectories
 
         step1:
         convert trajectory from multiline into polygon
-        step2:
-        plot trajectory and the polygon created based on it
+
+        step2 (optional): if k_most similar is greater than 0 then keep k trajectories with
+        minimum mean distance to the target trajectory else finds similar trajectories threshold based using d
+
         step3:
+        plot trajectory and the polygon created based on it
+
+        plot step:
         plot all returned trajectories
 
     :param trajectory: is a multiLine geo json obj
@@ -664,7 +709,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
     collection = db.ais_navigation2
 
     # step 1
-    poly, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(trajectory)
+    poly, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(trajectory, d=d)
 
     # create mongo aggregation pipeline
     pipeline = [
@@ -676,19 +721,23 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
     # execute query
     results = collection.aggregate(pipeline)
     dictlist = queryResultToDictList(results)
-    print("--- %s seconds ---" % (time.time() - start_time))
 
     print(json.dumps(dictlist, sort_keys=False, indent=4))
+
+    # step 2 checks if it is a k-most query or a threshold based
+    if k_most > 0 :
+        dictlist = ext_givenTrajectoryFindSimilar(dictlist, trajectory["coordinates"], k_most)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     # step 2
     ax = createAXNFigure()
 
-    plotLineString(ax, trajectory, color=RED, label="Given Trajectory")
+    plotLineString(ax, trajectory, color='k', alpha=0.2, label="Given Trajectory")
     # plot poly
     ax.add_patch(PolygonPatch(poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectory Polygon with (d=0.2)"))
     # ax.axis('scaled')
 
-    # step 3
     # get n (ships) + points list len  random colors
     cmap = get_cmap(len(dictlist))
 
@@ -699,6 +748,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294) :
         if 2 < len(trajj["coordinates"]) and trajj["coordinates"] != trajectory["coordinates"] :
             plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
 
+    # plot step
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
               ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
     plt.title("Find Trajectories that pass near specific points in specific time interval")
@@ -862,6 +912,121 @@ def findTrajectoriesFromPoints(pointsList) :
     plt.show()
 
 
+def calculatePointsDistance(coords_1, coords_2) :
+    """
+    Vectorized helper func for calculating distance between 2 geo points
+
+    source:
+     https://towardsdatascience.com/heres-how-to-calculate-distance-between-2-geolocations-in-python-93ecab5bbba4
+
+    :param coords_1: lat long of first point
+    :param coords_2: lat log of second point
+    :return: distance between points
+    """
+
+    r = 6371
+    lat1 = coords_1[0]
+    lat2 = coords_2[0]
+    lon1 = coords_1[1]
+    lon2 = coords_2[1]
+    phi1 = np.radians(lat1)
+    phi2 = np.radians(lat2)
+    delta_phi = np.radians(lat2 - lat1)
+    delta_lambda = np.radians(lon2 - lon1)
+    a = np.sin(delta_phi / 2) ** 2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2) ** 2
+    res = r * (2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a)))
+    return np.round(res, 2)
+    # approach using geopy
+    # return geopy.distance.geodesic(coords_1, coords_2).km
+
+
+# def comparePointSets(pointSet1, pointSet2, d) :
+#     """
+#     this helper func is calculating the distance per point between 2 point sets
+#      (trajectories or points observed in a polygon)
+#
+#     step 1) create a vectorized 2d numpy array by applying calculatePointsDistance() helper function
+#     step 2) find 2d elements with values less than d, create a pair and add it in to a list
+#     step 3) calculate average distance for this 2 trajectories
+#
+#     :param pointSet1: list of lat, log pairs
+#     :param pointSet2: list of lat, log pairs
+#     :param d: distance threshold in kilometers.
+#     :return m: trajectory mean distance. The mean distance for all to all points of 2 point sets
+#     """
+#     start_time = time.time()
+#
+#     ps1 = np.array(pointSet1)
+#     ps2 = np.array(pointSet2)
+#
+#     # to signature sto np.vectorize leei gia kathe ena apo ta 2 (2d vectors me to (n),(n)) pare ola ta items (n) tis kathe "gramis"
+#     # kai tha epistrepsei ena return me to "()"
+#     fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
+#     r = fv(ps1[:, np.newaxis], ps2)
+#     # r = geopy.distance.geodesic(ps1, ps2).km  #a[:, None] + b * 2
+#
+#     # calculate mean
+#     m = np.mean(r)
+#
+#     # check if tranjectory is closer than threshold
+#     # rmatch = np.vectorize(lambda i: i <= d)
+#     # r_new = rmatch(r)
+#
+#     # r = r[r_new]
+#
+#     # get mean of 2d array
+#     print(r)
+#     print(np.mean(r))
+#     print("--- %s seconds ---" % (time.time() - start_time))
+#     return m
+
+
+def distanceJoinQuery(poly1, poly2, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None):
+
+    start_time = time.time()
+    if collection is None :
+        connection = connectMongoDB()
+        # connecting or switching to the database
+        db = connection.marine_trafic
+
+        # creating or switching to ais_navigation collection
+        collection = db.ais_navigation2
+
+    # group all the pings in a list no requirement for more information
+    groupAgg = {"$group": {"_id": None, "location" : {"$push" : "$location.coordinates"}}}
+
+
+    matchAggregation = {
+        "$match" : {
+            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : poly1}}
+        }
+    }
+
+    pipeline = [
+        matchAggregation,
+        groupAgg
+    ]
+
+    # execute query
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    dictlist = queryResultToDictList(results)
+
+
+
+    matchAggregation = {
+        "$match" : {
+            **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : poly2}}
+        }
+    }
+
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    dictlist = queryResultToDictList(results)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+
 if __name__ == '__main__' :
     """
         Bullet 1:
@@ -886,7 +1051,7 @@ if __name__ == '__main__' :
     # query 2
     # shipMMSI = getShipsByCountry(["France", "German"])
     # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
-    #TODO THIS QUERY HAS PROBLEM WITH $group
+    # TODO THIS QUERY HAS PROBLEM WITH $group
     # Exceeded memory limit for $group, but didn't allow external sort. Pass allowDiskUse:true
     # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
 
@@ -910,12 +1075,16 @@ if __name__ == '__main__' :
         
         query3: 
         find k closest ship sigmas to a point (test point:" coordinates" : [-4.1660385,50.334972]) (k=5)
+        
+        query 4: Distance join queries
+        given 2 A and B polygon or geo areas (circles on point or bounging box)
+        find point pairs (a,b) that dictance from a to b is lees than threshold d
     """
     # query1
     poly = findPolyFromSeas(seaName="Bay of Biscay")
     shipMMSI = getShipsByCountry(["France"])
     matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
-                                   "location": {"$geoWithin": {"$geometry": poly["geometry"]}}}}
+                                    "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}}}}
     # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     # query2 # ARGEI POLI
@@ -932,6 +1101,50 @@ if __name__ == '__main__' :
     # query 3
     point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
     # findShipsNearPoint(point, doPlot=True, k_near=20)
+
+    # query 4
+    poly1 = {
+        "type" : "Polygon",
+        "coordinates" : [
+                [
+
+                    [-5.1855469, 47.5765257],
+                    [-3.6474609, 46.7097359],
+                    [-2.6586914, 45.9511497],
+                    [-3.2299805, 45.7828484],
+                    [-4.7680664, 45.6908328],
+                    [-5.625, 46.4378569],
+                    [-6.0644531, 46.8000594],
+                    [-5.6469727, 47.44295],
+                    [-5.1855469, 47.5765257]
+                ]
+
+        ]
+    }
+
+    poly2 = {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [-7.6464844, 45.3675844],
+                [-3.7792969, 44.6217541],
+                [-1.8896484, 44.4337798],
+                [-2.4169922, 43.5166885],
+                [-8.7451172, 44.0560117],
+                [-8.9208984, 45.5525253],
+                [-7.6464844, 45.3675844]
+            ]
+        ]
+    }
+
+    # matchAggregation = {"$match" : {"location" : {"$geoWithin" : {"$geometry" : poly1}}}}
+    # # den to kanei plot
+    # findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
+    distanceJoinQuery(poly1, poly2)
+
+    # trajectory1 = findShipTrajectory()
+    # trajectory2 = findShipTrajectory(mmsi=304808000)
+    # comparePointSets(trajectory1['coordinates'], trajectory2['coordinates'], 100)
 
     """
         Bullet 3: Spatio-temporal queries
@@ -966,7 +1179,6 @@ if __name__ == '__main__' :
     # findPointsForMatchAggr(geoNearAgg,matchAgg,doPlot=True,
     #                        queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port for 2 hours interval")
 
-
     # query 2
     point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
     geoNearAgg = {"$geoNear" : {"near" : point,
@@ -983,17 +1195,19 @@ if __name__ == '__main__' :
     # query 3:
     poly = findPolyFromSeas()
     shipMMSI = getShipsByCountry(["France"])
-    matchAggregation = {"$match": {'mmsi' : {'$in' : shipMMSI.tolist()},
-                                   "location": {"$geoWithin": {"$geometry": poly["geometry"]}},
-                                   'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (6*one_hour_in_unix_time)}}}
+    matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
+                                    "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}},
+                                    'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (6 * one_hour_in_unix_time)}}}
     # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     """
         Bullet 4.2:
         Given a trajectory, find similar trajectories (threshold-based, k-most similar)
     """
-    trajectory = findShipTrajectory()
-    givenTrajectoryFindSimilar(trajectory)
+    # trajectory = findShipTrajectory(mmsi=227002630)
+    # trajectory = findShipTrajectory()
+    # givenTrajectoryFindSimilar(trajectory)
+    # givenTrajectoryFindSimilar(trajectory, k_most=3)
 
     """
         Bullet 4.3:

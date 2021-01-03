@@ -67,8 +67,17 @@ SELECT * FROM ais_status_codes_types.ship_types_detailed
 SELECT * 
 FROM ais_status_codes_types.mmsi_country_codes
 
+/*
+Pernoume ta specs gia ola ta plia pou iparxoun ston ANFR
+*/
 
-
+with ping_mmsi as(
+	SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi
+	FROM ais_data.dynamic_ships D 
+	ORDER BY mmsi, lat, lon, ts
+) select DISTINCT ON (VL.mmsi) VL.mmsi, VL.length, VL.tonnage, VL.tonnage_unit, VL.materiel_onboard
+from vesselregister.anfr_vessel_list VL Inner Join ping_mmsi PM on
+PM.mmsi = VL.mmsi
 
 
 

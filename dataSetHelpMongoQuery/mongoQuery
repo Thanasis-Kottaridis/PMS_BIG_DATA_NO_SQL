@@ -144,6 +144,13 @@ db.ais_navigation2.find({location:{ $near : {$geometry: { type: "Point",  coordi
 // step 1 na eksagw tin troxia enos pliou gia mia mera:
 /*
 mmsi: 923166
+mmsi: 227318010 pano apo 200 pings (ola mesa se enan kolpo den douleuei poli kala to k near eki oute to poligono) time: 300kati.
+MMSI: 227002630 pano apo 600 ping poli kako sto k-most similar time: 874.672003030777(k-most) 25.kati (kanoniko )
+        vectorized approach time --- 151.71992182731628 seconds ---
+
+mmsi 228947000 90 ping se 1 min
+        vect
+
 
 from:
 Epoch timestamp: 1448988894
@@ -212,6 +219,214 @@ trajectory = {
 
 
 db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-7.072965,47.371117] }, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*30, spherical: true, key: "location"}, 'ts': {$gte: 1448988894, $lte: 1449075294}}},{$group: {_id: "$mmsi"}}])
+
+
+/**
+ * Distance Join Query gia 2 troxies
+ * 
+ * pernoume 2 polgona
+ * 
+ */
+// poly 1
+{
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -6.0974121,
+          49.3036358
+        ],
+        [
+          -4.822998,
+          49.7670741
+        ],
+        [
+          -3.482666,
+          50.0218584
+        ],
+        [
+          -1.7468262,
+          50.3805025
+        ],
+        [
+          1.0876465,
+          50.7712078
+        ],
+        [
+          1.3293457,
+          50.3244227
+        ],
+        [
+          0.637207,
+          50.0289166
+        ],
+        [
+          -0.5603027,
+          49.582226
+        ],
+        [
+          -1.7907715,
+          49.8663167
+        ],
+        [
+          -1.9555664,
+          48.7996274
+        ],
+        [
+          -2.3620605,
+          48.8140985
+        ],
+        [
+          -3.5046387,
+          49.1673386
+        ],
+        [
+          -5.0537109,
+          48.5965923
+        ],
+        [
+          -6.3500977,
+          48.994636
+        ],
+        [
+            -6.0974121,
+            49.3036358
+          ]
+      ]
+    ]
+  }
+
+// polygon 2
+{
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -5.625,
+          47.4578085
+        ],
+        [
+          -4.0869141,
+          47.3090342
+        ],
+        [
+          -1.7138672,
+          45.5217439
+        ],
+        [
+          -2.5927734,
+          43.8978924
+        ],
+        [
+          -4.6582031,
+          43.7075935
+        ],
+        [
+          -8.2617188,
+          43.7075935
+        ],
+        [
+          -5.8447266,
+          47.15984
+        ],
+        [
+            -5.625,
+            47.4578085
+          ]
+      ]
+    ]
+  }
+
+
+// poli 3 sub poly of poly2
+{
+    "coordinates": [
+      [
+        [
+          -5.1855469,
+          47.5765257
+        ],
+        [
+          -3.6474609,
+          46.7097359
+        ],
+        [
+          -2.6586914,
+          45.9511497
+        ],
+        [
+          -3.2299805,
+          45.7828484
+        ],
+        [
+          -4.7680664,
+          45.6908328
+        ],
+        [
+          -5.625,
+          46.4378569
+        ],
+        [
+          -6.0644531,
+          46.8000594
+        ],
+        [
+          -5.6469727,
+          47.44295
+        ],
+        [
+            -5.1855469,
+            47.5765257
+        ]
+      ]
+    ],
+    "type": "Polygon"
+  }
+
+
+// poly 4 sub poly of poly2
+
+{
+    "coordinates": [
+      [
+        [
+          -7.6464844,
+          45.3675844
+        ],
+        [
+          -3.7792969,
+          44.6217541
+        ],
+        [
+          -1.8896484,
+          44.4337798
+        ],
+        [
+          -2.4169922,
+          43.5166885
+        ],
+        [
+          -8.7451172,
+          44.0560117
+        ],
+        [
+          -8.9208984,
+          45.5525253
+        ],
+        [
+            -7.6464844,
+            45.3675844
+        ]
+      ]
+    ],
+    "type": "Polygon"
+  }
+
+
+// mongo query gia na parw ta pings apo to poligono grouparismena se mia lista.
+  db.ais_navigation2.aggregate([{$match: { "location" : {"$geoWithin" : {"$geometry" : poly}}}}, {$group: { _id: null, "location" : {"$push" : "$location.coordinates"}}}])
+  // query gia na parw to sum ton points sto poly
+  db.ais_navigation2.aggregate([{$match: { "location" : {"$geoWithin" : {"$geometry" : poly}}}}, {$group: { _id: null,count: { $sum: 1 } }}])
 
 
 

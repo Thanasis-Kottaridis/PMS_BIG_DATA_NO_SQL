@@ -16,7 +16,7 @@ jsonFilePath = r'json_data/ais_navigation.json'
 
 
 # this func is used for executing query on postgress sql it takes the query as parameter and returns cursor data
-def executeQuery(query):
+def executeQuery(query) :
     try :
         # CONNECTING TO POSTGRES (use your credentials here)
         connection = psycopg2.connect(user="thanoskottaridis",
@@ -37,7 +37,7 @@ def executeQuery(query):
         print("Error while fetching data from PostgreSQL", error)
         return None, None
 
-    finally:
+    finally :
         # closing database connection.
         if connection :
             cursor.close()
@@ -45,7 +45,7 @@ def executeQuery(query):
             print("PostgreSQL connection is closed")
 
 
-def fetchAISCollection():
+def fetchAISCollection() :
     """
         #SECTION 1
         This helper func is used to fetch and format all the ship_dynamic data from postgreSQl
@@ -58,7 +58,6 @@ def fetchAISCollection():
         """
         SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
         FROM ais_data.dynamic_ships D 
-        LIMIT 100
         """
         # LIMIT 100
     )
@@ -81,20 +80,33 @@ def fetchAISCollection():
 
 
 # create json object from AIS Collection
-def preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_status_column_names):
+def preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_status_column_names) :
     ais_collection = []
     nav_status_dict = {}
 
-    for row in nav_status_data:
+    for row in nav_status_data :
         nav_status_dict[row[0]] = dict(zip(nav_status_column_names, row))
 
     # converts query records into list of dicts
-    for row in dynamic_data:
-        main_data = dict(zip(column_names[:4], row[:4]))
+    for row in dynamic_data :
+        main_data = {}
+        # store mmsi and ts
+        main_data["mmsi"] = row[0]
+        main_data["ts"] = row[3]
+        # create document to geo-jason format
+        main_data["location"] = {
+            "type" : "Point",
+            "coordinates" : [
+                row[1],
+                row[2]
+            ]
+        }
+
+        # main_data = dict(zip(column_names[:4], row[:4]))
         navigational_metadata = dict(zip(column_names[4 :-1], row[4 :-1]))
 
         # sets up navigational status if ais status code is not null or empty
-        try:
+        try :
             main_data["nav_status"] = nav_status_dict[row[-1]]
         except :
             print("INVALID ")
@@ -108,7 +120,7 @@ def preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_statu
     return ais_collection
 
 
-def fetchShipMetadata():
+def fetchShipMetadata() :
     """
         SECTION 2
         This helper func is used to fetch and format all the ship metadata from static_ship table on postgreSQL
@@ -129,6 +141,22 @@ def fetchShipMetadata():
     print(ship_meta_column_names)
     print(len(ship_metadata))
 
+    # fetch ship spexts from ANFR using postgress
+    ship_specs_column_names, ship_specs = executeQuery(
+        """
+        with ping_mmsi as(
+	        SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi
+	        FROM ais_data.dynamic_ships D 
+	        ORDER BY mmsi, lat, lon, ts
+        ) select DISTINCT ON (VL.mmsi) VL.mmsi, VL.imo_number, VL.ship_name, VL.callsign, VL.length, VL.tonnage, VL.tonnage_unit, VL.materiel_onboard
+        from vesselregister.anfr_vessel_list VL Inner Join ping_mmsi PM on
+        PM.mmsi = VL.mmsi
+        """
+    )
+
+    print(ship_specs_column_names)
+    print(len(ship_specs))
+
     # fetch ship type with details
     ship_type_column_names, ship_types = executeQuery(
         """
@@ -142,15 +170,18 @@ def fetchShipMetadata():
     print(len(ship_types))
 
     # Combine ship metadata with ship type in order to extract the complete ship_metadata
-    ship_metadata_dict = preprocessShipMetaData(ship_metadata, ship_meta_column_names, ship_types,
-                                                ship_type_column_names)
+    ship_metadata_dict = preprocessShipMetaData(ship_metadata, ship_meta_column_names,
+                                                ship_types, ship_type_column_names,
+                                                ship_specs, ship_specs_column_names)
     return ship_metadata_dict
 
 
 # creates a dict/json object with the ship metadata
-def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_columns):
+def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_columns, ship_specs,
+                           ship_specs_columns, ) :
     ship_meta_dict = {}
     ship_types_dict = {}
+    ship_specs_dicts = {}
 
     # firstly we convert types into a dict of dicts using id_detailedtype as key on ship_types_dict
     # which is column 0 in our query results and we know it is unique
@@ -160,7 +191,7 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
     print(json.dumps(ship_types_dict, sort_keys=False, indent=4))
 
     # converts query records into dict of dicts
-    for row in ship_meta:
+    for row in ship_meta :
         # convert all columns into a dict except the last which is the shiptype
         ship_data = dict(zip(ship_meta_columns[1 :- 1], row[1 :- 1]))  # we dont need mmsi in dict
         # adding to ship data the type using last column as key on ship_types_dict
@@ -171,11 +202,32 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
 
         # sets mmsi which is row[0] in our data as key and ands main data into dict
         ship_meta_dict[row[0]] = ship_data
+
+    # then we add ship specs into ship_meta_dict using mmsi as key if mmsi doesnt exist
+    # we add all information imo,ship_type
+    for row in ship_specs :
+        ship_specs = dict(zip(ship_specs_columns[4 :- 1], row[4 :- 1]))
+        # add equipment in ship_specs
+        ship_specs["materiel_onboard"] = row[-1].split("-")
+        # check if mmsi exists in ship_meta_dict
+        if row[0] in ship_meta_dict :
+            # if so create ship specs dict
+            ship_meta_dict[row[0]]["ship_specs"] = ship_specs
+        else :
+            # create new ship meta
+            ship_meta_dict[row[0]] = {
+                **({'imo' : row[1]} if row[1] is not None else {}),
+                **({'callsign' : row[3]} if row[3] is not None else {}),
+                **({'shipname' : row[2]} if row[2] is not None else {}),
+                "ship_specs" : ship_specs
+            }
+        # print(json.dumps(ship_meta_dict[row[0]], sort_keys=False, indent=4))
+
     print(json.dumps(ship_data, sort_keys=False, indent=4))
     return ship_meta_dict
 
 
-def fetchMMSICountryData(isForAIS=True):
+def fetchMMSICountryData(isForAIS=True) :
     """
         SECTION 3
         fetch all mmsi country data and convert them into dict
@@ -191,18 +243,18 @@ def fetchMMSICountryData(isForAIS=True):
 
     mmsi_countries_dict = {}
 
-    if isForAIS:
+    if isForAIS :
         # convert them into a dict of dicts using country code as key (row[0])
         for row in mmsi_countries :
             mmsi_countries_dict[str(row[0])] = dict(zip(mmsi_country_column_names, row))
-    else:
+    else :
         # convert them into dic of dicts using country name as key
-        for row in mmsi_countries:
-            if str(row[1]) in mmsi_countries_dict.keys():
+        for row in mmsi_countries :
+            if str(row[1]) in mmsi_countries_dict.keys() :
                 # append code
                 mmsi_countries_dict[str(row[1])]['country_codes'].append(row[0])
-            else: # create new dict
-                mmsi_countries_dict[str(row[1])] = {'country': row[1], 'country_codes': [row[0]]}
+            else :  # create new dict
+                mmsi_countries_dict[str(row[1])] = {'country' : row[1], 'country_codes' : [row[0]]}
     return mmsi_countries_dict
 
 
@@ -214,14 +266,15 @@ def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
         then append ship_metadata into ais_collection document. Before appending ship_metadata into document we have to enrich
         metadata with country dict.
     """
-    for ais_document in ais_collection:
+    for ais_document in ais_collection :
         mmsi = ais_document["mmsi"]
         mmsi_country_code = str(mmsi)[:3]
 
         # Creates a 4D morton and store it at _id field as string because mongo can store only 64 bit ints
         # and 4D morton is 124
-        #TODO ADD THIS  FOR ADDING MORTON AT _id
-        lon, lat = mortonCodeManager.lonLatToInt(ais_document["lon"], ais_document["lat"])
+        # TODO ADD THIS  FOR ADDING MORTON AT _id
+        lon, lat = mortonCodeManager.lonLatToInt(ais_document["location"]["coordinates"][0],
+                                                 ais_document["location"]["coordinates"][1])
         ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
 
         ship_metadata_dict = {}
@@ -246,7 +299,7 @@ def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
     return ais_collection
 
 
-def preprocessAisDynamic():
+def preprocessAisDynamic() :
     # fetch all dynamic_ship data and format them into ais_collection
     ais_collection = fetchAISCollection()
 
@@ -259,11 +312,11 @@ def preprocessAisDynamic():
     print(json.dumps(mmsi_countries_dict, sort_keys=False, indent=4))
 
     # perform batch insertion to mongo db
-    for i in range(0 , len(ais_collection), 100000) :
+    for i in range(0, len(ais_collection), 100000) :
         # update ais_collection by adding on it all extracted metadata
-        ais_batch = createAISCollection(ais_collection[i : i+100000], ship_metadata_dict, mmsi_countries_dict)
+        ais_batch = createAISCollection(ais_collection[i : i + 100000], ship_metadata_dict, mmsi_countries_dict)
         mongoDBManager.insertAISData(ais_batch)
-        print("----------------------BATCH ", i/100000, " INSERTED ----------------------")
+        print("----------------------BATCH ", i / 100000, " INSERTED ----------------------")
 
     # TODO:- CHECK IF THIS BLOCK OF CODE NEEDED!
     # CODE TO EXTRACT DATA TO JSON FILE
@@ -276,4 +329,3 @@ def preprocessAisDynamic():
 
     # return dict/json
     # return ais_collection
-
