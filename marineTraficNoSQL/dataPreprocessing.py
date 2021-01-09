@@ -13,6 +13,7 @@ import mongoDBManager
 import mortonCodeManager
 
 jsonFilePath = r'json_data/ais_navigation.json'
+jsonFilePath_5m = r'json_data/ais_navigation_5m.json'
 
 
 # this func is used for executing query on postgress sql it takes the query as parameter and returns cursor data
@@ -56,8 +57,8 @@ def fetchAISCollection() :
     # and the navigational_metadata form rest columns
     column_names, dynamic_data = executeQuery(
         """
-        SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, geom, status
-        FROM ais_data.dynamic_ships D 
+        SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi, lat, lon, ts, turn, speed, course, heading, status
+        FROM ais_data.dynamic_ships D
         """
         # LIMIT 100
     )
@@ -273,9 +274,9 @@ def createAISCollection(ais_collection, ship_metadata, mmsi_countries_dict) :
         # Creates a 4D morton and store it at _id field as string because mongo can store only 64 bit ints
         # and 4D morton is 124
         # TODO ADD THIS  FOR ADDING MORTON AT _id
-        lon, lat = mortonCodeManager.lonLatToInt(ais_document["location"]["coordinates"][0],
-                                                 ais_document["location"]["coordinates"][1])
-        ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
+        # lon, lat = mortonCodeManager.lonLatToInt(ais_document["location"]["coordinates"][0],
+        #                                          ais_document["location"]["coordinates"][1])
+        # ais_document["_id"] = str(mortonCodeManager.EncodeMorton4D(lon, lat, ais_document["mmsi"], ais_document["ts"]))
 
         ship_metadata_dict = {}
 
@@ -316,6 +317,10 @@ def preprocessAisDynamic() :
         # update ais_collection by adding on it all extracted metadata
         ais_batch = createAISCollection(ais_collection[i : i + 100000], ship_metadata_dict, mmsi_countries_dict)
         mongoDBManager.insertAISData(ais_batch)
+        # write_json(jsonFilePath_5m, ais_batch, int(i / 100000))
+        # with open(jsonFilePath_5m, 'w', encoding='utf-8') as jsonf :
+        #     ais_collection_json = json.dumps(ais_batch, sort_keys=False, indent=4)
+        #     jsonf.write(ais_collection_json)
         print("----------------------BATCH ", i / 100000, " INSERTED ----------------------")
 
     # TODO:- CHECK IF THIS BLOCK OF CODE NEEDED!
@@ -324,8 +329,61 @@ def preprocessAisDynamic() :
     #
     # # Open a json writer, and use the json.dumps()
     # # function to dump data
-    # with open(jsonFilePath, 'w', encoding='utf-8') as jsonf :
-    #     jsonf.write(ais_collection_json)
+    # with open(jsonFilePath_5m, 'w', encoding='utf-8') as jsonf :
+    #     jsonf.write(ais_batch)
 
     # return dict/json
     # return ais_collection
+
+
+def write_json(path, list, i):
+    data = []
+    try:
+        with open(path) as json_file :
+            data = json.load(json_file)
+    except:
+        print("no file or empty")
+
+    data.extend(list)
+
+    # r'json_data/ais_navigation_{}.json'.format(i)
+    with open(path, 'w', encoding='utf-8') as jsonf :
+        ais_collection_json = json.dumps(list, sort_keys=False, indent=4)
+        jsonf.write(ais_collection_json)
+
+
+def plotTimeDistribution():
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import  numpy as np
+    # 03/31/2016 ts=1459461599
+    # 09/30/2015 ts = 1443650401
+    # fetch mmsi_country
+    # ara 24 vdomades.
+    column_names, time = executeQuery(
+        """
+        select ts
+        from ais_data.dynamic_ships
+        """
+    )
+
+    df = pd.DataFrame(time, columns=column_names)
+    print(df.head())
+
+    ts_max = df['ts'].max()
+    ts_min = df['ts'].min()
+
+    ts_range = ts_max - ts_min
+    step = ts_range / 24
+    bins = np.linspace(ts_min, ts_max, int(step + 1))
+
+    df['ts'].hist(bins=24)
+
+    # print(bins)
+    #
+    # counts, _, _ = plt.hist(df['ts'], bins=bins)
+    plt.show()
+
+
+if __name__ == '__main__':
+    plotTimeDistribution()
