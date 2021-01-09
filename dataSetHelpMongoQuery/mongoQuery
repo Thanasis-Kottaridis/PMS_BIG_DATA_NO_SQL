@@ -441,3 +441,9 @@ db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-
 db.ais_navigation2.createIndex({"location":"2dsphere"})
 db.ais_navigation2.createIndex({"mmsi": 1})
 db.ais_navigation2.createIndex({"ts": 1})
+
+
+/**
+ * @SHARDING
+ */
+sh.enableSharding("marine_trafic")

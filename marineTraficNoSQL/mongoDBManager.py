@@ -30,7 +30,7 @@ one_hour_in_unix_time = 3600
 def connectMongoDB() :
     try :
         # conect to mongo server
-        # connect = MongoClient("mongodb://mongoadmin:mongoadmin@83.212.117.74/admin")
+        # connect = MongoClient("mongodb://mongoadmin2:mongoadmin@83.212.117.74/admin")
         # connect to local mongo db
         connect = MongoClient()
         print("Connected Successfully!")
@@ -39,15 +39,15 @@ def connectMongoDB() :
         print("Could not connect MongoDB")
 
 
-def queryResultToDictList(results) :
+def queryResultToDictList(results, dictlist=[]) :
     """
     this helper func converts pymongo query results into a list of dictionaries
 
+    :param dictlist:
     :param results: the results of pymongo query
     :return: returns a list of dictionaries
     """
 
-    dictlist = []
     for doc in results :
         dictlist.append(doc)
 
@@ -97,12 +97,13 @@ def convertLineStringToPolygon(line, d=0.1) :
         This helper func creates a polygon from a linestring geo json
     :param line: line string geojson
     :param d: threshold distance (2*d is the width of poly)
-    :return geoPolygon: polygon geojson,
-    :return dilated:shapely outer polygon,
-    :return eroded: shapely inner poly
+    :return :
+     - geoPolygon polygon geojson,
+     - dilated:shapely outer polygon,
+     - eroded: shapely inner poly
     """
 
-    line = LineString(line["coordinates"])
+    line = LineString(line)
     dilated = line.buffer(d)
     eroded = dilated.buffer(d / 2)
 
@@ -709,7 +710,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     collection = db.ais_navigation2
 
     # step 1
-    poly, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(trajectory, d=d)
+    poly, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(trajectory["coordinates"], d=d)
 
     # create mongo aggregation pipeline
     pipeline = [
@@ -940,48 +941,95 @@ def calculatePointsDistance(coords_1, coords_2) :
     # return geopy.distance.geodesic(coords_1, coords_2).km
 
 
-# def comparePointSets(pointSet1, pointSet2, d) :
-#     """
-#     this helper func is calculating the distance per point between 2 point sets
-#      (trajectories or points observed in a polygon)
-#
-#     step 1) create a vectorized 2d numpy array by applying calculatePointsDistance() helper function
-#     step 2) find 2d elements with values less than d, create a pair and add it in to a list
-#     step 3) calculate average distance for this 2 trajectories
-#
-#     :param pointSet1: list of lat, log pairs
-#     :param pointSet2: list of lat, log pairs
-#     :param d: distance threshold in kilometers.
-#     :return m: trajectory mean distance. The mean distance for all to all points of 2 point sets
-#     """
-#     start_time = time.time()
-#
-#     ps1 = np.array(pointSet1)
-#     ps2 = np.array(pointSet2)
-#
-#     # to signature sto np.vectorize leei gia kathe ena apo ta 2 (2d vectors me to (n),(n)) pare ola ta items (n) tis kathe "gramis"
-#     # kai tha epistrepsei ena return me to "()"
-#     fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
-#     r = fv(ps1[:, np.newaxis], ps2)
-#     # r = geopy.distance.geodesic(ps1, ps2).km  #a[:, None] + b * 2
-#
-#     # calculate mean
-#     m = np.mean(r)
-#
-#     # check if tranjectory is closer than threshold
-#     # rmatch = np.vectorize(lambda i: i <= d)
-#     # r_new = rmatch(r)
-#
-#     # r = r[r_new]
-#
-#     # get mean of 2d array
-#     print(r)
-#     print(np.mean(r))
-#     print("--- %s seconds ---" % (time.time() - start_time))
-#     return m
+def comparePointSets(pointSet1, pointSet2, d) :
+    """
+    this helper func is calculating the distance per point between 2 point sets
+     (trajectories or points observed in a polygon)
+
+    step 1) create a vectorized 2d numpy array by applying calculatePointsDistance() helper function
+    step 2) find 2d elements with values less than d, create a pair and add it in to a list
+    step 3) calculate average distance for this 2 trajectories
+
+    :param pointSet1: list of lat, log pairs
+    :param pointSet2: list of lat, log pairs
+    :param d: distance threshold in kilometers.
+    :return m: trajectory mean distance. The mean distance for all to all points of 2 point sets
+    """
+    start_time = time.time()
+
+    ps1 = np.array(pointSet1)
+    ps2 = np.array(pointSet2)
+
+    # to signature sto np.vectorize leei gia kathe ena apo ta 2 (2d vectors me to (n),(n)) pare ola ta items (n) tis kathe "gramis"
+    # kai tha epistrepsei ena return me to "()"
+    fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
+    r = fv(ps1[:, np.newaxis], ps2)
+    # r = geopy.distance.geodesic(ps1, ps2).km  #a[:, None] + b * 2
+
+    # calculate mean
+    m = np.mean(r)
+
+    # check if tranjectory is closer than threshold
+    # rmatch = np.vectorize(lambda i: i <= d)
+    # r_new = rmatch(r)
+
+    # r = r[r_new]
+
+    # get mean of 2d array
+    print(r)
+    print(np.mean(r))
+    print("--- %s seconds ---" % (time.time() - start_time))
+    return m
 
 
-def distanceJoinQuery(poly1, poly2, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None):
+def getEnrichBoundingBox(pointsList, theta=0) :
+    """
+    This helper func calculates the enrich bounding box of a polygon.
+    and returns its bottom left and upper right coordinates
+
+    :param poly:
+    :param theta:
+    :return: the polygon geo json of bounding box
+    """
+    x_coordinates, y_coordinates = zip(*pointsList)
+    # return [(min(x_coordinates), min(y_coordinates)), (max(x_coordinates), max(y_coordinates))]
+    return {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [min(x_coordinates), min(y_coordinates)],
+                [min(x_coordinates), max(y_coordinates)],
+                [max(x_coordinates), max(y_coordinates)],
+                [max(x_coordinates), min(y_coordinates)],
+                [min(x_coordinates), min(y_coordinates)],
+            ]
+        ]
+    }
+
+
+def distanceJoinQuery(polyList, theta, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None) :
+    """
+    Algorithm logic:
+    @MAIN IDEA
+    step 1: get all points in poly1 and poly2
+    step 2: for each poly filter the points that their distance from the other poly is greater than theta
+    because their is no way for point that have distance greater than theta to have a valid pair.
+
+    @ TEST IDEA.
+    step 1: get only points that are likely to be valid from poly1 and poly2
+        how to do that?
+        by creating a bounding box of each poly greater than 2theta on each side.
+        then query all points of poly1 that are inside the bounding box of poly2
+        and via versa
+
+    :param polyList:
+    :param theta:
+    :param timeFrom:
+    :param timeTo:
+    :param allowDiskUse:
+    :param collection:
+    :return:
+    """
 
     start_time = time.time()
     if collection is None :
@@ -993,36 +1041,106 @@ def distanceJoinQuery(poly1, poly2, timeFrom=None, timeTo=None, allowDiskUse=Fal
         collection = db.ais_navigation2
 
     # group all the pings in a list no requirement for more information
-    groupAgg = {"$group": {"_id": None, "location" : {"$push" : "$location.coordinates"}}}
+    groupAgg = {"$group" : {"_id" : None, "location" : {"$push" : "$location.coordinates"}}}
 
+    poly_dictList = []
+    # for i, poly in enumerate(polyList):
 
-    matchAggregation = {
-        "$match" : {
-            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
-            "location" : {"$geoWithin" : {"$geometry" : poly1}}
-        }
-    }
+    # crate a poly from target poly border as line
+    # sos: adding 0.1 distance pou poly to reduce failure probability
+    poly1_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly1["coordinates"][0], d=theta + 0.1)
+    poly2_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly2["coordinates"][0], d=theta + 0.1)
 
     pipeline = [
-        matchAggregation,
-        groupAgg
+        {"$match" : {
+            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : poly1}}
+            }
+        },
+        # {"$match" : {
+        #     # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+        #     "location" : {"$geoWithin" : {"$geometry" : poly2_expanded}}
+        #     }
+        # },
+        # groupAgg
+        # TEST
+        {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
     ]
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    dictlist = queryResultToDictList(results)
+    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
 
-
-
-    matchAggregation = {
-        "$match" : {
-            **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+    pipeline = [
+        {"$match" : {
+            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
             "location" : {"$geoWithin" : {"$geometry" : poly2}}
         }
-    }
+        },
+        # {"$match" : {
+        #     # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+        #     "location" : {"$geoWithin" : {"$geometry" : poly1_expanded}}
+        # }
+        # },
+        # groupAgg,
+        #TEST
+        {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
+    ]
 
+    # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    dictlist = queryResultToDictList(results)
+    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+
+    # filter points and keep only thouse has distance less than theta.
+    # for i, poly_points in enumerate(poly_dictList) :
+        # poly = sg.Polygon(polyList[i]["coordinates"][0])
+        # np_points = poly_points["location"]
+        # link gia na ipologisw tin apostasi tou simiou apo to polygon
+        # https://gis.stackexchange.com/questions/342433/calculating-distance-from-polygon-to-point
+        # fv = np.vectorize(lambda point: )
+        # r = fv(ps1[:, np.newaxis], ps2)
+        # sg.Polygon(polyList[0]["coordinates"][0]).boundary.distance(sg.Point([-4.783252, 47.354046]))
+        # sg.Point([-5.1855469, 47.5765257]).distance(sg.Point([-4.783252, 47.354046])) # 0.4597155680179872
+    print(poly_dictList)
+    #
+    # # compare 2 point sets.
+    #
+    #
+    # matchAggregation = {
+    #     "$match" : {
+    #         **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+    #         "location" : {"$geoWithin" : {"$geometry" : poly2}}
+    #     }
+    # }
+    #
+    # results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    # poly2_dictList = queryResultToDictList(results)
+    #
+    # comparePointSets(poly1_dictList[0]["location"], poly2_dictList[0]["location"], 100)
+
+    # Draw polygons
+    ax = createAXNFigure()
+    cmap = get_cmap(len(poly_dictList))
+
+    # plot pings
+    for index, ship in enumerate(poly_dictList) :
+        isFirst = True
+        for ping in ship["location"] :
+            ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index + 1),
+                    label=ship["_id"] if isFirst else None)
+            isFirst = False
+
+
+    ax.add_patch(PolygonPatch(poly1_expanded, fc="k", ec="k", alpha=0.2, zorder=2, label="Polygon 1 Expanded"))
+    ax.add_patch(PolygonPatch(poly1, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
+    ax.add_patch(PolygonPatch(poly2_expanded, fc="r", ec="r", alpha=0.2, zorder=2, label="Polygon 2 Expanded"))
+    ax.add_patch(PolygonPatch(poly2, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2, label="Polygon 2"))
+
+    ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5), ncol=1)
+    plt.title("Find Trajectories that pass near specific points in specific time interval")
+    plt.xlabel("Latitude")
+    plt.ylabel("Longitude")
+    plt.show()
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -1106,19 +1224,17 @@ if __name__ == '__main__' :
     poly1 = {
         "type" : "Polygon",
         "coordinates" : [
-                [
-
-                    [-5.1855469, 47.5765257],
-                    [-3.6474609, 46.7097359],
-                    [-2.6586914, 45.9511497],
-                    [-3.2299805, 45.7828484],
-                    [-4.7680664, 45.6908328],
-                    [-5.625, 46.4378569],
-                    [-6.0644531, 46.8000594],
-                    [-5.6469727, 47.44295],
-                    [-5.1855469, 47.5765257]
-                ]
-
+            [
+                [-5.1855469, 47.5765257],
+                [-3.6474609, 46.7097359],
+                [-2.6586914, 45.9511497],
+                [-3.2299805, 45.7828484],
+                [-4.7680664, 45.6908328],
+                [-5.625, 46.4378569],
+                [-6.0644531, 46.8000594],
+                [-5.6469727, 47.44295],
+                [-5.1855469, 47.5765257]
+            ]
         ]
     }
 
@@ -1140,7 +1256,7 @@ if __name__ == '__main__' :
     # matchAggregation = {"$match" : {"location" : {"$geoWithin" : {"$geometry" : poly1}}}}
     # # den to kanei plot
     # findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
-    distanceJoinQuery(poly1, poly2)
+    distanceJoinQuery([poly1, poly2], 1.5)
 
     # trajectory1 = findShipTrajectory()
     # trajectory2 = findShipTrajectory(mmsi=304808000)

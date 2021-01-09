@@ -6,7 +6,7 @@ import numpy as np
 
 if __name__ == '__main__' :
     # insert ais_navigation data to mongo
-    ais_navigation_json = dataPreprocessing.preprocessAisDynamic()
+     ais_navigation_json = dataPreprocessing.preprocessAisDynamic()
 
     # insert ports geo point data in mongo
     # 1) load json file from datasetJSON
@@ -48,9 +48,9 @@ if __name__ == '__main__' :
     # print("T", mortonCodeManager.DecodeMorton4Dt(morton))
 
 
-    """
-        Create countries collection
-    """
+    # """
+    #     Create countries collection
+    # """
     # # get country data
     # countries = dataPreprocessing.fetchMMSICountryData(isForAIS=False)
     # # converting into list
