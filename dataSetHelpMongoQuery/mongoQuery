@@ -218,7 +218,38 @@ trajectory = {
  */
 
 
-db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-7.072965,47.371117] }, distanceField: "dist.calculated", minDistance: nautical_mile_in_meters*10, maxDistance: nautical_mile_in_meters*30, spherical: true, key: "location"}, 'ts': {$gte: 1448988894, $lte: 1449075294}}},{$group: {_id: "$mmsi"}}])
+db.ais_navigation.aggregate([
+  {$geoNear: {
+    near: { 
+      type: "Point",
+       coordinates: [-7.072965,47.371117]
+      },
+      distanceField: "dist.calculated",
+      minDistance: 1852*10,
+      maxDistance: 1852*30,
+      spherical: true,
+      key: "location"
+    }},
+    { $match: {
+      'ts': {
+        $gte: 1448988894,
+        $lte: 1449075294}
+    }},
+    {$group: {_id: "$mmsi"}}])
+
+
+
+      db.ais_navigation2.aggregate([
+        {$geoNear: {
+          near: port_point.geometry,
+          distanceField: "dist.calculated", 
+          minDistance: nautical_mile_in_meters*10,
+          maxDistance: nautical_mile_in_meters*30,
+          spherical: true,
+          key: "location"
+        }},
+        {$group: {_id: "$mmsi"}}])
+
 
 
 /**
@@ -338,6 +369,7 @@ db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-
   }
 
 
+// me apostasi 100km se perasma me pano pao 90k kai 900. ping
 // poli 3 sub poly of poly2
 {
     "coordinates": [
@@ -423,12 +455,305 @@ db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-
   }
 
 
+
+
+
+  // new poly for distance join me apostasi 50 km
+  {
+    "coordinates": [
+      [
+        [-3.9385986,49.8946344],
+        [-3.6804199,50.0765319],
+        [-3.3013916,50.2103068],
+        [-2.9388428,49.9600554],
+        [-3.4194946,49.5287739],
+        [-3.9605713,49.7280302],
+        [-3.9385986,49.8946344]
+      ]
+    ],
+    "type": "Polygon"
+  }
+
+
+
+
+  {
+    "coordinates": [
+      [
+        [-3.9111328,48.9405432],
+        [-3.9385986,49.3859487],
+        [-3.4442139,49.5145101],
+        [-2.9223633,49.3966751],
+        [-2.3126221,49.099049],
+        [-2.6586914,48.9188897],
+        [-3.2958984,49.0450696],
+        [-3.9111328,48.9405432]
+      ]
+    ],
+    "type": "Polygon"
+  }
+
+
 // mongo query gia na parw ta pings apo to poligono grouparismena se mia lista.
   db.ais_navigation2.aggregate([{$match: { "location" : {"$geoWithin" : {"$geometry" : poly}}}}, {$group: { _id: null, "location" : {"$push" : "$location.coordinates"}}}])
   // query gia na parw to sum ton points sto poly
   db.ais_navigation2.aggregate([{$match: { "location" : {"$geoWithin" : {"$geometry" : poly}}}}, {$group: { _id: null,count: { $sum: 1 } }}])
 
+// DISTANCE JOIN MONGO APPROCH
+//STEP 1 CREATE A POLY COLLECTION
+db.query_polygons.insertMany([
+    {
+      "_id" : "test_poly_1",
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [-5.1855469, 47.5765257],
+                [-3.6474609, 46.7097359],
+                [-2.6586914, 45.9511497],
+                [-3.2299805, 45.7828484],
+                [-4.7680664, 45.6908328],
+                [-5.625, 46.4378569],
+                [-6.0644531, 46.8000594],
+                [-5.6469727, 47.44295],
+                [-5.1855469, 47.5765257]
+            ]
+        ] 
+      }
+  },
+  {
+    "_id" : "test_poly_2",
+    "geometry" : {
+      "type" : "Polygon",
+      "coordinates" : [
+          [
+              [-7.6464844, 45.3675844],
+              [-3.7792969, 44.6217541],
+              [-1.8896484, 44.4337798],
+              [-2.4169922, 43.5166885],
+              [-8.7451172, 44.0560117],
+              [-8.9208984, 45.5525253],
+              [-7.6464844, 45.3675844]
+          ]
+      ] 
+    }
+  }    
+])
 
+
+
+/**
+ * sto let vazoume fields tou ekso collection
+ * kai to match kanoume anafora sta fields tou mesa me $ kai tou ekso me $$
+ */
+db.query_polygons.aggregate([
+  {
+    $lookup:
+      {
+         from: "ais_navigation2",
+         let: { geometry: "$geometry"},
+         pipeline: [{
+           $match: {
+            location: {$geoWithin: {"$geometry": {
+              "type" : "Polygon",
+              "coordinates" : "$$geometry"}}}
+            }
+           }],  // Cannot include $out or $merge
+         as: "pings_in_poly"
+      }
+  }
+]).pretty()
+
+
+
+db.ais_navigation2.aggregate([
+  {
+    $lookup:
+      {
+         from: "query_polygons",
+         let: { poly: "$coordinates"},
+         pipeline: [{
+           $match: {
+            "location" : { 
+              $geoWithin: { $geometry: {
+                "type" : "Polygon",
+                "coordinates" : "$coordinates"
+                } 
+              }
+            }
+           }
+         }],  // Cannot include $out or $merge
+         as: "pings_in_poly"
+      }
+  }
+])
+
+
+
+$expr: {
+  "location" : { 
+    $geoWithin: { $geometry: {
+      "type" : "Polygon",
+      "coordinates" : "$$poly"
+      } 
+    }
+  }
+ }
+
+
+$match: { "location" : { 
+  $geoWithin: { $geometry: {
+    "type" : "Polygon",
+    "coordinates" : "$$poly"
+  } 
+}
+}
+}
+
+
+db.ais_navigation.aggregate({$match: {location: {$geoWithin: {$geometry: poly.geometry}}}})
+
+
+
+db.ais_navigation.aggregate([{$match: {location: {$geoWithin: {"$geometry": {
+  "type" : "Polygon",
+  "coordinates" : [
+      [
+          [-7.6464844, 45.3675844],
+          [-3.7792969, 44.6217541],
+          [-1.8896484, 44.4337798],
+          [-2.4169922, 43.5166885],
+          [-8.7451172, 44.0560117],
+          [-8.9208984, 45.5525253],
+          [-7.6464844, 45.3675844]
+      ]
+  ]
+}
+}}
+}}])
+
+var poly = {
+  "_id" : "test_poly_2",
+  "geometry" : {
+    "type" : "Polygon",
+    "coordinates" : [
+        [
+            [-7.6464844, 45.3675844],
+            [-3.7792969, 44.6217541],
+            [-1.8896484, 44.4337798],
+            [-2.4169922, 43.5166885],
+            [-8.7451172, 44.0560117],
+            [-8.9208984, 45.5525253],
+            [-7.6464844, 45.3675844]
+        ]
+    ] 
+  }
+} 
+
+var poly = db.world_seas.findOne({"properties.NAME": "Celtic Sea"})
+db.ais_navigation2.aggregate({$match: {location: {$geoWithin: {$geometry: poly.geometry}}}})
+
+db.world_seas.aggregate([{
+
+}])
+
+db.ais_navigation.aggregate({$match: {mmsi: 205204000}})
+
+
+// valid location
+"location" : {
+  "type" : "Point",
+  "coordinates" : [
+    -4.1660385,
+    50.334972
+  ]
+}
+
+"location" : {
+  "type" : "Point",
+  "coordinates" : [
+    50.334972,
+    -4.1660385
+  ]
+}
+
+
+/**
+ * fix reversed lat long bug on server
+ */
+// test doc
+db.ais_navigation.find({"mmsi": 923166, "ts": 1448977419}).pretty()
+// resstore func
+// ferst get all documents
+// then update them and push them
+//{ "_id" : ObjectId("5ff9cba3a589db8f094d8927"),
+// "location" : { "coordinates" : [ 50.334972, -4.1660385 ] } }
+
+db.ais_navigation.find({},{"location.coordinates": 1}).forEach( function(doc){
+  var longitude = doc.location.coordinates[1]
+  doc.location.coordinates[1] = doc.location.coordinates[0]
+  doc.location.coordinates[0] = longitude
+
+  //then update doc
+  db.ais_navigation.update({"_id": doc._id}, {
+    $set: {
+      "location.coordinates": doc.location.coordinates
+    }
+  })
+})
+
+db.ais_navigation.updateMany(
+  {}
+  [{"$set":{
+     "location" : {
+      type:"Point",
+      coordinates:[
+        "$location.coordinates[1]",
+        "$location.coordinates[0]"
+      ]
+     }
+   }
+  }]
+)
+
+// aggregation version
+db.ais_navigation.aggregate([{
+  $addFields:{
+    longitude: {
+      $function:{
+        body: function(coord){
+          var longitude = coord[1]
+          
+        
+          return longitude 
+        },
+        args: ["$location.coordinates"],
+        lang: "js"
+      }
+    },
+    latitude: {
+      $function:{
+        body: function(coord){
+          var latitude = coord[0]
+          
+        
+          return latitude 
+        },
+        args: ["$location.coordinates"],
+        lang: "js"
+      }
+    }
+  }
+}])
+
+
+/**
+* entoles
+*/
+
+db.dropDatabase()
+db.ais_navigation.getShardDistribution()
+db.ais_navigation.getIndexes()
 
 /**
  * @INDEXING 
@@ -438,12 +763,13 @@ db.ais_navigation2.aggregate([{$geoNear: {near: { type: "Point", coordinates: [-
  * by default iparxei enas index sto id (morton code)
  */
 
-db.ais_navigation2.createIndex({"location":"2dsphere"})
-db.ais_navigation2.createIndex({"mmsi": 1})
-db.ais_navigation2.createIndex({"ts": 1})
-
+db.ais_navigation.createIndex({"location":"2dsphere"})
+db.ais_navigation.createIndex({"mmsi": 1})
+db.ais_navigation.createIndex({"ts": 1})
+db.ais_navigation.createIndex( { "ts": 1, "mmsi": "hashed"} )
 
 /**
  * @SHARDING
  */
 sh.enableSharding("marine_trafic")
+sh.shardCollection("marine_trafic.ais_navigation", {"ts": 1, "mmsi":"hashed"})

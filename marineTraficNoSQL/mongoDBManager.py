@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from descartes import PolygonPatch
 from shapely.geometry import LineString
 import shapely.geometry as sg
+import geog
 import time
 import geopy.distance
 
@@ -30,13 +31,29 @@ one_hour_in_unix_time = 3600
 def connectMongoDB() :
     try :
         # conect to mongo server
-        # connect = MongoClient("mongodb://mongoadmin2:mongoadmin@83.212.117.74/admin")
+        # connect = MongoClient("mongodb://mongoadmin:mongoadmin@83.212.117.74/admin")
         # connect to local mongo db
         connect = MongoClient()
-        print("Connected Successfully!")
+        # print("Connected Successfully!")
         return connect
     except :
         print("Could not connect MongoDB")
+
+
+def queryResultToDictList(results) :
+    """
+    this helper func converts pymongo query results into a list of dictionaries
+
+    :param dictlist:
+    :param results: the results of pymongo query
+    :return: returns a list of dictionaries
+    """
+    dictlist = []
+
+    for doc in results :
+        dictlist.append(doc)
+
+    return dictlist
 
 
 def queryResultToDictList(results, dictlist=[]) :
@@ -360,7 +377,7 @@ def findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294, colle
     ]
 
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results)
+    dictlist = queryResultToDictList(results, dictlist=[])
 
     # print(json.dumps(dictlist, sort_keys=False, indent=4))
 
@@ -428,8 +445,8 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
 
         if len(dictlist) < 50 :  # show legend
             plt.title("Trajectories")
-        plt.xlabel("Latitude")
-        plt.ylabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.xlabel("Longitude")
         plt.show()
 
     return dictlist
@@ -549,8 +566,8 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
         ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
                   ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
         plt.title(queryTitle)
-        plt.xlabel("Latitude")
-        plt.ylabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.xlabel("Longitude")
         plt.show()
 
     return dictlist
@@ -609,8 +626,8 @@ def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=No
             ax.plot(ship["location"]["coordinates"][0], ship["location"]["coordinates"][1], 'ro', alpha=0.5)
 
         plt.title(queryTitle)
-        plt.xlabel("Latitude")
-        plt.ylabel("Longitude")
+        plt.y("Latitude")
+        plt.xlabel("Longitude")
         plt.show()
 
     return dictlist
@@ -753,8 +770,8 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
               ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
     plt.title("Find Trajectories that pass near specific points in specific time interval")
-    plt.xlabel("Latitude")
-    plt.ylabel("Longitude")
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
     plt.show()
 
 
@@ -902,14 +919,14 @@ def findTrajectoriesFromPoints(pointsList) :
     # plot trajectories
     for i, trajj in enumerate(trajectories) :
         if 2 < len(trajj["coordinates"]) :
-            plotLineString(ax, trajj, color=cmap(i + 3), alpha=0.5,
+            plotLineString(ax, trajj, color=cmap(i + 3), alpha=1,
                            label=validMMSITimePair[i]["mmsi"])  # alpha 0.5 gia na doume overlaps
 
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
               ncol=1 if len(trajectories) < 10 else int(len(trajectories) / 10))
     plt.title("Find Trajectories that pass near specific points in specific time interval")
-    plt.xlabel("Latitude")
-    plt.ylabel("Longitude")
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
     plt.show()
 
 
@@ -941,6 +958,13 @@ def calculatePointsDistance(coords_1, coords_2) :
     # return geopy.distance.geodesic(coords_1, coords_2).km
 
 
+def comparePoints(point1, point2, d):
+    if calculatePointsDistance(point1, point2) <= d:
+        return True
+    else:
+        return False
+
+
 def comparePointSets(pointSet1, pointSet2, d) :
     """
     this helper func is calculating the distance per point between 2 point sets
@@ -962,24 +986,35 @@ def comparePointSets(pointSet1, pointSet2, d) :
 
     # to signature sto np.vectorize leei gia kathe ena apo ta 2 (2d vectors me to (n),(n)) pare ola ta items (n) tis kathe "gramis"
     # kai tha epistrepsei ena return me to "()"
-    fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
-    r = fv(ps1[:, np.newaxis], ps2)
-    # r = geopy.distance.geodesic(ps1, ps2).km  #a[:, None] + b * 2
-
-    # calculate mean
-    m = np.mean(r)
-
-    # check if tranjectory is closer than threshold
+    # fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
+    # r = fv(ps1[:, np.newaxis], ps2)
+    # # r = geopy.distance.geodesic(ps1, ps2).km  #a[:, None] + b * 2
+    #
+    # # calculate mean
+    # # m = np.mean(r)
+    #
+    # # check if tranjectory is closer than threshold
     # rmatch = np.vectorize(lambda i: i <= d)
     # r_new = rmatch(r)
+    #
+    # # get i, j of ture values
+    # r = np.argwhere(r_new)# r[r_new]
+    # # rmatch = np.vectorize(lambda i : i <= d)
+    #
+    fv = np.vectorize(lambda i , j: comparePoints(i, j, d), signature='(n),(n)->()')
+    r = fv(ps1[:, np.newaxis], ps2)
+    r = np.argwhere(r)
 
-    # r = r[r_new]
+    p1i, p2i = zip(*r)
+    # r = r[~np.isnan(r)]
+    # r = r[r.astype(bool)]
 
     # get mean of 2d array
-    print(r)
-    print(np.mean(r))
+    print(len(p1i))
     print("--- %s seconds ---" % (time.time() - start_time))
-    return m
+    print(len(p2i))
+
+    return p1i, p2i
 
 
 def getEnrichBoundingBox(pointsList, theta=0) :
@@ -993,21 +1028,82 @@ def getEnrichBoundingBox(pointsList, theta=0) :
     """
     x_coordinates, y_coordinates = zip(*pointsList)
     # return [(min(x_coordinates), min(y_coordinates)), (max(x_coordinates), max(y_coordinates))]
-    return {
-        "type" : "Polygon",
-        "coordinates" : [
-            [
+    MBB_points = [
                 [min(x_coordinates), min(y_coordinates)],
                 [min(x_coordinates), max(y_coordinates)],
                 [max(x_coordinates), max(y_coordinates)],
                 [max(x_coordinates), min(y_coordinates)],
                 [min(x_coordinates), min(y_coordinates)],
             ]
+
+    enritch_MBB_points_x = []
+    enritch_MBB_points_y = []
+    for point in MBB_points:
+        p = sg.Point(point)
+        n_points = 5
+        d = theta * 1000  # meters
+        angles = np.linspace(0, 360, n_points)
+        polygon = geog.propagate(p, angles, d)
+        # test = {
+        #     "_id" : "test_poly_2",
+        #     "type" : "Polygon",
+        #     "coordinates" : [polygon]
+        # }
+        # ax.add_patch(PolygonPatch(test, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
+        # plt.ylabel("Latitude")
+        # plt.xlabel("Longitude")
+        # plt.show()
+        xs, ys = zip(*polygon)
+        print(calculatePointsDistance(point,
+                                      polygon[3]))
+
+        enritch_MBB_points_x.extend([min(xs), max(xs)])
+        enritch_MBB_points_y.extend([min(ys), max(ys)])
+
+
+    # TODO SOS GIA DISTANCE JOIN
+
+
+
+
+    # print(polygon)
+    # test = {
+    #     "_id" : "test_poly_2",
+    #     "type" : "Polygon",
+    #     "coordinates" : [
+    #         [
+    #             [min(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+    #             [min(enritch_MBB_points_x), max(enritch_MBB_points_y)],
+    #             [max(enritch_MBB_points_x), max(enritch_MBB_points_y)],
+    #             [max(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+    #             [min(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+    #         ]
+    #     ]
+    # }
+    # sg.Polygon(polygon)
+
+
+    # ax = createAXNFigure()
+    # ax.add_patch(PolygonPatch(test, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
+    # plt.ylabel("Latitude")
+    # plt.xlabel("Longitude")
+    # plt.show()
+
+    return {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [min(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+                [min(enritch_MBB_points_x), max(enritch_MBB_points_y)],
+                [max(enritch_MBB_points_x), max(enritch_MBB_points_y)],
+                [max(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+                [min(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+            ]
         ]
     }
 
 
-def distanceJoinQuery(polyList, theta, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None) :
+def distanceJoinPolyQuery(p1, p2, theta, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None) :
     """
     Algorithm logic:
     @MAIN IDEA
@@ -1022,7 +1118,8 @@ def distanceJoinQuery(polyList, theta, timeFrom=None, timeTo=None, allowDiskUse=
         then query all points of poly1 that are inside the bounding box of poly2
         and via versa
 
-    :param polyList:
+    :param p1:
+    :param p2:
     :param theta:
     :param timeFrom:
     :param timeTo:
@@ -1048,23 +1145,25 @@ def distanceJoinQuery(polyList, theta, timeFrom=None, timeTo=None, allowDiskUse=
 
     # crate a poly from target poly border as line
     # sos: adding 0.1 distance pou poly to reduce failure probability
-    poly1_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly1["coordinates"][0], d=theta + 0.1)
-    poly2_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly2["coordinates"][0], d=theta + 0.1)
+    # poly1_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly1["coordinates"][0], d=theta + 0.1)
+    # poly2_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly2["coordinates"][0], d=theta + 0.1)
+    poly1_expanded = getEnrichBoundingBox(p1["coordinates"][0], theta)
+    poly2_expanded = getEnrichBoundingBox(p2["coordinates"][0], theta)
 
     pipeline = [
         {"$match" : {
-            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
-            "location" : {"$geoWithin" : {"$geometry" : poly1}}
+            **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : p1}}
             }
         },
-        # {"$match" : {
-        #     # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
-        #     "location" : {"$geoWithin" : {"$geometry" : poly2_expanded}}
-        #     }
-        # },
-        # groupAgg
+        {"$match" : {
+            **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : poly2_expanded}}
+            }
+        },
+        groupAgg
         # TEST
-        {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
+        # {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
     ]
 
     # execute query
@@ -1074,61 +1173,48 @@ def distanceJoinQuery(polyList, theta, timeFrom=None, timeTo=None, allowDiskUse=
     pipeline = [
         {"$match" : {
             # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
-            "location" : {"$geoWithin" : {"$geometry" : poly2}}
+            "location" : {"$geoWithin" : {"$geometry" : p2}}
         }
         },
-        # {"$match" : {
-        #     # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
-        #     "location" : {"$geoWithin" : {"$geometry" : poly1_expanded}}
-        # }
-        # },
-        # groupAgg,
+        {"$match" : {
+            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : poly1_expanded}}
+        }
+        },
+        groupAgg,
         #TEST
-        {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
+        # {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
     ]
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
     poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
 
-    # filter points and keep only thouse has distance less than theta.
-    # for i, poly_points in enumerate(poly_dictList) :
-        # poly = sg.Polygon(polyList[i]["coordinates"][0])
-        # np_points = poly_points["location"]
-        # link gia na ipologisw tin apostasi tou simiou apo to polygon
-        # https://gis.stackexchange.com/questions/342433/calculating-distance-from-polygon-to-point
-        # fv = np.vectorize(lambda point: )
-        # r = fv(ps1[:, np.newaxis], ps2)
-        # sg.Polygon(polyList[0]["coordinates"][0]).boundary.distance(sg.Point([-4.783252, 47.354046]))
-        # sg.Point([-5.1855469, 47.5765257]).distance(sg.Point([-4.783252, 47.354046])) # 0.4597155680179872
-    print(poly_dictList)
-    #
-    # # compare 2 point sets.
-    #
-    #
-    # matchAggregation = {
-    #     "$match" : {
-    #         **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
-    #         "location" : {"$geoWithin" : {"$geometry" : poly2}}
-    #     }
-    # }
-    #
-    # results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    # poly2_dictList = queryResultToDictList(results)
-    #
-    # comparePointSets(poly1_dictList[0]["location"], poly2_dictList[0]["location"], 100)
+    ps1, ps2 = comparePointSets(poly_dictList[0]["location"], poly_dictList[1]["location"], theta)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     # Draw polygons
     ax = createAXNFigure()
-    cmap = get_cmap(len(poly_dictList))
+
+    # cmap = get_cmap(len(poly_dictList["location"]))
 
     # plot pings
+    isFirstRed = True
+    isFirstGreen = True
     for index, ship in enumerate(poly_dictList) :
-        isFirst = True
-        for ping in ship["location"] :
-            ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index + 1),
-                    label=ship["_id"] if isFirst else None)
-            isFirst = False
+        for pIndex, ping in enumerate(ship["location"]) :
+            if(index == 0 and pIndex in ps1) or (index == 1 and pIndex in ps2):
+                ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.5, c='g', label="matching points" if isFirstGreen else None)
+                isFirstGreen = False
+            else:
+                ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.5, c='r', label="non matching points" if isFirstRed else None)
+                isFirstRed = False
+            # ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.5, c= 'g' if( index == 0 and pIndex in ps1) or (index == 1 and pIndex in ps2) else 'r',
+            #         label=ship["_id"] if isFirst else None)
+
+
+    # plot lines
+
 
 
     ax.add_patch(PolygonPatch(poly1_expanded, fc="k", ec="k", alpha=0.2, zorder=2, label="Polygon 1 Expanded"))
@@ -1136,13 +1222,124 @@ def distanceJoinQuery(polyList, theta, timeFrom=None, timeTo=None, allowDiskUse=
     ax.add_patch(PolygonPatch(poly2_expanded, fc="r", ec="r", alpha=0.2, zorder=2, label="Polygon 2 Expanded"))
     ax.add_patch(PolygonPatch(poly2, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2, label="Polygon 2"))
 
-    ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5), ncol=1)
+    ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
     plt.title("Find Trajectories that pass near specific points in specific time interval")
-    plt.xlabel("Latitude")
-    plt.ylabel("Longitude")
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
     plt.show()
 
+
+def distanceJoinRectQuery(rect1, rect2, theta, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None):
+    """
+       :param rect1:
+       :param rect2:
+       :param theta:
+       :param timeFrom:
+       :param timeTo:
+       :param allowDiskUse:
+       :param collection:
+       :return:
+       """
+
+    start_time = time.time()
+    if collection is None :
+        connection = connectMongoDB()
+        # connecting or switching to the database
+        db = connection.marine_trafic
+
+        # creating or switching to ais_navigation collection
+        collection = db.ais_navigation2
+
+    # group all the pings in a list no requirement for more information
+    groupAgg = {"$group" : {"_id" : None, "location" : {"$push" : "$location.coordinates"}}}
+
+    poly_dictList = []
+    # for i, poly in enumerate(polyList):
+
+    # crate a poly from target poly border as line
+    # sos: adding 0.1 distance pou poly to reduce failure probability
+    # poly1_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly1["coordinates"][0], d=theta + 0.1)
+    # poly2_expanded, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(poly2["coordinates"][0], d=theta + 0.1)
+    rect1_expanded = getEnrichBoundingBox(rect1, theta)
+    rect2_expanded = getEnrichBoundingBox(rect2, theta)
+
+    pipeline = [
+        {"$match" : {
+            **({'ts' : {"$gte" : timeFrom, "$lte" : timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$box" : rect1}}
+        }
+        },
+        {"$match" : {
+            **({'ts' : {"$gte" : timeFrom, "$lte" : timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : rect2_expanded}}
+        }
+        },
+        groupAgg
+        # TEST
+        # {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
+    ]
+
+    # execute query
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+
+    pipeline = [
+        {"$match" : {
+            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : rect1}}
+        }
+        },
+        {"$match" : {
+            # **({'ts': {"$gte": timeFrom, "$lte": timeTo}} if timeFrom is not None and timeTo is not None else {}),
+            "location" : {"$geoWithin" : {"$geometry" : rect1_expanded}}
+        }
+        },
+        groupAgg,
+        # TEST
+        # {"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}}
+    ]
+
+    # execute query
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+
+    r = comparePointSets(poly_dictList[0]["location"], poly_dictList[1]["location"], theta)
     print("--- %s seconds ---" % (time.time() - start_time))
+
+    # Draw polygons
+    ax = createAXNFigure()
+
+    cmap = get_cmap(len(poly_dictList))
+
+    # plot pings
+    for index, ship in enumerate(poly_dictList) :
+        isFirst = True
+        for ping in ship["location"] :
+            ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index),
+                    label=ship["_id"] if isFirst else None)
+            isFirst = False
+
+    rect1_x, rect1_y = zip(*rect1)
+    rect2_x, rect2_y = zip(*rect2)
+    rect1_poly = [[min(rect1_x), min(rect1_y)], [min(rect1_x), max(rect1_y)], [max(rect1_x), max(rect1_y)],
+                  [max(rect1_x), min(rect1_y)], [min(rect1_x), min(rect1_y)]]
+    rect2_poly = [[min(rect2_x), min(rect2_y)], [min(rect2_x), max(rect2_y)], [max(rect2_x), max(rect2_y)],
+                  [max(rect2_x), min(rect2_y)], [min(rect2_x), min(rect2_y)]]
+
+    ax.add_patch(PolygonPatch(rect1_expanded, fc="k", ec="k", alpha=0.2, zorder=2, label="Polygon 1 Expanded"))
+    ax.add_patch(PolygonPatch(rect1_poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
+    ax.add_patch(PolygonPatch(rect2_expanded, fc="r", ec="r", alpha=0.2, zorder=2, label="Polygon 2 Expanded"))
+    ax.add_patch(PolygonPatch(rect2_poly, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2, label="Polygon 2"))
+
+    ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5), ncol=1)
+    plt.title("Find Trajectories that pass near specific points in specific time interval")
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
+    plt.show()
+
+
+def distanceJoinSphereQuery(p1, r1, p2, r2, theta, timeFrom=None, timeTo=None, allowDiskUse=False, collection=None):
+    print("im in distance join sphere")
 
 
 if __name__ == '__main__' :
@@ -1220,35 +1417,36 @@ if __name__ == '__main__' :
     point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
     # findShipsNearPoint(point, doPlot=True, k_near=20)
 
-    # query 4
+    # query 4.1 distance join with polygons
     poly1 = {
+        "_id" : "test_poly_1",
         "type" : "Polygon",
         "coordinates" : [
             [
-                [-5.1855469, 47.5765257],
-                [-3.6474609, 46.7097359],
-                [-2.6586914, 45.9511497],
-                [-3.2299805, 45.7828484],
-                [-4.7680664, 45.6908328],
-                [-5.625, 46.4378569],
-                [-6.0644531, 46.8000594],
-                [-5.6469727, 47.44295],
-                [-5.1855469, 47.5765257]
+                [-3.9385986, 49.8946344],
+                [-3.6804199, 50.0765319],
+                [-3.3013916, 50.2103068],
+                [-2.9388428, 49.9600554],
+                [-3.4194946, 49.5287739],
+                [-3.9605713, 49.7280302],
+                [-3.9385986, 49.8946344]
             ]
         ]
     }
 
     poly2 = {
+        "_id" : "test_poly_2",
         "type" : "Polygon",
         "coordinates" : [
             [
-                [-7.6464844, 45.3675844],
-                [-3.7792969, 44.6217541],
-                [-1.8896484, 44.4337798],
-                [-2.4169922, 43.5166885],
-                [-8.7451172, 44.0560117],
-                [-8.9208984, 45.5525253],
-                [-7.6464844, 45.3675844]
+                [-3.9111328, 48.9405432],
+                [-3.9385986, 49.3859487],
+                [-3.4442139, 49.5145101],
+                [-2.9223633, 49.3966751],
+                [-2.3126221, 49.099049],
+                [-2.6586914, 48.9188897],
+                [-3.2958984, 49.0450696],
+                [-3.9111328, 48.9405432]
             ]
         ]
     }
@@ -1256,7 +1454,17 @@ if __name__ == '__main__' :
     # matchAggregation = {"$match" : {"location" : {"$geoWithin" : {"$geometry" : poly1}}}}
     # # den to kanei plot
     # findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
-    distanceJoinQuery([poly1, poly2], 1.5)
+    distanceJoinPolyQuery(poly1, poly2, 50)
+
+    # query 4.2 distance join with boxies
+    box1 = []
+    box2 = []
+    distanceJoinRectQuery(box1, box2, 100)
+
+    # query 4.3 distance join given point and R
+    distanceJoinSphereQuery()
+
+
 
     # trajectory1 = findShipTrajectory()
     # trajectory2 = findShipTrajectory(mmsi=304808000)
@@ -1334,7 +1542,8 @@ if __name__ == '__main__' :
     """
     pointsList = [
         {"type" : "Point", "coordinates" : [-7.072965, 47.371117]},
-        {"type" : "Point", "coordinates" : [-7.0410814, 47.4131]},
-        {"type" : "Point", "coordinates" : [-6.868215, 47.6239]}
+        {"type" : "Point", "coordinates" : [-6.494, 47.820]},
+        {"type" : "Point", "coordinates" : [-5.683, 48.480]}
     ]
     # findTrajectoriesFromPoints(pointsList)
+

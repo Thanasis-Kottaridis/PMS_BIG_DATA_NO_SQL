@@ -143,25 +143,25 @@ def fetchShipMetadata() :
     print(len(ship_metadata))
 
     # fetch ship spexts from ANFR using postgress
-    ship_specs_column_names, ship_specs = executeQuery(
-        """
-        with ping_mmsi as(
-	        SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi
-	        FROM ais_data.dynamic_ships D 
-	        ORDER BY mmsi, lat, lon, ts
-        ) select DISTINCT ON (VL.mmsi) VL.mmsi, VL.imo_number, VL.ship_name, VL.callsign, VL.length, VL.tonnage, VL.tonnage_unit, VL.materiel_onboard
-        from vesselregister.anfr_vessel_list VL Inner Join ping_mmsi PM on
-        PM.mmsi = VL.mmsi
-        """
-    )
+    # ship_specs_column_names, ship_specs = executeQuery(
+    #     """
+    #     with ping_mmsi as(
+	#         SELECT DISTINCT ON ( mmsi, lat, lon, ts) mmsi
+	#         FROM ais_data.dynamic_ships D
+	#         ORDER BY mmsi, lat, lon, ts
+    #     ) select DISTINCT ON (VL.mmsi) VL.mmsi, VL.imo_number, VL.ship_name, VL.callsign, VL.length, VL.tonnage, VL.tonnage_unit, VL.materiel_onboard
+    #     from vesselregister.anfr_vessel_list VL Inner Join ping_mmsi PM on
+    #     PM.mmsi = VL.mmsi
+    #     """
+    # )
 
-    print(ship_specs_column_names)
-    print(len(ship_specs))
+    # print(ship_specs_column_names)
+    # print(len(ship_specs))
 
     # fetch ship type with details
     ship_type_column_names, ship_types = executeQuery(
         """
-        SELECT  D.id_detailedtype, D.detailed_type, T.id_shiptype, T.type_name, T.ais_type_summary
+        SELECT T.id_shiptype, T.type_name
         FROM ais_status_codes_types.ship_types T INNER JOIN ais_status_codes_types.ship_types_detailed D
         ON T.id_shiptype = D.id_shiptype
         """
@@ -172,14 +172,12 @@ def fetchShipMetadata() :
 
     # Combine ship metadata with ship type in order to extract the complete ship_metadata
     ship_metadata_dict = preprocessShipMetaData(ship_metadata, ship_meta_column_names,
-                                                ship_types, ship_type_column_names,
-                                                ship_specs, ship_specs_column_names)
+                                                ship_types, ship_type_column_names)
     return ship_metadata_dict
 
 
 # creates a dict/json object with the ship metadata
-def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_columns, ship_specs,
-                           ship_specs_columns, ) :
+def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_columns ) :
     ship_meta_dict = {}
     ship_types_dict = {}
     ship_specs_dicts = {}
@@ -197,7 +195,8 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
         ship_data = dict(zip(ship_meta_columns[1 :- 1], row[1 :- 1]))  # we dont need mmsi in dict
         # adding to ship data the type using last column as key on ship_types_dict
         try :
-            ship_data["ship_type"] = ship_types_dict[row[-1]]
+            ship_data["id_shiptype"] = ship_types_dict["ship_types_dict"]
+            ship_data["type_name"] = ship_types_dict["type_name"]
         except :
             print("INVALID SHIP TYPE: ", row[-1])
 
@@ -206,23 +205,23 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
 
     # then we add ship specs into ship_meta_dict using mmsi as key if mmsi doesnt exist
     # we add all information imo,ship_type
-    for row in ship_specs :
-        ship_specs = dict(zip(ship_specs_columns[4 :- 1], row[4 :- 1]))
-        # add equipment in ship_specs
-        ship_specs["materiel_onboard"] = row[-1].split("-")
-        # check if mmsi exists in ship_meta_dict
-        if row[0] in ship_meta_dict :
-            # if so create ship specs dict
-            ship_meta_dict[row[0]]["ship_specs"] = ship_specs
-        else :
-            # create new ship meta
-            ship_meta_dict[row[0]] = {
-                **({'imo' : row[1]} if row[1] is not None else {}),
-                **({'callsign' : row[3]} if row[3] is not None else {}),
-                **({'shipname' : row[2]} if row[2] is not None else {}),
-                "ship_specs" : ship_specs
-            }
-        # print(json.dumps(ship_meta_dict[row[0]], sort_keys=False, indent=4))
+    # for row in ship_specs :
+    #     ship_specs = dict(zip(ship_specs_columns[4 :- 1], row[4 :- 1]))
+    #     # add equipment in ship_specs
+    #     ship_specs["materiel_onboard"] = row[-1].split("-")
+    #     # check if mmsi exists in ship_meta_dict
+    #     if row[0] in ship_meta_dict :
+    #         # if so create ship specs dict
+    #         ship_meta_dict[row[0]]["ship_specs"] = ship_specs
+    #     else :
+    #         # create new ship meta
+    #         ship_meta_dict[row[0]] = {
+    #             **({'imo' : row[1]} if row[1] is not None else {}),
+    #             **({'callsign' : row[3]} if row[3] is not None else {}),
+    #             **({'shipname' : row[2]} if row[2] is not None else {}),
+    #             "ship_specs" : ship_specs
+    #         }
+    #     # print(json.dumps(ship_meta_dict[row[0]], sort_keys=False, indent=4))
 
     print(json.dumps(ship_data, sort_keys=False, indent=4))
     return ship_meta_dict
@@ -386,4 +385,4 @@ def plotTimeDistribution():
 
 
 if __name__ == '__main__':
-    plotTimeDistribution()
+    ais_navigation_json = preprocessAisDynamic()
