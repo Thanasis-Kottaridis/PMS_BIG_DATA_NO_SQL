@@ -615,6 +615,15 @@ db.ais_navigation.aggregate({$match: {location: {$geoWithin: {$geometry: poly.ge
 
 
 
+db.ais_navigation2.aggregate([{$match: {location: {$geoWithin: {"$box": [
+  [-4.861, 49.458],
+  [-3.258, 50.164]
+]
+}}
+}}])
+
+
+
 db.ais_navigation.aggregate([{$match: {location: {$geoWithin: {"$geometry": {
   "type" : "Polygon",
   "coordinates" : [
@@ -631,6 +640,23 @@ db.ais_navigation.aggregate([{$match: {location: {$geoWithin: {"$geometry": {
 }
 }}
 }}])
+
+
+db.ais_navigation.aggregate([{ $match: {"ts": { $lte: 1451520000 }}},
+{
+  $count: "total_docs"
+}
+])
+
+
+
+db.ais_batch2.aggregate([{ $match: {"ts": { $gte: 1455494400 }}},
+{
+  $out: "ais_batch22"
+}
+])
+{  }
+
 
 var poly = {
   "_id" : "test_poly_2",
@@ -676,6 +702,140 @@ db.ais_navigation.aggregate({$match: {mmsi: 205204000}})
     -4.1660385
   ]
 }
+
+
+/**
+ * Distance join sphere
+ * https://stackoverflow.com/questions/57936820/how-to-use-geonear-after-lookup
+ * https://stackoverflow.com/questions/38339995/mongodb-geonear-with-multiple-matches-in-same-document
+ */
+db.ais_navigation.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 30.000,
+                      "spherical" : true, "key" : "location"}
+  },{"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 120.000,
+                      "spherical" : true, "key" : "location"}  
+  }
+])
+
+// PAIZEI ALLA EXEI TO SHARDED COLL STO LOOKUP
+db.ais_navigation2.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 30.000,
+                      "spherical" : true,
+                      "key" : "location"}
+  },{
+    $lookup:
+      {
+         from: "ais_navigation2",
+         let: { poly: "$location"},
+         pipeline: [
+          {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+          "distanceField" : "dist.calculated",
+          "maxDistance" : 120.000,
+          "spherical" : true, "key" : "location"}  
+}
+         ],  // Cannot include $out or $merge
+         as: "pings_in_poly"
+      }
+  },{
+    $unwind: "$pings_in_poly"
+  }
+]).pretty()
+
+// paralagi distance join me kiklous na ipostirizei kai shard.
+/**
+ * step1 aggregate in fist circle to get the risults
+ * step2 push results into array propubly using project
+ * step3 query for the second circle using $in aggregation for the above array to
+ * find the common elements  
+ */
+// STEP 1,2
+db.ais_navigation.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 30.000,
+                      "spherical" : true,
+                      "key" : "location"}
+  },{$group:{
+    "_id":"",
+     "id":{
+         $push : "$_id"
+     }
+}},
+{$project:{"id":1,"_id":0}}])
+
+//STEP 3
+db.ais_navigation.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+          "distanceField" : "dist.calculated",
+          "maxDistance" : 120.000,
+          "spherical" : true, "key" : "location"}
+  },{$match: {
+    _id: {
+      $in: db.ais_navigation.aggregate([
+        {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+                            "distanceField" : "dist.calculated",
+                            "maxDistance" : 30.000,
+                            "spherical" : true,
+                            "key" : "location"}
+        },{$group:{
+          "_id":"",
+           "id":{
+               $push : "$_id"
+           }
+      }},
+      {$project:{"id":1,"_id":0}}])
+      
+    }
+  }}
+])
+
+
+// db.ais_navigation.explain().aggregate(
+db.ais_navigation.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 30.000,
+                      "spherical" : true,
+                      "key" : "location"}
+  },
+  {$match: {'ts': {$gte: 1448988894, $lte: 1449075294}}},
+  {$group: {"_id":null, count: {$sum: 1}}}
+//   {$group:{
+//     "_id":"",
+//      "id":{
+//          $push : "$_id"
+//      }
+// }}
+  // {$project: {_id: 1}}
+  // {$count: "pointsInShape"}
+])
+
+db.ais_navigation.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+          "distanceField" : "dist.calculated",
+          "maxDistance" : 30.000,
+          "spherical" : true, "key" : "location"}
+  },
+  {$match: {'ts': {$gte: 1448988894, $lte: 1449075294}}},
+  {$count: "pointsInShape"}
+  // {$group: { _id: null , pings: {$push: "$_id"}}}
+  ])
+
+  db.ais_navigation.aggregate([
+    {"$geoNear" : {"near" :  {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 1000 * 30,
+                      "spherical" : true,"key" : "location"}},
+        {"$project": {"_id" : 1}}
+   ])
+
+
 
 
 /**
