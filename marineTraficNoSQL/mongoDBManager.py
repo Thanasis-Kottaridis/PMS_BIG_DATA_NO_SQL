@@ -19,6 +19,7 @@ import shapely.geometry as sg
 import geog
 import time
 import geopy.distance
+import mongoUtils
 
 # CONSTS
 BLUE = '#6699cc'
@@ -1869,7 +1870,7 @@ if __name__ == '__main__' :
         [-4.118, 49.451],
         [-5.401, 48.839]
     ]
-    findTrajectoriesInSpaTemBox(box1)
+    # findTrajectoriesInSpaTemBox(box1)
 
     """
         Bullet 4.2:
@@ -1894,3 +1895,43 @@ if __name__ == '__main__' :
     ]
     # findTrajectoriesFromPoints(pointsList)
 
+    #
+    #TEST
+    #
+    print("------------ TEST -------------")
+    poly1 = {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [-5.1855469, 47.5765257],
+                [-3.6474609, 46.7097359],
+                [-2.6586914, 45.9511497],
+                [-3.2299805, 45.7828484],
+                [-4.7680664, 45.6908328],
+                [-5.625, 46.4378569],
+                [-6.0644531, 46.8000594],
+                [-5.6469727, 47.44295],
+                [-5.1855469, 47.5765257]
+            ]
+        ]
+    }
+    poly = findPolyFromSeas(seaName="Bay of Biscay")
+    grid = mongoUtils.getPolyGrid2(poly1)
+    print(grid)
+
+    ax = createAXNFigure()
+
+    ax.add_patch(PolygonPatch(poly1, fc=BLUE, ec=BLUE, alpha=1, zorder=2, label="Trajectories Within Polygon"))
+    # grid.plot(grid, edgecolor='gray', ax=ax)
+
+    for cell in grid:
+        # p = {
+        #     "type" : "Polygon",
+        #     "coordinates" : [cell]
+        # }
+        ax.add_patch(
+            PolygonPatch(cell, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
+
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
+    plt.show()

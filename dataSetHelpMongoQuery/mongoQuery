@@ -778,7 +778,7 @@ db.ais_navigation.aggregate([
   },{$match: {
     _id: {
       $in: db.ais_navigation.aggregate([
-        {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+        {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-7.072965,47.371117]},
                             "distanceField" : "dist.calculated",
                             "maxDistance" : 30.000,
                             "spherical" : true,
@@ -789,8 +789,8 @@ db.ais_navigation.aggregate([
                $push : "$_id"
            }
       }},
-      {$project:{"id":1,"_id":0}}])
-      
+      {$project:{"id":1,"_id":0}}
+    ])     
     }
   }}
 ])
@@ -933,3 +933,39 @@ db.ais_navigation.createIndex( { "ts": 1, "mmsi": "hashed"} )
  */
 sh.enableSharding("marine_trafic")
 sh.shardCollection("marine_trafic.ais_navigation", {"ts": 1, "mmsi":"hashed"})
+
+
+
+var countX = 10; //cells by x
+var countY = 10; //cells by y
+var cellWidth = mapWidth / countX;
+var cellHeight = mapHeight / countY;
+
+var coordinates = [],
+    c = {x: 0, y: mapHeight}, //cursor
+    //top-left/top-right/bottom-right/bottom-left
+    tLx, tLy,   tRx, tRy,
+    bRx, bRy,   bLx, bLy;
+
+// build coordinates array, from top-left to bottom-right
+// count by row
+
+for(var iY = 0; iY < countY; iY++){
+  // count by cell in row
+  for(var iX = 0; iX < countX; iX++){
+    tLx = bLx = c.x;
+    tLy = tRy = c.y;
+    tRx = bRx =c.x + cellWidth;
+    bRy = bLy = c.y - cellHeight;
+    var cell = [
+      // top-left/top-right/bottom-right/bottom-left/top-left
+      [tLx, tLy], [tRx, tRy], [bRx, bRy], [bLx, bLy], [tLx, tLy]
+    ];
+    coordinates.push(cell);
+    // refresh cusror for cell
+    c.x = c.x + cellWidth;
+  }
+  // refresh cursor for row
+  c.x = 0;
+  c.y = c.y - cellHeight;
+}
