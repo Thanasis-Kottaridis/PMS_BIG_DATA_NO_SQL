@@ -29,15 +29,13 @@ import mongoDBManager
 #     grid.to_file("grid.shp")
 
 
-def getPolyGrid2(poly):
+def getPolyGrid2(poly, theta):
     # points = gpd.read_file('geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp')
 
     # geom = [Polygon(poly["coordinates"](i) for i in poly["coordinates"])]
     geom = Polygon(poly["coordinates"][0])
     poly_gpd = gpd.GeoDataFrame({'Country': "poly", 'geometry':[geom]})
     xmin, ymin, xmax, ymax = poly_gpd.total_bounds
-
-    theta = 10 #KM
 
     kmPerDegree = 1/111
     length = wide = kmPerDegree*theta
@@ -52,9 +50,9 @@ def getPolyGrid2(poly):
             polygons.append(Polygon([(x, y), (x + wide, y), (x + wide, y - length), (x, y - length)]))
 
     grid = gpd.GeoDataFrame({'geometry' : polygons})
-    # valid_grid = gpd.sjoin(grid, poly_gpd, how="inner", op='intersects')
+    valid_grid = gpd.sjoin(grid, poly_gpd, how="inner", op='intersects')
     # print(polygons)
-    return polygons
+    return valid_grid
     # grid.to_file("grid.shp")
 
 # import geopands as gpd

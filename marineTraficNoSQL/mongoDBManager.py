@@ -32,7 +32,7 @@ one_hour_in_unix_time = 3600
 def connectMongoDB() :
     try :
         # conect to mongo server
-        # connect = MongoClient("mongodb://mongoadmin:mongoadmin@83.212.117.74/admin")
+        # connect = MongoClient("mongodb://mongoadmin2:mongoadmin@83.212.117.74/admin")
         # connect to local mongo db
         connect = MongoClient()
         # print("Connected Successfully!")
@@ -240,6 +240,22 @@ def insertFishingPortData(insertDoc, isMany=True) :
 
     # creating or switching to ais_navigation collection
     collection = db.fishing_port
+
+    # insert data based on whether it is many or not
+    if isMany :
+        collection.insert(insertDoc)
+    else :
+        collection.insert_one(insertDoc)
+
+
+def insertTestPolyData(insertDoc, isMany=True) :
+    connection = connectMongoDB()
+
+    # connecting or switching to the database
+    db = connection.marine_trafic
+
+    # creating or switching to ais_navigation collection
+    collection = db.query_polygons
 
     # insert data based on whether it is many or not
     if isMany :
@@ -552,9 +568,10 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
         cmap = get_cmap(len(dictlist) + 1)
 
         # plot points
-        point = geoNearAgg["$geoNear"]["near"]
-        ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
-                label="Target Point")
+        if geoNearAgg is not None:
+            point = geoNearAgg["$geoNear"]["near"]
+            ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
+                    label="Target Point")
 
         # plot pings
         for index, ship in enumerate(dictlist) :
@@ -1893,12 +1910,42 @@ if __name__ == '__main__' :
         {"type" : "Point", "coordinates" : [-6.494, 47.820]},
         {"type" : "Point", "coordinates" : [-5.683, 48.480]}
     ]
-    # findTrajectoriesFromPoints(pointsList)
+    findTrajectoriesFromPoints(pointsList)
 
     #
     #TEST
     #
     print("------------ TEST -------------")
+
+    """
+    IDEA GIA DISTANCE JOIN
+    
+    step1: ftiaxnoume to grid tou poligonou me tetragona plevras theta.
+    step2: ftiaxnoume expanded grid me tetragona pleuras 2 theta.
+    step3: aneuazoume stin mongo kai ta 2 poly set:
+        # GIA APLO POLY object tou kathe grid stin mongo:
+        {
+            _id: 1,
+            parent_poly_id: 1,
+            expanded_grid_id: 1,
+            geometry: {
+                "type" : "Polygon",
+                "coordinates" : []
+            }
+        }
+        
+        # Gia Expanded grid (@SOS AUTO THA EINAI POLY ME TRIPA STO GRID)
+        {
+            _id: 1,
+            parent_poly_id: 1,
+            geometry: {
+                "type" : "Polygon",
+                "coordinates" : []
+            }
+        }
+    """
+
+    start_time = time.time()
     poly1 = {
         "type" : "Polygon",
         "coordinates" : [
@@ -1916,22 +1963,41 @@ if __name__ == '__main__' :
         ]
     }
     poly = findPolyFromSeas(seaName="Bay of Biscay")
-    grid = mongoUtils.getPolyGrid2(poly1)
-    print(grid)
+    grid = mongoUtils.getPolyGrid2(poly1, theta=10)
+    expanded_grid = mongoUtils.getPolyGrid2(poly1, theta=30)
 
     ax = createAXNFigure()
 
-    ax.add_patch(PolygonPatch(poly1, fc=BLUE, ec=BLUE, alpha=1, zorder=2, label="Trajectories Within Polygon"))
-    # grid.plot(grid, edgecolor='gray', ax=ax)
+    ax.add_patch(PolygonPatch(poly1, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
 
-    for cell in grid:
+    expanded_grid2 = []
+
+    for cell in grid["geometry"]:
         # p = {
         #     "type" : "Polygon",
         #     "coordinates" : [cell]
         # }
+
+
+        eb = getEnrichBoundingBox(cell.__geo_interface__["coordinates"][0], 10)
+        # expanded_grid2.append(getEnrichBoundingBox(cell.__geo_interface__[0]["coordinates"], 10))
+        ax.add_patch(
+            PolygonPatch(eb, fc='y', ec='k', alpha=0.1, zorder=2))
+
         ax.add_patch(
             PolygonPatch(cell, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
 
+    # for cell in expanded_grid["geometry"]:
+    #     ax.add_patch(
+    #         PolygonPatch(cell, fc='r', ec='r', alpha=0.3, zorder=2))
+
+        # matchAggregation = {"$match" : {"location" : {"$geoWithin" : {"$geometry" : cell.__geo_interface__}}}}
+        # response = findPointsForMatchAggr(matchAggregation, doPlot=False)
+        # responseList.extend(response)
+
+    # print(responseList)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
     plt.ylabel("Latitude")
     plt.xlabel("Longitude")
     plt.show()
