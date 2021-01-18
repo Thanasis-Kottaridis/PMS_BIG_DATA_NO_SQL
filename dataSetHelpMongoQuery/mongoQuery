@@ -606,7 +606,7 @@ db.ais_navigation.aggregate([
 
 // PAIZEI ALLA EXEI TO SHARDED COLL STO LOOKUP
 db.ais_navigation2.aggregate([
-  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-0.0109863, 50.2823195]},
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-7.072965,47.371117]},
                       "distanceField" : "dist.calculated",
                       "maxDistance" : 30.000,
                       "spherical" : true,
@@ -617,9 +617,9 @@ db.ais_navigation2.aggregate([
          from: "ais_navigation2",
          let: { poly: "$location"},
          pipeline: [
-          {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+          {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [ -6.868215, 47.6239]},
           "distanceField" : "dist.calculated",
-          "maxDistance" : 120.000,
+          "maxDistance" : 40.000,
           "spherical" : true, "key" : "location"}  
 }
          ],  // Cannot include $out or $merge
@@ -629,6 +629,16 @@ db.ais_navigation2.aggregate([
     $unwind: "$pings_in_poly"
   }
 ]).pretty()
+
+
+
+db.ais_navigation2.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-1.3980103, 50.2050333]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 30.000,
+                      "spherical" : true,
+                      "key" : "location"}
+  }])
 
 // paralagi distance join me kiklous na ipostirizei kai shard.
 /**
@@ -806,13 +816,132 @@ db.ais_navigation.getIndexes()
  * by default iparxei enas index sto id (morton code)
  */
 
-db.ais_navigation.createIndex({"location":"2dsphere"})
-db.ais_navigation.createIndex({"mmsi": 1})
-db.ais_navigation.createIndex({"ts": 1})
-db.ais_navigation.createIndex( { "ts": 1, "mmsi": "hashed"} )
+db.ais_navigation_grid.createIndex({"location":"2dsphere"})
+db.ais_navigation_grid.createIndex({"mmsi": 1})
+db.ais_navigation_grid.createIndex({"grid_id": 1})
+db.ais_navigation_grid.createIndex({"ts": 1})
+db.ais_navigation_grid.createIndex( { "ts": 1, "mmsi": "hashed"} )
 
 /**
  * @SHARDING
  */
 sh.enableSharding("marine_trafic")
 sh.shardCollection("marine_trafic.ais_navigation", {"ts": 1, "mmsi":"hashed"})
+
+
+
+
+
+
+
+
+db.ais_navigation2.aggregate([
+  {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-7.072965,47.371117]},
+                      "distanceField" : "dist.calculated",
+                      "maxDistance" : 30.000,
+                      "spherical" : true,
+                      "key" : "location"}
+  },{
+    $lookup:
+      {
+         from: "ais_navigation2",
+         let: { poly: "$location"},
+         pipeline: [
+          {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [ -6.868215, 47.6239]},
+          "distanceField" : "dist.calculated",
+          "maxDistance" : 40.000,
+          "spherical" : true, "key" : "location"}  
+}
+         ],  // Cannot include $out or $merge
+         as: "pings_in_poly"
+      }
+  },{
+    $unwind: "$pings_in_poly"
+  }
+]).pretty()
+
+
+// DISTANCE JOIN IMPLEMENTATION
+//  https://stackoverflow.com/questions/36166173/aggregation-lookup-for-geometry-values
+// step 1 get all points in polygon.
+var poly = {
+  "type" : "Polygon",
+  "coordinates" : [
+      [
+          [-5.1855469, 47.5765257],
+          [-3.6474609, 46.7097359],
+          [-2.6586914, 45.9511497],
+          [-3.2299805, 45.7828484],
+          [-4.7680664, 45.6908328],
+          [-5.625, 46.4378569],
+          [-6.0644531, 46.8000594],
+          [-5.6469727, 47.44295],
+          [-5.1855469, 47.5765257]
+      ]
+  ]
+}
+
+db.ais_navigation2.aggregate([
+  {$match: {
+    "location": {$geoWithin:{ $geometry: {
+      "type": "Polygon",
+      "coordinates": poly.coordinates
+    }}}
+  }
+},
+{$project: {_id: 1 ,mmsi: 1, location: 1}
+}]).pretty()
+//
+//STEP 2 PAIZEI ME LOOKUP SE SHARDD COLLECTION
+//
+db.test_grid.aggregate([{
+  $lookup:
+    {
+      from: "ais_navigation2",
+      let: {grid_id: "_id" ,coords: "coordinates"},
+      pipeline:[
+        {
+          $match: {
+            $expr: { $function:{
+              body:   function(grid_id, coords) {
+                var query_results = db.ais_navigation2.aggregate([
+                  {$match: {
+                    "location": {$geoWithin:{ $geometry: {
+                      "type": "Polygon",
+                      "coordinates": coords
+                    }}}
+                  }
+                },
+                {$project: {_id: 1 ,mmsi: 1, location: 1}},
+                {$group: {_id: grid_id, pings: {$push: "$location"}}}
+                ])
+      
+                return query_results
+      
+              },
+              args: ["$$grid_id" ,"$$coords"],
+              lang: "js"
+              }
+            } 
+          }
+        }
+      ],
+      as: "points_in_grid"
+    }},{
+      $unwind: "$points_in_grid"
+    }
+]).pretty()
+
+
+
+db.sales.aggregate(
+  [
+    {
+      $group:
+      {
+        _id: {},
+        minPrice: { $min: "$price" }
+      }
+    }
+  ]
+ );

@@ -1,5 +1,7 @@
 import dataPreprocessing
 import json
+import mongo.mongoSetUp as mongoSetUp
+from geospatial import geoDataPreprocessing
 import mongoDBManager
 import mortonCodeManager
 import numpy as np
@@ -27,7 +29,7 @@ if __name__ == '__main__' :
     # 2) upload it
     # with open("geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
     #     data = json.load(f)
-    #     mongoDBManager.insertWorldSeas(data)
+    #     mongoSetUp.insertWorldSeas(data)
 
     # insert ports data in mongo
     # 1) load json file from datasetJSON
@@ -67,5 +69,21 @@ if __name__ == '__main__' :
     # with open("json_data/test_poly.json") as f :
     #     data = json.load(f)
     #     mongoDBManager.insertTestPolyData(data)
+
+    """
+    Create grid for target seas and link it to ais documents
+    """
+    # generate map grid
+    geoDataPreprocessing.createGridForTargetSeas()
+
+    # link grid to documents
+    mongoSetUp.linkGridToDocuments()
+
+    # insert ports data in mongo
+    # 1) calculate grids for target seas
+    # 2) upload it
+    grid_list = geoDataPreprocessing.createGridForTargetSeas()
+    mongoSetUp.insertMapGrid(grid_list)
+
 
 

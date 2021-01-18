@@ -6,7 +6,6 @@
 
     (establish connection link: https://kb.objectrocket.com/mongo-db/how-to-insert-data-in-mongodb-using-python-683)
 """
-import multiprocessing
 from pymongo import MongoClient
 import numpy as np
 import json
@@ -18,8 +17,8 @@ from shapely.geometry import LineString
 import shapely.geometry as sg
 import geog
 import time
-import geopy.distance
-import mongoUtils
+from mongo import mongoConnector as connector
+from geospatial import geoDataPreprocessing
 
 # CONSTS
 BLUE = '#6699cc'
@@ -205,7 +204,7 @@ def insertAISData(insertDoc, isMany=True) :
     db = connection.marine_trafic
 
     # creating or switching to ais_navigation collection
-    collection = db.ais_navigation
+    collection = db.ais_navigation_shard
 
     # insert data based on whether it is many or not
     if isMany :
@@ -1603,6 +1602,227 @@ def findTrajectoriesInSpaTemBox(rect1, timeFrom=None, timeTo=None, doPlot=True, 
     return dictlist
 
 
+def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=12):
+    """
+    IMPLEMENT DISANCE JOIN USING GRID
+    given a polygon and a ship find all given locations within distance theta of ship pings
+    test ship 228858000 366 pings
+
+    # step 1 find all grids intersects with polygon.
+    # step 2 find target ship pings in polygon grouped by grid
+    # step 3 find other ship pings in polygon grids.
+    # step 4 find all points matching with in the same grid with target ship grids. and place them
+             into matching list and the rest to the non_matching_list
+    # step 5 expand target grids by theta and search non_matching points with spatial join in them
+    """
+    start_time = time.time()
+
+    connection, db = connector.connectMongoDB()
+
+    # step 1
+    collection = db.target_map_grid
+
+    grid_results = list(collection.find(
+        {"geometry" : {"$geoIntersects": {"$geometry": poly}}}
+        # ,{"_id": 1}
+        ))
+
+    # get target grid ids in list
+    grid_ids = [r["_id"] for r in grid_results]
+    print(grid_ids)
+    print(len(grid_results))
+
+    # step 2
+    collection = db.ais_navigation_grid
+    pipeline = [{
+        "$match" : {
+            "mmsi" : mmsi,
+            "location" : {"$geoIntersects": {"$geometry": poly}}
+        }},
+        {"$group" : {"_id": "$mmsi", #"_id" :  "$grid_id",
+                     "grid_ids": {"$push" : "$grid_id"},
+                     "locations" : {"$push" : "$location.coordinates"},
+                     "total" : {"$sum" : 1}
+                     }
+        }]
+
+    target_ship_results = list(collection.aggregate(pipeline))
+
+    # get target grid ids and locations grouped
+
+    target_grid_ids = target_ship_results[0]["grid_ids"]#[i["_id"] for i in target_ship_results]
+
+
+    # step 3
+    collection = db.ais_navigation_grid
+
+    pipeline = [{
+        "$match" : {
+            "mmsi" : {"$ne": mmsi},
+            "grid_id" : {"$in": grid_ids}
+        }},
+        {"$group" :
+            {"_id": "$grid_id",
+                # {
+                #     "mmsi": "$mmsi",
+                #     "grid_id": "$grid_id"
+                # },
+             "locations" : {"$push" : "$location.coordinates"},
+             "total" : {"$sum" : 1}
+        }
+    }]
+
+    results = list(collection.aggregate(pipeline))
+    print(len(results))
+
+    # step 4
+    # for key in results new check if key is in target mmsi polys and add its pings to matching pings
+    # else add them to non matching pings
+    matching_locs = []
+    non_matching_locs = []
+    for i in results :
+        if i["_id"] in target_grid_ids :
+            matching_locs.extend(i["locations"])
+        else:
+            non_matching_locs.extend(i["locations"])
+
+
+    # step 5
+
+    # 1) create a multypoligon from expanded grids
+    # expanded_grid = []
+    expanded_multi_poly = {
+        "type" : "MultiPolygon",
+        "coordinates" : []
+    }
+    for i in grid_results:
+        if i["_id"] in target_grid_ids:
+            expanded_multi_poly["coordinates"].append(getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta)["coordinates"])
+            # expanded_grid.append({
+            #     "_id": i["_id"],
+            #     "geometry": sg.shape(getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
+            # })
+
+    # 2) perform geointersects on grids with expanded_multy_poly and initial poly and not in target grids
+    # in order to get new target grids
+    collection = db.target_map_grid
+
+    grid_results = list(collection.find(
+        {"geometry" : {"$geoIntersects" : {"$geometry" : poly}}}
+        # ,{"_id": 1}
+    ))
+
+    pipeline = [{
+        "$match" : {
+            "_id" : {"$nin": target_grid_ids},
+            "geometry" : {"$geoIntersects" : {"$geometry" : poly}}
+        }},
+        {"$match" : {
+            "geometry" : {"$geoIntersects" : {"$geometry" : expanded_multi_poly}}
+        }}
+        # ,{"$project" : {"_id" : 1}}
+        ]
+
+    expanded_intersects = list(collection.aggregate(pipeline))
+    # get target grid ids
+    expanded_grid_ids = [i["_id"] for i in expanded_intersects if i]
+
+    # step 6 compare distance of trajectory points with expanded_intersects points
+    # for
+
+    target_locs = []
+    for i in results:
+        if i["_id"] in expanded_grid_ids:
+            target_locs.extend(i["locations"])
+
+    # ps1, ps2 = comparePointSets(target_ship_results[0]["locations"], target_locs, theta)
+    # print(ps1)
+    # print("--- %s seconds ---" % (time.time() - start_time))
+    # print(ps2)
+    """
+    ENDS
+    """
+
+    """
+    COMMENT ATTEMPT WITH GEOPANDAS spatial join
+    """
+    # create geo pandas df from grids
+    # expanded_grid_df = gpd.GeoDataFrame(expanded_grid)
+    #
+    # # create geo pandas df for non matching locs
+    # non_matching_locs_shape = [sg.Point(i[0], i[1]) for i in non_matching_locs]
+    # non_matching_df = gpd.GeoDataFrame(geometry=non_matching_locs_shape)
+    # non_matching_df = non_matching_df.rename(columns={'location' : 'geometry'})
+    #
+    # # perform s join to find non_matching pings in expanded target grids
+    # valid_pings = gpd.sjoin(non_matching_df, expanded_grid_df, how="inner", op="intersects")
+    # print(valid_pings)
+    #
+    # for i in target_grid_ids:
+    #     t = valid_pings.loc[valid_pings['_id'] == i]
+    #     print(t["geometry"].tolist())
+    #     # valid_pings["_id"].tolist()
+
+    # group results per grid.
+    # results_new = {}
+    # for item in results :
+    #     results_new.setdefault(item["_id"]['grid_id'], []).append({
+    #         "mmsi": item["_id"]['mmsi'],
+    #         "locations": item["locations"]
+    #     })
+    #
+    # print(len(results_new))
+    """
+    END
+    """
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    # plot results
+    # Draw polygons
+    ax = createAXNFigure()
+
+    # plot poly
+    ax.add_patch(PolygonPatch(poly, fc='y', ec='k', alpha=0.1, zorder=2))
+    ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
+
+    for cell in grid_results:
+        ax.add_patch(
+            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
+
+    for cell in expanded_intersects:
+        ax.add_patch(
+            PolygonPatch(cell["geometry"],  fc="m", ec="m", alpha=1, zorder=2))
+
+    # # plot non matching points
+    # isFirstRed = True
+    # for ping in non_matching_locs :
+    #     ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.3, c='r',
+    #             label="non matching points" if isFirstRed else None)
+    #     isFirstRed = False
+    #
+    # # plot matching points
+    # isFirstGreen = True
+    # for ping in matching_locs:
+    #     ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.5, c='g',
+    #             label="matching points" if isFirstGreen else None)
+    #     isFirstGreen = False
+
+    # plot target ship pings
+    isFirstBlue = True
+    # for grid in target_ship_results:
+    for ping in target_ship_results[0]["locations"]: #grid["locations"] :
+        ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=1, c='b',
+                label="target points" if isFirstBlue else None)
+        isFirstBlue = False
+
+    ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
+    plt.title("Distance Join Query using Spheres and theta: {}".format(theta))
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
+    plt.show()
+
+
 if __name__ == '__main__' :
     """
         Bullet 1:
@@ -1910,7 +2130,7 @@ if __name__ == '__main__' :
         {"type" : "Point", "coordinates" : [-6.494, 47.820]},
         {"type" : "Point", "coordinates" : [-5.683, 48.480]}
     ]
-    findTrajectoriesFromPoints(pointsList)
+    # findTrajectoriesFromPoints(pointsList)
 
     #
     #TEST
@@ -1945,8 +2165,8 @@ if __name__ == '__main__' :
         }
     """
 
-    start_time = time.time()
     poly1 = {
+        "_id" : "test_poly_1",
         "type" : "Polygon",
         "coordinates" : [
             [
@@ -1962,30 +2182,63 @@ if __name__ == '__main__' :
             ]
         ]
     }
-    poly = findPolyFromSeas(seaName="Bay of Biscay")
-    grid = mongoUtils.getPolyGrid2(poly1, theta=10)
-    expanded_grid = mongoUtils.getPolyGrid2(poly1, theta=30)
+    # poly1 = {
+    #     "type" : "Polygon",
+    #     "coordinates" : [
+    #         [
+    #             [-5.1855469, 47.5765257],
+    #             [-3.6474609, 46.7097359],
+    #             [-2.6586914, 45.9511497],
+    #             [-3.2299805, 45.7828484],
+    #             [-4.7680664, 45.6908328],
+    #             [-5.625, 46.4378569],
+    #             [-6.0644531, 46.8000594],
+    #             [-5.6469727, 47.44295],
+    #             [-5.1855469, 47.5765257]
+    #         ]
+    #     ]
+    # }
+    distanceJoinUsingGrid(poly1)
+    # poly1 = findPolyFromSeas(seaName="Bay of Biscay")
+    # poly2 = findPolyFromSeas(seaName="Celtic Sea")
+    # grid = mongoUtils.getPolyGrid(poly, theta=10)
+    # expanded_grid = mongoUtils.getPolyGrid(poly, theta=30)
 
-    ax = createAXNFigure()
 
-    ax.add_patch(PolygonPatch(poly1, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+    # print(poly1["geometry"]["coordinates"][0])
+    # print(poly2["geometry"]["coordinates"][0])
 
-    expanded_grid2 = []
+    # ax = createAXNFigure()
 
-    for cell in grid["geometry"]:
-        # p = {
-        #     "type" : "Polygon",
-        #     "coordinates" : [cell]
-        # }
+    # ax.add_patch(PolygonPatch(poly1["geometry"], fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+    # ax.add_patch(PolygonPatch(poly2["geometry"], fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
 
 
-        eb = getEnrichBoundingBox(cell.__geo_interface__["coordinates"][0], 10)
-        # expanded_grid2.append(getEnrichBoundingBox(cell.__geo_interface__[0]["coordinates"], 10))
-        ax.add_patch(
-            PolygonPatch(eb, fc='y', ec='k', alpha=0.1, zorder=2))
+    # gridList = []
+    # for cell in grid["geometry"] :
+    #     gridList.append(cell.__geo_interface__)
+    #
+    # import mongo.mongoConnector as connector
+    #
+    # connection, db = connector.connectMongoDB()
+    #
+    # # creating or switching to ais_navigation collection
+    # collection = db.test_grid
+    #
+    # # insert data based on whether it is many or not
+    # collection.insert(gridList)
 
-        ax.add_patch(
-            PolygonPatch(cell, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
+
+
+    # for cell in grid["geometry"]:
+    #
+    #     eb = getEnrichBoundingBox(cell.__geo_interface__["coordinates"][0], 10)
+    #     # expanded_grid2.append(getEnrichBoundingBox(cell.__geo_interface__[0]["coordinates"], 10))
+    #     ax.add_patch(
+    #         PolygonPatch(eb, fc='y', ec='k', alpha=0.1, zorder=2))
+    #
+    #     ax.add_patch(
+    #         PolygonPatch(cell, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
 
     # for cell in expanded_grid["geometry"]:
     #     ax.add_patch(
@@ -1997,7 +2250,7 @@ if __name__ == '__main__' :
 
     # print(responseList)
 
-    print("--- %s seconds ---" % (time.time() - start_time))
-    plt.ylabel("Latitude")
-    plt.xlabel("Longitude")
-    plt.show()
+    # print("--- %s seconds ---" % (time.time() - start_time))
+    # plt.ylabel("Latitude")
+    # plt.xlabel("Longitude")
+    # plt.show()

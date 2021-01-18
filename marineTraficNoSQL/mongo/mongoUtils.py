@@ -1,35 +1,22 @@
 import geopandas as gpd
 from shapely.geometry import Polygon
 import numpy as np
+import matplotlib.pyplot as plt
 import mongoDBManager
 
-# def getPolyGrid():
-#      points = gpd.read_file('points.shp')
-#      xmin,ymin,xmax,ymax =  points.total_bounds
-#      width = 2000
-#      height = 1000
-#      rows = int(np.ceil((ymax-ymin) /  height))
-#      cols = int(np.ceil((xmax-xmin) / width))
-#      XleftOrigin = xmin
-#      XrightOrigin = xmin + width
-#      YtopOrigin = ymax
-#      YbottomOrigin = ymax- height
-#      polygons = []
-#      for i in range(cols):
-#         Ytop = YtopOrigin
-#         Ybottom =YbottomOrigin
-#         for j in range(rows):
-#             polygons.append(Polygon([(XleftOrigin, Ytop), (XrightOrigin, Ytop), (XrightOrigin, Ybottom), (XleftOrigin, Ybottom)]))
-#             Ytop = Ytop - height
-#             Ybottom = Ybottom - height
-#         XleftOrigin = XleftOrigin + width
-#         XrightOrigin = XrightOrigin + width
-#
-#     grid = gpd.GeoDataFrame({'geometry':polygons})
-#     grid.to_file("grid.shp")
+
+def createAXNFigure() :
+    # geopandas basic world map with out details
+    # world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    world = gpd.read_file("geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
+    world.to_crs(epsg=4326, inplace=True)  # convert axes tou real world coordinates
+
+    ax = world.plot(figsize=(10, 6))
+    plt.axis([-20, 15, 40, 60])  # set plot bounds
+    return ax
 
 
-def getPolyGrid2(poly, theta):
+def getPolyGrid(poly, theta):
     # points = gpd.read_file('geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp')
 
     # geom = [Polygon(poly["coordinates"](i) for i in poly["coordinates"])]
@@ -51,7 +38,7 @@ def getPolyGrid2(poly, theta):
 
     grid = gpd.GeoDataFrame({'geometry' : polygons})
     valid_grid = gpd.sjoin(grid, poly_gpd, how="inner", op='intersects')
-    # print(polygons)
+    print(len(poly))
     return valid_grid
     # grid.to_file("grid.shp")
 

@@ -76,7 +76,7 @@ def fetchAISCollection() :
     ais_collection = preprocessDynamicData(dynamic_data, column_names, nav_status_data, nav_status_column_names)
 
     print("prin collection count: \n\n")
-    print(ais_collection)
+    # print(ais_collection)
     return ais_collection
 
 
@@ -161,7 +161,7 @@ def fetchShipMetadata() :
     # fetch ship type with details
     ship_type_column_names, ship_types = executeQuery(
         """
-        SELECT T.id_shiptype, T.type_name
+        SELECT D.id_detailedtype, T.id_shiptype, T.type_name
         FROM ais_status_codes_types.ship_types T INNER JOIN ais_status_codes_types.ship_types_detailed D
         ON T.id_shiptype = D.id_shiptype
         """
@@ -195,8 +195,9 @@ def preprocessShipMetaData(ship_meta, ship_meta_columns, ship_types, ship_types_
         ship_data = dict(zip(ship_meta_columns[1 :- 1], row[1 :- 1]))  # we dont need mmsi in dict
         # adding to ship data the type using last column as key on ship_types_dict
         try :
-            ship_data["id_shiptype"] = ship_types_dict["ship_types_dict"]
-            ship_data["type_name"] = ship_types_dict["type_name"]
+            ship_data["ship_type"] = ship_types_dict[row[-1]]
+            # ship_data["id_shiptype"] = ship_types_dict[row[-1]]["ship_types_dict"]
+            # ship_data["type_name"] = ship_types_dict[row[-1]]["type_name"]
         except :
             print("INVALID SHIP TYPE: ", row[-1])
 
@@ -349,7 +350,6 @@ def write_json(path, list, i):
     with open(path, 'w', encoding='utf-8') as jsonf :
         ais_collection_json = json.dumps(list, sort_keys=False, indent=4)
         jsonf.write(ais_collection_json)
-
 
 def plotTimeDistribution():
     import pandas as pd
