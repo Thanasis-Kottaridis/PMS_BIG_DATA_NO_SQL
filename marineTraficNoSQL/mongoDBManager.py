@@ -1637,7 +1637,7 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
     pipeline = [{
         "$match" : {
             "mmsi" : mmsi,
-            "location" : {"$geoIntersects": {"$geometry": poly}}
+            "location" : {"$geoWithin": {"$geometry": poly}}
         }},
         {"$group" : {"_id": "$mmsi", #"_id" :  "$grid_id",
                      "grid_ids": {"$push" : "$grid_id"},
@@ -1659,7 +1659,8 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
     pipeline = [{
         "$match" : {
             "mmsi" : {"$ne": mmsi},
-            "grid_id" : {"$in": grid_ids}
+            "location" : {"$geoWithin" : {"$geometry" : poly}}
+            # "grid_id" : {"$in": grid_ids}
         }},
         {"$group" :
             {"_id": "$grid_id",
@@ -1735,10 +1736,17 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
         if i["_id"] in expanded_grid_ids:
             target_locs.extend(i["locations"])
 
-    # ps1, ps2 = comparePointSets(target_ship_results[0]["locations"], target_locs, theta)
-    # print(ps1)
-    # print("--- %s seconds ---" % (time.time() - start_time))
-    # print(ps2)
+    # gets ps1 is the indexes of points of our target rajectory, ps2 are the indexes of target locs
+    ps1, ps2 = comparePointSets(target_ship_results[0]["locations"], target_locs, theta)
+    print(ps1)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    print(ps2)
+    np_locs = np.array(target_locs)
+    matching_locs.extend(list(np_locs[list(ps2)]))
+    mask = np.ones(np_locs.shape[0], dtype=bool)
+    mask[list(ps2)] = False
+    non_matching_locs = np_locs[mask,:]
+
     """
     ENDS
     """
@@ -1794,19 +1802,19 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
         ax.add_patch(
             PolygonPatch(cell["geometry"],  fc="m", ec="m", alpha=1, zorder=2))
 
-    # # plot non matching points
-    # isFirstRed = True
-    # for ping in non_matching_locs :
-    #     ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.3, c='r',
-    #             label="non matching points" if isFirstRed else None)
-    #     isFirstRed = False
-    #
-    # # plot matching points
-    # isFirstGreen = True
-    # for ping in matching_locs:
-    #     ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.5, c='g',
-    #             label="matching points" if isFirstGreen else None)
-    #     isFirstGreen = False
+    # plot non matching points
+    isFirstRed = True
+    for ping in non_matching_locs :
+        ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.3, c='r',
+                label="non matching points" if isFirstRed else None)
+        isFirstRed = False
+
+    # plot matching points
+    isFirstGreen = True
+    for ping in matching_locs:
+        ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.2, c='g',
+                label="matching points" if isFirstGreen else None)
+        isFirstGreen = False
 
     # plot target ship pings
     isFirstBlue = True
@@ -1815,6 +1823,178 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
         ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=1, c='b',
                 label="target points" if isFirstBlue else None)
         isFirstBlue = False
+
+    ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
+    plt.title("Distance Join Query using Spheres and theta: {}".format(theta))
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
+    plt.show()
+
+
+def distanceJoinUsingGPDGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=12):
+    start_time = time.time()
+
+    connection, db = connector.connectMongoDB()
+
+    # step 1
+    collection = db.target_map_grid
+
+    grid_results = list(collection.find(
+        {"geometry" : {"$geoIntersects": {"$geometry": poly}}}
+        # ,{"_id": 1}
+        ))
+
+    # get target grid ids in list
+    grid_ids = [r["_id"] for r in grid_results]
+    print(grid_ids)
+    print(len(grid_results))
+
+    # step 2
+    collection = db.ais_navigation_grid
+    pipeline = [{
+        "$match" : {
+            "mmsi" : mmsi,
+            "location" : {"$geoWithin": {"$geometry": poly}}
+        }},
+        {"$group" : {"_id": "$grid_id", #"_id" :  "$grid_id",
+                     "grid_ids": {"$push" : "$grid_id"},
+                     "locations" : {"$push" : "$location.coordinates"},
+                     "total" : {"$sum" : 1}
+                     }
+        }]
+
+    target_ship_results = list(collection.aggregate(pipeline))
+
+    # get target grid ids and locations grouped
+
+    target_grid_ids = [i["_id"] for i in target_ship_results]
+
+
+    # step 3
+    collection = db.ais_navigation_grid
+
+    pipeline = [{
+        "$match" : {
+            "mmsi" : {"$ne": mmsi},
+            "location" : {"$geoWithin" : {"$geometry" : poly}}
+            # "grid_id" : {"$in": grid_ids}
+        }},
+        {"$group" :
+            {"_id": "$grid_id",
+                # {
+                #     "mmsi": "$mmsi",
+                #     "grid_id": "$grid_id"
+                # },
+             "locations" : {"$push" : "$location.coordinates"},
+             "total" : {"$sum" : 1}
+        }
+    }]
+
+    results = list(collection.aggregate(pipeline))
+    print(len(results))
+
+    # step 4
+    # for key in results new check if key is in target mmsi polys and add its pings to matching pings
+    # else add them to non matching pings
+    matching_locs = []
+    non_matching_locs = []
+    for i in results :
+        if i["_id"] in target_grid_ids :
+            matching_locs.extend(i["locations"])
+        else:
+            non_matching_locs.extend(i["locations"])
+
+    # step 5
+
+    # 1) create a multypoligon from expanded grids
+    expanded_grid = []
+    expanded_multi_poly = {
+        "type" : "MultiPolygon",
+        "coordinates" : []
+    }
+    for i in grid_results:
+        if i["_id"] in target_grid_ids:
+            expanded_grid.append({
+                "_id": i["_id"],
+                "geometry": sg.shape(getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
+            })
+
+    # create geo pandas df from grids
+    expanded_grid_df = gpd.GeoDataFrame(expanded_grid)
+
+    # create geo pandas df for non matching locs
+    non_matching_locs_shape = [sg.Point(i[0], i[1]) for i in non_matching_locs]
+    non_matching_df = gpd.GeoDataFrame(geometry=non_matching_locs_shape)
+    non_matching_df = non_matching_df.rename(columns={'location' : 'geometry'})
+
+    # perform s join to find non_matching pings in expanded target grids
+    valid_pings = gpd.sjoin(non_matching_df, expanded_grid_df, how="inner", op="intersects")
+
+    non_matching_locs = []
+    for i, target_id in enumerate(target_grid_ids):
+        t = valid_pings.loc[valid_pings['_id'] == target_id]
+        ps = [j.__geo_interface__['coordinates'] for j in t["geometry"].tolist()]  # TODO MAKE THIS QUICKER
+        print(target_id)
+        ps1, ps2 = comparePointSets(target_ship_results[i]["locations"], ps, theta)
+        # print(ps1)
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # print(ps2)
+        # valid_ping_indexes.extend(ps2)
+        print(len(ps))
+        valid_pings["_id"].tolist()
+        np_locs = np.array(ps)
+        matching_locs.extend(list(np_locs[list(ps2)]))
+        mask = np.ones(np_locs.shape[0], dtype=bool)
+        mask[list(ps2)] = False
+        non_matching_locs.extend(list(np_locs[mask, :]))
+
+    # # group results per grid.
+    # results_new = {}
+    # for item in results :
+    #     results_new.setdefault(item["_id"]['grid_id'], []).append({
+    #         "mmsi": item["_id"]['mmsi'],
+    #         "locations": item["locations"]
+    #     })
+
+    # print(len(results_new))
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    print(len(non_matching_locs))
+
+    # plot results
+    # Draw polygons
+    ax = createAXNFigure()
+
+    # plot poly
+    ax.add_patch(PolygonPatch(poly, fc='y', ec='k', alpha=0.1, zorder=2))
+    # ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
+
+    for cell in grid_results :
+        ax.add_patch(
+            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
+
+    # plot non matching points
+    isFirstRed = True
+    for ping in non_matching_locs :
+        ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.3, c='r',
+                label="non matching points" if isFirstRed else None)
+        isFirstRed = False
+
+    # plot matching points
+    isFirstGreen = True
+    for ping in matching_locs :
+        ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=0.2, c='g',
+                label="matching points" if isFirstGreen else None)
+        isFirstGreen = False
+
+    # plot target ship pings
+    isFirstBlue = True
+    for grid in target_ship_results:
+        for ping in grid["locations"] :  # grid["locations"] :
+            ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=1, c='b',
+                    label="target points" if isFirstBlue else None)
+            isFirstBlue = False
 
     ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
     plt.title("Distance Join Query using Spheres and theta: {}".format(theta))
@@ -2182,23 +2362,33 @@ if __name__ == '__main__' :
             ]
         ]
     }
-    # poly1 = {
-    #     "type" : "Polygon",
-    #     "coordinates" : [
-    #         [
-    #             [-5.1855469, 47.5765257],
-    #             [-3.6474609, 46.7097359],
-    #             [-2.6586914, 45.9511497],
-    #             [-3.2299805, 45.7828484],
-    #             [-4.7680664, 45.6908328],
-    #             [-5.625, 46.4378569],
-    #             [-6.0644531, 46.8000594],
-    #             [-5.6469727, 47.44295],
-    #             [-5.1855469, 47.5765257]
-    #         ]
-    #     ]
-    # }
-    distanceJoinUsingGrid(poly1)
+    poly2 = {
+        "_id" : "test_poly_1",
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [-3.9385986, 49.8946344],
+                [-3.6804199, 50.0765319],
+                [-3.3013916, 50.2103068],
+                [-2.9388428, 49.9600554],
+                [-3.4194946, 49.5287739],
+                [-3.9605713, 49.7280302],
+                [-3.9385986, 49.8946344]
+            ]
+        ]
+    }
+
+    # matchAggregation = {
+    #     "$match" : {
+    #         "location" : {"$geoWithin" : {"$geometry" : poly1}}
+    # }}
+    # TODO THIS QUERY HAS PROBLEM WITH $group
+    # Exceeded memory limit for $group, but didn't allow external sort. Pass allowDiskUse:true
+    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+
+    distanceJoinUsingGPDGrid(poly1, mmsi=305810000) #538003876
+    # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
+    # distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
     # poly1 = findPolyFromSeas(seaName="Bay of Biscay")
     # poly2 = findPolyFromSeas(seaName="Celtic Sea")
     # grid = mongoUtils.getPolyGrid(poly, theta=10)
