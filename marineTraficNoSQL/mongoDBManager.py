@@ -10,6 +10,7 @@ from pymongo import MongoClient
 import numpy as np
 import json
 import math
+import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from descartes import PolygonPatch
@@ -391,6 +392,7 @@ def findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294, colle
         {"$group" : {"_id" : "$mmsi", "ts" : {"$push" : "$ts"}, "total" : {"$sum" : 1},
                      "location" : {"$push" : "$location.coordinates"}}}
     ]
+    explain = db.command('aggregate', 'ais_navigation2', pipeline=pipeline, explain=True)
 
     results = collection.aggregate(pipeline)
     dictlist = queryResultToDictList(results, dictlist=[])
@@ -787,6 +789,179 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
               ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
     plt.title("Find Trajectories that pass near specific points in specific time interval")
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
+    plt.show()
+
+
+def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12):
+    """
+    1) Given an mmsi find its trajectory.
+    2) find the grids of each trajectory and expand the by d
+    3) create a multy polygon and find all the grids that intersects with them
+     in order to find threshold based trajectories
+    :param mmsi:
+    :param tsFrom:
+    :param tsTo:
+    :param k_most:
+    :param d:
+    :return:
+    """
+    start_time = time.time()
+
+    connection, db = connector.connectMongoDB()
+
+    # step 1
+    collection = db.ais_navigation_grid
+    pipeline = [{
+        "$match": {
+            "mmsi": mmsi,
+            **({'ts' : {"$gte" : tsFrom, "$lte" : tsTo}} if tsFrom is not None and tsTo is not None else {}),
+        }},
+        {
+            "$sort": {"ts" : 1}
+        },
+        {
+        "$group": {
+            "_id": "$mmsi",
+            "grid_ids" : {"$push" : "$grid_id"},
+            "locations" : {"$push" : "$location.coordinates"}
+        }
+    }]
+
+    explain = db.command('aggregate', 'ais_navigation_grid', pipeline=pipeline, explain=True)
+    target_ship_results = list(collection.aggregate(pipeline))
+    # get trajectory grid ids
+    target_grid_ids = target_ship_results[0]["grid_ids"]
+    target_grid_ids = list(dict.fromkeys(target_grid_ids))
+    target_trajectory = pointsListToMultiPoint(target_ship_results[0]["locations"])
+
+    # step 2 get target grids
+    collection = db.target_map_grid
+
+    grid_results = list(collection.find(
+        {"geometry" :  {"$geoIntersects": {"$geometry": target_trajectory}}}
+    ))
+
+    if d > 10 :
+        # step 3 expand them and convert them into a multi polygon
+        expanded_multi_poly = {
+            "type" : "MultiPolygon",
+            "coordinates" : []
+        }
+        for i in grid_results :
+            expanded_multi_poly["coordinates"].append(
+                getEnrichBoundingBox(i["geometry"]["coordinates"][0], d)["coordinates"])
+
+
+        # step4 find grids intersecting with this multy poly
+        collection = db.target_map_grid
+
+        # create mongo aggregation pipeline
+        pipeline = [
+            {"$match" : {
+                "_id": {"$nin": target_grid_ids},
+                "geometry" : {"$geoIntersects" : {"$geometry" : expanded_multi_poly}}
+            }},
+        ]
+
+        # execute query
+        results = list(collection.aggregate(pipeline))
+        # add results to grid list
+        grids_new = []
+        # for grid in grid_results:
+        #     if grid["_id"] not in
+        # [dict(t) for t in {tuple(d.items()) for d in grid_results}]
+        grid_results.extend(results)
+        # grids_new = grids_new.extend(results)
+        # find gid ids
+        # get results grid id
+        target_grid_ids.extend([d['_id'] for d in results])
+
+
+    collection = db.ais_navigation_grid
+
+    # create mongo aggregation pipeline
+    pipeline = [
+        {"$match" : {
+            "mmsi": {"$ne": mmsi},
+            **({'ts' : {"$gte" : tsFrom, "$lte" : tsTo}} if tsFrom is not None and tsTo is not None else {}),
+            "grid_id" : {"$in" : target_grid_ids}
+        }},
+        {
+            "$sort" : {"ts" : 1}
+        },
+        {
+            "$group" : {
+                "_id" : "$mmsi",
+                "total" : {"$sum" : 1},
+                "geometry" : {"$push" : "$location.coordinates"}}
+        }
+    ]
+
+    results = collection.aggregate(pipeline)
+    dictlist = queryResultToDictList(results)
+
+    # filter trajectories
+    # step 0 append target trajectory to dictList
+    dictlist.append(
+        {
+            "_id": mmsi,
+            "total": len(target_ship_results[0]["locations"]),
+            "geometry": target_ship_results[0]["locations"]
+        }
+    )
+
+    # step 1 convert all trajectories to in to a geo dataframe of lineStrings
+    trajectory_df = pd.DataFrame(dictlist)
+    trajectory_df['geometry'] = trajectory_df['geometry'].apply(lambda point_list : LineString(point_list) if len(point_list) >= 5 else None)
+    trajectory_df = gpd.GeoDataFrame(trajectory_df.dropna(), geometry=trajectory_df["geometry"])
+
+    # create grid geo dataframe.
+    grid_df = pd.DataFrame(grid_results)
+    grid_df['geometry'] = grid_df['geometry'].apply(lambda grid : sg.shape(grid))
+    grid_df = gpd.GeoDataFrame(grid_df.dropna(), geometry=grid_df["geometry"])
+
+    # perform spatial join
+    sjoin_df = gpd.sjoin(trajectory_df, grid_df, how="inner", op="intersects")
+
+    # get grids per ship Series
+    grids_per_ship = sjoin_df["_id_left"].value_counts()
+    # find the grid count of target trajectory
+    target_traj_grid_intersect = grids_per_ship.loc[mmsi]
+    grids_per_ship = grids_per_ship.drop(mmsi)
+    grids_per_ship = grids_per_ship.apply(lambda count: count if count > int(target_traj_grid_intersect*0.5)
+                                                                 and count < int(target_traj_grid_intersect*1.5) else None)
+    filtered_similar_trajectories = grids_per_ship.dropna()
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    ax = createAXNFigure()
+    # get n (ships) + points list len  random colors
+    cmap = get_cmap(len(dictlist)+1)
+
+    # plot poly
+    # ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
+
+    #plot grid
+    for cell in grid_results :
+        ax.add_patch(
+            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.3, zorder=2))
+
+    #  plot trajectories
+    trajj = pointsListToMultiPoint(target_ship_results[0]["locations"])
+
+    if 2 < len(trajj["coordinates"]) :
+        plotLineString(ax, trajj, color=cmap(0), alpha=1, label="target_trajectory")
+
+    for i, trajectory in enumerate(dictlist):
+        if trajectory["_id"] in filtered_similar_trajectories.index:
+            trajj = pointsListToMultiPoint(trajectory["geometry"])
+
+            if 2 < len(trajj["coordinates"]) :
+                plotLineString(ax, trajj, color=cmap(i), alpha=1, label="target_trajectory")
+
+    plt.title("Find threshold based similar trajectories: {}".format(d))
     plt.ylabel("Latitude")
     plt.xlabel("Longitude")
     plt.show()
@@ -1747,43 +1922,6 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
     mask[list(ps2)] = False
     non_matching_locs = np_locs[mask,:]
 
-    """
-    ENDS
-    """
-
-    """
-    COMMENT ATTEMPT WITH GEOPANDAS spatial join
-    """
-    # create geo pandas df from grids
-    # expanded_grid_df = gpd.GeoDataFrame(expanded_grid)
-    #
-    # # create geo pandas df for non matching locs
-    # non_matching_locs_shape = [sg.Point(i[0], i[1]) for i in non_matching_locs]
-    # non_matching_df = gpd.GeoDataFrame(geometry=non_matching_locs_shape)
-    # non_matching_df = non_matching_df.rename(columns={'location' : 'geometry'})
-    #
-    # # perform s join to find non_matching pings in expanded target grids
-    # valid_pings = gpd.sjoin(non_matching_df, expanded_grid_df, how="inner", op="intersects")
-    # print(valid_pings)
-    #
-    # for i in target_grid_ids:
-    #     t = valid_pings.loc[valid_pings['_id'] == i]
-    #     print(t["geometry"].tolist())
-    #     # valid_pings["_id"].tolist()
-
-    # group results per grid.
-    # results_new = {}
-    # for item in results :
-    #     results_new.setdefault(item["_id"]['grid_id'], []).append({
-    #         "mmsi": item["_id"]['mmsi'],
-    #         "locations": item["locations"]
-    #     })
-    #
-    # print(len(results_new))
-    """
-    END
-    """
-
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # plot results
@@ -2378,69 +2516,15 @@ if __name__ == '__main__' :
         ]
     }
 
-    # matchAggregation = {
-    #     "$match" : {
-    #         "location" : {"$geoWithin" : {"$geometry" : poly1}}
-    # }}
-    # TODO THIS QUERY HAS PROBLEM WITH $group
-    # Exceeded memory limit for $group, but didn't allow external sort. Pass allowDiskUse:true
-    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
-
-    distanceJoinUsingGPDGrid(poly1, mmsi=305810000) #538003876
-    # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
-    # distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
     # poly1 = findPolyFromSeas(seaName="Bay of Biscay")
     # poly2 = findPolyFromSeas(seaName="Celtic Sea")
-    # grid = mongoUtils.getPolyGrid(poly, theta=10)
-    # expanded_grid = mongoUtils.getPolyGrid(poly, theta=30)
 
+    # distanceJoinUsingGPDGrid(poly1["geometry"], mmsi=305810000) #538003876
+    # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
+    # distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
 
-    # print(poly1["geometry"]["coordinates"][0])
-    # print(poly2["geometry"]["coordinates"][0])
-
-    # ax = createAXNFigure()
-
-    # ax.add_patch(PolygonPatch(poly1["geometry"], fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
-    # ax.add_patch(PolygonPatch(poly2["geometry"], fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
-
-
-    # gridList = []
-    # for cell in grid["geometry"] :
-    #     gridList.append(cell.__geo_interface__)
-    #
-    # import mongo.mongoConnector as connector
-    #
-    # connection, db = connector.connectMongoDB()
-    #
-    # # creating or switching to ais_navigation collection
-    # collection = db.test_grid
-    #
-    # # insert data based on whether it is many or not
-    # collection.insert(gridList)
+    # findThresholdBasedSimilarTrajectories(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294)
+    findThresholdBasedSimilarTrajectories(mmsi=227574020, tsFrom=1443676587, tsTo=1443679590, d=0)
 
 
 
-    # for cell in grid["geometry"]:
-    #
-    #     eb = getEnrichBoundingBox(cell.__geo_interface__["coordinates"][0], 10)
-    #     # expanded_grid2.append(getEnrichBoundingBox(cell.__geo_interface__[0]["coordinates"], 10))
-    #     ax.add_patch(
-    #         PolygonPatch(eb, fc='y', ec='k', alpha=0.1, zorder=2))
-    #
-    #     ax.add_patch(
-    #         PolygonPatch(cell, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
-
-    # for cell in expanded_grid["geometry"]:
-    #     ax.add_patch(
-    #         PolygonPatch(cell, fc='r', ec='r', alpha=0.3, zorder=2))
-
-        # matchAggregation = {"$match" : {"location" : {"$geoWithin" : {"$geometry" : cell.__geo_interface__}}}}
-        # response = findPointsForMatchAggr(matchAggregation, doPlot=False)
-        # responseList.extend(response)
-
-    # print(responseList)
-
-    # print("--- %s seconds ---" % (time.time() - start_time))
-    # plt.ylabel("Latitude")
-    # plt.xlabel("Longitude")
-    # plt.show()
