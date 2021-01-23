@@ -4,14 +4,21 @@
 
     And Also contains Plotting helper functions in order to visualize our results
 """
+from mongo import mongoConnector as connector
 
 import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import shapely.geometry as sg
-from shapely.geometry import Polygon
 from shapely.geometry import LineString
+from shapely.geometry import Polygon
+from descartes import PolygonPatch
 import json
+import time
+
+# CONSTS
+nautical_mile_in_meters = 1852
+one_hour_in_unix_time = 3600
 
 #
 # PLOT UTILS
@@ -21,6 +28,7 @@ GRAY = '#999999'
 RED = '#B20000'
 
 
+
 def createAXNFigure() :
     """
     creates a map ploting european coastline
@@ -28,7 +36,7 @@ def createAXNFigure() :
     """
     # geopandas basic world map with out details
     # world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    world = gpd.read_file("../geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
+    world = gpd.read_file("/Users/thanoskottaridis/Documents/metaptixiako_files/main lectures/noSQL/apalaktiki ergasia/PMS_BIG_DATA_NO_SQL/marineTraficNoSQL/geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
     world.to_crs(epsg=4326, inplace=True)  # convert axes tou real world coordinates
 
     ax = world.plot(figsize=(10, 6))
@@ -138,6 +146,151 @@ def convertLineStringToPolygon(line, d=0.1) :
     print(json.dumps(geoPolygon, sort_keys=False, indent=4))
 
     return geoPolygon, dilated, eroded
+
+
+def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False, withPoly=None, logResponse=False, allowDiskUse=False) :
+    """
+        This helper func is used to find trajectories by givent match aggregation
+
+    :param matchAggregation: mongo $match aggregation json
+    :param collection: collection on which we have establish a connection default value None
+    :param doPlot: bool flag which check if plot needed or not
+    :param logResponse: bool flag which check if log response on console needed or not
+    :return: returns a dict with the folowing format:
+        {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}
+    """
+    start_time = time.time()
+
+    if collection is None :
+        # connecting or switching to the database
+        connection, db = connector.connectMongoDB()
+
+        # creating or switching to ais_navigation collection
+        collection = db.ais_navigation
+
+    # create mongo aggregation pipeline
+    pipeline = [
+        matchAggregation,
+        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}},
+        {"$sort" : {'total' : -1}}
+    ]
+
+    # execute query
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    dictlist = queryResultToDictList(results)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    if logResponse :
+        print(json.dumps(dictlist, sort_keys=False, indent=4))
+
+    # check if plot needed
+    if doPlot :
+        ax = createAXNFigure()
+
+        # plot polygon if exists
+        if withPoly is not None :
+            # plot poly
+            ax.add_patch(
+                PolygonPatch(withPoly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+
+        # get n (ships) + points list len  random colors
+        cmap = get_cmap(len(dictlist))
+
+        #  plot trajectories
+        for i, ship in enumerate(dictlist) :
+            trajj = pointsListToLineString(ship["location"])
+
+            if 2 < len(trajj["coordinates"]) :
+                plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
+
+        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
+                  ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
+
+        if len(dictlist) < 50 :  # show legend
+            plt.title("Trajectories")
+        plt.ylabel("Latitude")
+        plt.xlabel("Longitude")
+        plt.show()
+
+    return dictlist
+
+
+def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=None, allowDiskUse=False, doPlot=False,
+                           logResponse=False,
+                           queryTitle=None) :
+    """
+           This helper func is used to find points (ship pings) by givet match aggregation
+
+       :param queryTitle:
+       :param matchAggregation: mongo $match aggregation json
+       :param collection: collection on which we have establish a connection default value None
+       :param doPlot: bool flag which check if plot needed or not
+       :param logResponse: bool flag which check if log response on console needed or not
+       :return: returns a dict with the folowing format:
+           {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}
+       """
+    start_time = time.time()
+
+    if collection is None :
+        # connecting or switching to the database
+        connection, db = connector.connectMongoDB()
+
+        # creating or switching to ais_navigation collection
+        collection = db.ais_navigation
+
+    # adds main aggregations to pipeline
+    pipeline = [
+        geoNearAgg
+    ]
+
+    # adds match agg if exists
+    if matchAgg is not None :
+        pipeline.append(matchAgg)
+
+    # adds limit aggrigation if exists
+    if k_near is not None :
+        pipeline.append({"$limit" : k_near})
+
+    # add group aggregation in order to display them
+    pipeline.append({"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}})
+
+    # execute query
+    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
+    dictlist = queryResultToDictList(results)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    if logResponse :
+        print(json.dumps(dictlist, sort_keys=False, indent=4))
+
+    # check if plot needed
+    if doPlot :
+        print("---  PLOTTING ---")
+
+        ax = createAXNFigure()
+
+        # get n (ships) + 1 (point) random colors
+        cmap = get_cmap(len(dictlist) + 1)
+
+        # plot points
+        if geoNearAgg is not None:
+            point = geoNearAgg["$geoNear"]["near"]
+            ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
+                    label="Target Point")
+
+        # plot pings
+        for index, ship in enumerate(dictlist) :
+            isFirst = True
+            for ping in ship["location"] :
+                ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index + 1),
+                        label=ship["_id"] if isFirst else None)
+                isFirst = False
+
+        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
+                  ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
+        plt.title(queryTitle)
+        plt.ylabel("Latitude")
+        plt.xlabel("Longitude")
+        plt.show()
+
+    return dictlist
 
 
 def getPolyGrid(poly, theta):

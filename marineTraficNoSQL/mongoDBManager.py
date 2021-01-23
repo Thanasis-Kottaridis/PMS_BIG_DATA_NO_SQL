@@ -9,6 +9,7 @@
 # my packages
 from mongo import mongoConnector as connector
 from mongo import mongoUtils as utils
+from mongo.query import relationalQueries
 
 # python libraries
 from pymongo import MongoClient
@@ -29,301 +30,15 @@ from geospatial import geoDataPreprocessing
 nautical_mile_in_meters = 1852
 one_hour_in_unix_time = 3600
 
-
-def connectMongoDB() :
-    try :
-        # conect to mongo server
-        # connect = MongoClient("mongodb://mongoadmin2:mongoadmin@83.212.117.74/admin")
-        # connect to local mongo db
-        connect = MongoClient()
-        # print("Connected Successfully!")
-        return connect
-    except :
-        print("Could not connect MongoDB")
-
-
-def getAllAisMMSI() :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.ais_navigation2
-    document_ids = collection.find().distinct('mmsi')  # list of all ids
-    return document_ids
-
-
-def getShipsByCountry(countryName, db=None) :
-    start_time = time.time()
-
-    if db is None :
-        connection = connectMongoDB()
-
-        # connecting or switching to the database
-        db = connection.marine_trafic
-
-    # creating or switching to countries collection
-    collection = db.countries
-
-    # get all codes by country name
-    country = collection.find({"country" : {"$in" : countryName}})
-    countryCodes = []
-    for c in country :
-        countryCodes.extend(c["country_codes"])
-
-    countryCodes = np.array(countryCodes)
-
-    # get all ships by mmsi
-    ships = np.array(getAllAisMMSI())
-    vmatch = np.vectorize(lambda mmsi : int(str(mmsi)[:3]) in countryCodes)
-
-    ships_new = vmatch(ships)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    return ships[ships_new]
-
-
-def printData(collection) :
-    # Printing the data inserted
-    cursor = collection.find()
-    for record in cursor :
-        print(record)
-
-
-def findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294, collection=None) :
-    """
-
-    :param mmsi:
-    :param tsFrom:
-    :param tsTo:
-    :return:
-    """
-
-    if collection is None :
-        connection = connectMongoDB()
-
-        # connecting or switching to the database
-        db = connection.marine_trafic
-
-        # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
-
-    # create mongo aggregation pipeline
-    pipeline = [
-        {"$match" : {'mmsi' : mmsi, 'ts' : {"$gte" : tsFrom, "$lte" : tsTo}}},
-        {"$group" : {"_id" : "$mmsi", "ts" : {"$push" : "$ts"}, "total" : {"$sum" : 1},
-                     "location" : {"$push" : "$location.coordinates"}}}
-    ]
-    explain = db.command('aggregate', 'ais_navigation2', pipeline=pipeline, explain=True)
-
-    results = collection.aggregate(pipeline)
-    dictlist = utils.queryResultToDictList(results, dictlist=[])
-
-    # print(json.dumps(dictlist, sort_keys=False, indent=4))
-
-    # convert point list into MultiPoint
-    return utils.pointsListToLineString(dictlist[0]["location"])
-
-
-def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False, withPoly=None, logResponse=False) :
-    """
-        This helper func is used to find trajectories by givent match aggregation
-
-    :param matchAggregation: mongo $match aggregation json
-    :param collection: collection on which we have establish a connection default value None
-    :param doPlot: bool flag which check if plot needed or not
-    :param logResponse: bool flag which check if log response on console needed or not
-    :return: returns a dict with the folowing format:
-        {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}
-    """
-    start_time = time.time()
-
-    if collection is None :
-        connection = connectMongoDB()
-        # connecting or switching to the database
-        db = connection.marine_trafic
-
-        # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
-
-    # create mongo aggregation pipeline
-    pipeline = [
-        matchAggregation,
-        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}},
-        {"$sort" : {'total' : -1}}
-    ]
-
-    # execute query
-    results = collection.aggregate(pipeline)
-    dictlist = utils.queryResultToDictList(results)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    if logResponse :
-        print(json.dumps(dictlist, sort_keys=False, indent=4))
-
-    # check if plot needed
-    if doPlot :
-        ax = utils.createAXNFigure()
-
-        # plot polygon if exists
-        if withPoly is not None :
-            # plot poly
-            ax.add_patch(
-                PolygonPatch(withPoly, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
-
-        # get n (ships) + points list len  random colors
-        cmap = utils.get_cmap(len(dictlist))
-
-        #  plot trajectories
-        for i, ship in enumerate(dictlist) :
-            trajj = utils.pointsListToLineString(ship["location"])
-
-            if 2 < len(trajj["coordinates"]) :
-                utils.plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
-
-        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
-                  ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
-
-        if len(dictlist) < 50 :  # show legend
-            plt.title("Trajectories")
-        plt.ylabel("Latitude")
-        plt.xlabel("Longitude")
-        plt.show()
-
-    return dictlist
-
-
-def findPolyFromSeas(seaName="Celtic Sea") :
-    start_time = time.time()
-
-    connection = connectMongoDB()
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.world_seas
-
-    results = collection.find_one({"properties.NAME" : seaName})
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    return results
-
-
-def findPort(portName='Brest') :
-    start_time = time.time()
-    connection = connectMongoDB()
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.world_port_geo
-
-    results = collection.find_one({"properties.libelle_po" : portName})
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    return results
-
-
-def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=None, allowDiskUse=False, doPlot=False,
-                           logResponse=False,
-                           queryTitle=None) :
-    """
-           This helper func is used to find points (ship pings) by givet match aggregation
-
-       :param queryTitle:
-       :param matchAggregation: mongo $match aggregation json
-       :param collection: collection on which we have establish a connection default value None
-       :param doPlot: bool flag which check if plot needed or not
-       :param logResponse: bool flag which check if log response on console needed or not
-       :return: returns a dict with the folowing format:
-           {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}
-       """
-    start_time = time.time()
-
-    if collection is None :
-        connection = connectMongoDB()
-        # connecting or switching to the database
-        db = connection.marine_trafic
-
-        # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
-
-    # adds main aggregations to pipeline
-    pipeline = [
-        geoNearAgg
-    ]
-
-    # adds match agg if exists
-    if matchAgg is not None :
-        pipeline.append(matchAgg)
-
-    # adds limit aggrigation if exists
-    if k_near is not None :
-        pipeline.append({"$limit" : k_near})
-
-    # add group aggregation in order to display them
-    pipeline.append({"$group" : {"_id" : "$mmsi", "location" : {"$push" : "$location.coordinates"}}})
-
-    # pipeline = [{
-    #     "$geoNear" : {"near" : point,
-    #                   "distanceField" : "dist.calculated",
-    #                   "minDistance" : nautical_mile_in_meters * 10,
-    #                   "maxDistance" : nautical_mile_in_meters * 30,
-    #                   "spherical" : True, "key" : "location"}},
-    #     {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1449075294}}},
-    #     {"$group" : {"_id" : "$mmsi","location" : {"$push" : "$location.coordinates"}}},
-    #
-    # ]
-
-    # execute query
-    results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    dictlist = utils.queryResultToDictList(results)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    if logResponse :
-        print(json.dumps(dictlist, sort_keys=False, indent=4))
-
-    # check if plot needed
-    if doPlot :
-        print("---  PLOTTING ---")
-
-        ax = utils.createAXNFigure()
-
-        # get n (ships) + 1 (point) random colors
-        cmap = utils.get_cmap(len(dictlist) + 1)
-
-        # plot points
-        if geoNearAgg is not None:
-            point = geoNearAgg["$geoNear"]["near"]
-            ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
-                    label="Target Point")
-
-        # plot pings
-        for index, ship in enumerate(dictlist) :
-            isFirst = True
-            for ping in ship["location"] :
-                ax.plot(ping[0], ping[1], marker='o', alpha=0.5, c=cmap(index + 1),
-                        label=ship["_id"] if isFirst else None)
-                isFirst = False
-
-        ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
-                  ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
-        plt.title(queryTitle)
-        plt.ylabel("Latitude")
-        plt.xlabel("Longitude")
-        plt.show()
-
-    return dictlist
-
-
 def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=None, doPlot=False, logResponse=False,
                        queryTitle=None) :
     start_time = time.time()
     if collection is None :
-        connection = connectMongoDB()
         # connecting or switching to the database
-        db = connection.marine_trafic
+        connection, db = connector.connectMongoDB()
 
         # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
+        collection = db.ais_navigation
 
     query = {"location" : {"$near" : {"$geometry" : point}}}
 
@@ -372,32 +87,6 @@ def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=No
         plt.show()
 
     return dictlist
-
-
-def findTrajectoryByVesselsFlag(country='Greece', collection=None) :
-    start_time = time.time()
-    if collection is None :
-        connection = connectMongoDB()
-        # connecting or switching to the database
-        db = connection.marine_trafic
-
-        # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
-
-        # create mongo aggregation pipeline
-    pipeline = [
-        {"$match" : {{'ship_metadata.mmsi_country.country' : country}}},
-        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}},
-        {"$sort" : {'total' : -1}}
-    ]
-
-    # execute query
-    results = collection.aggregate(pipeline)
-    dictlist = utils.queryResultToDictList(results)
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    return dictlist
-
 
 def ext_givenTrajectoryFindSimilar(dictlist, trajectory, k_most) :
     """
@@ -460,12 +149,11 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     """
     start_time = time.time()
 
-    connection = connectMongoDB()
     # connecting or switching to the database
-    db = connection.marine_trafic
+    connection, db = connector.connectMongoDB()
 
     # creating or switching to ais_navigation collection
-    collection = db.ais_navigation2
+    collection = db.ais_navigation
 
     # step 1
     poly, shpOuterPoly, shpInnerPoly = utils.convertLineStringToPolygon(trajectory["coordinates"], d=d)
@@ -534,7 +222,7 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
     connection, db = connector.connectMongoDB()
 
     # step 1
-    collection = db.ais_navigation_grid
+    collection = db.ais_navigation
     pipeline = [{
         "$match": {
             "mmsi": mmsi,
@@ -691,12 +379,11 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
 
 def findPingsPerPoint(point, collection=None) :
     if collection is None :
-        connection = connectMongoDB()
         # connecting or switching to the database
-        db = connection.marine_trafic
+        connection, db = connector.connectMongoDB()
 
         # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
+        collection = db.ais_navigation
 
     # create mongo aggregation pipeline
     pipeline = [
@@ -749,12 +436,11 @@ def findTrajectoriesFromPoints(pointsList) :
     # me for kai 3 requests --- 0.32604384422302246 seconds ---
     start_time = time.time()
 
-    connection = connectMongoDB()
     # connecting or switching to the database
-    db = connection.marine_trafic
+    connection, db = connector.connectMongoDB()
 
     # creating or switching to ais_navigation collection
-    collection = db.ais_navigation2
+    collection = db.ais_navigation
 
     # Step 1
     # pool object creation
@@ -811,7 +497,7 @@ def findTrajectoriesFromPoints(pointsList) :
     trajectories = []
     for pair in validMMSITimePair :
         trajectories.append(
-            findShipTrajectory(mmsi=pair["mmsi"],
+            relationalQueries.findShipTrajectory(mmsi=pair["mmsi"],
                                tsFrom=pair["ts"],
                                tsTo=pair["ts"] + (21600 * len(pointsList)),
                                collection=collection)
@@ -1022,12 +708,11 @@ def distanceJoinPolyQuery(p1, p2, theta, timeFrom=None, timeTo=None, allowDiskUs
 
     start_time = time.time()
     if collection is None :
-        connection = connectMongoDB()
         # connecting or switching to the database
-        db = connection.marine_trafic
+        connection, db = connector.connectMongoDB()
 
         # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
+        collection = db.ais_navigation
 
     # group all the pings in a list no requirement for more information
     groupAgg = {"$group" : {"_id" : None, "location" : {"$push" : "$location.coordinates"}}}
@@ -1138,12 +823,11 @@ def distanceJoinRectQuery(rect1, rect2, theta, timeFrom=None, timeTo=None, allow
 
     start_time = time.time()
     if collection is None :
-        connection = connectMongoDB()
         # connecting or switching to the database
-        db = connection.marine_trafic
+        connection, db = connector.connectMongoDB()
 
         # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
+        collection = db.ais_navigation
 
     # group all the pings in a list no requirement for more information
     groupAgg = {"$group" : {"_id" : None, "location" : {"$push" : "$location.coordinates"}}}
@@ -1274,12 +958,11 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
     """
     start_time = time.time()
     if collection is None :
-        connection = connectMongoDB()
         # connecting or switching to the database
-        db = connection.marine_trafic
+        connection, db = connector.connectMongoDB()
 
         # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
+        collection = db.ais_navigation
 
     k_dist = calculatePointsDistance(k1['coordinates'], k2['coordinates'])
     r1_extended = theta + r1
@@ -1438,12 +1121,11 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
 def findTrajectoriesInSpaTemBox(rect1, timeFrom=None, timeTo=None, doPlot=True, allowDiskUse=False, collection=None):
     start_time = time.time()
     if collection is None :
-        connection = connectMongoDB()
         # connecting or switching to the database
-        db = connection.marine_trafic
+        connection, db = connector.connectMongoDB()
 
         # creating or switching to ais_navigation collection
-        collection = db.ais_navigation2
+        collection = db.ais_navigation
 
     pipeline = [
         {"$match" : {
@@ -1872,20 +1554,20 @@ if __name__ == '__main__' :
         local time to get and filter all country codes and all mmsi --- 0.07462787628173828 seconds ---
         local time to execute query --- 0.046157121658325195 seconds ---
             
-        query2: find trajectories for all france fishing vessels and German tankers
+        query2: find trajectories for all france and German Dredger for 72 hours interval from ts = 1448988894
         vres ola ta fishing vessels me galiki simea pou kinounte me 
     """
     # query 1
-    # shipMMSI = getShipsByCountry(["Greece"])
+    # shipMMSI = relationalQueries.getShipsByCountry(["Greece"])
     # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
-    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
 
     # query 2
-    # shipMMSI = getShipsByCountry(["France", "German"])
-    # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
-    # TODO THIS QUERY HAS PROBLEM WITH $group
-    # Exceeded memory limit for $group, but didn't allow external sort. Pass allowDiskUse:true
-    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+    # shipMMSI = relationalQueries.getShipsByCountry(["France", "German"])
+    # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()},
+    #                                 'ship_metadata.ship_type.type_name': 'Dredger',
+    #                                 'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (72 * one_hour_in_unix_time)}}}
+    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True, allowDiskUse=True)
 
     """
         Bullet 2: Spatial queries
@@ -1929,14 +1611,14 @@ if __name__ == '__main__' :
 
     """
     # query1
-    poly = findPolyFromSeas(seaName="Bay of Biscay")
-    shipMMSI = getShipsByCountry(["France"])
+    poly = relationalQueries.findPolyFromSeas(seaName="Bay of Biscay")
+    shipMMSI = relationalQueries.getShipsByCountry(["France"])
     matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
                                     "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}}}}
-    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
+    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     # query2 # ARGEI POLI
-    # port_point = findPort()
+    port_point = relationalQueries.findPort()
     matchAggregation = {
         "$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-4.475309812300752, 48.38273389573341]},
                       "distanceField" : "dist.calculated",
@@ -1944,7 +1626,7 @@ if __name__ == '__main__' :
                       "maxDistance" : nautical_mile_in_meters * 30,
                       "spherical" : True, "key" : "location"}}
     # den to kanei plot
-    # findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
+    # utils.findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
 
     # query 3
     point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
@@ -2013,8 +1695,8 @@ if __name__ == '__main__' :
         Bullet 3: Spatio-temporal queries
         Range, k-nn, distance join queries
         
-        query1: Find all ships that moved in range from 10 to 50 sea miles from Burst port for one day time range
-        for 6 hours time interval
+        query1: Find all ships that moved in range from 10 to 30 sea miles from Burst port for one day time range
+        for 2 hours time interval
         (to many ping it took a lot of time to find them all 
         first run --- 408.56871485710144 seconds ---
         second run --- 220.98046803474426 seconds --- (great improvement))
@@ -2043,8 +1725,8 @@ if __name__ == '__main__' :
 
     """
     # query1
-    # port_point = findPort()
-    geoNearAgg = {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-4.47530, 48.3827]},
+    port_point = relationalQueries.findPort()
+    geoNearAgg = {"$geoNear" : {"near" : {"type" : "Point", "coordinates" : port_point['geometry']['coordinates'][0]},
                                 "distanceField" : "dist.calculated",
                                 "minDistance" : nautical_mile_in_meters * 10,
                                 "maxDistance" : nautical_mile_in_meters * 30,
@@ -2052,7 +1734,7 @@ if __name__ == '__main__' :
 
     matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (2 * one_hour_in_unix_time)}}}
 
-    # findPointsForMatchAggr(geoNearAgg,matchAgg,doPlot=True,
+    # utils.findPointsForMatchAggr(geoNearAgg,matchAgg,doPlot=True,
     #                        queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port for 2 hours interval")
 
     # query 2
@@ -2065,16 +1747,16 @@ if __name__ == '__main__' :
 
     matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1449075294}}}
 
-    # findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=20, doPlot=True,
+    # utils.findPointsForMatchAggr(geoNearAgg, matchAgg, k_near=20, doPlot=True,
     #                        queryTitle="find k closest ship sigmas to a point (k=5) in one day interval")
 
     # query 3:
-    poly = findPolyFromSeas()
-    shipMMSI = getShipsByCountry(["France"])
+    poly = relationalQueries.findPolyFromSeas()
+    shipMMSI = relationalQueries.getShipsByCountry(["France"])
     matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
                                     "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}},
                                     'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (6 * one_hour_in_unix_time)}}}
-    # findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
+    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     # query 4.1 distance join with polygons spatio temporal
     poly1 = {
@@ -2149,8 +1831,10 @@ if __name__ == '__main__' :
         Bullet 4.2:
         Given a trajectory, find similar trajectories (threshold-based, k-most similar)
     """
-    # trajectory = findShipTrajectory(mmsi=227002630)
-    # trajectory = findShipTrajectory()
+    # trajectory = relationalQueries.findShipTrajectory(mmsi=227002630, tsFrom=1448988894, tsTo=1449075294)
+    # trajectory = relationalQueries.findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294)
+    # trajectory = relationalQueries.findShipTrajectory(mmsi=240266000)
+
     # givenTrajectoryFindSimilar(trajectory)
     # givenTrajectoryFindSimilar(trajectory, k_most=3)
 
@@ -2234,8 +1918,8 @@ if __name__ == '__main__' :
         ]
     }
 
-    # poly1 = findPolyFromSeas(seaName="Bay of Biscay")
-    # poly2 = findPolyFromSeas(seaName="Celtic Sea")
+    poly1 = relationalQueries.findPolyFromSeas(seaName="Bay of Biscay")
+    poly2 = relationalQueries.findPolyFromSeas(seaName="Celtic Sea")
 
     # distanceJoinUsingGPDGrid(poly1, mmsi=305810000) #538003876
     # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
