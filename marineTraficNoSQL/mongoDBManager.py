@@ -6,6 +6,11 @@
 
     (establish connection link: https://kb.objectrocket.com/mongo-db/how-to-insert-data-in-mongodb-using-python-683)
 """
+# my packages
+from mongo import mongoConnector as connector
+from mongo import mongoUtils as utils
+
+# python libraries
 from pymongo import MongoClient
 import numpy as np
 import json
@@ -18,13 +23,9 @@ from shapely.geometry import LineString
 import shapely.geometry as sg
 import geog
 import time
-from mongo import mongoConnector as connector
 from geospatial import geoDataPreprocessing
 
 # CONSTS
-BLUE = '#6699cc'
-GRAY = '#999999'
-RED = '#B20000'
 nautical_mile_in_meters = 1852
 one_hour_in_unix_time = 3600
 
@@ -39,285 +40,6 @@ def connectMongoDB() :
         return connect
     except :
         print("Could not connect MongoDB")
-
-
-def queryResultToDictList(results) :
-    """
-    this helper func converts pymongo query results into a list of dictionaries
-
-    :param dictlist:
-    :param results: the results of pymongo query
-    :return: returns a list of dictionaries
-    """
-    dictlist = []
-
-    for doc in results :
-        dictlist.append(doc)
-
-    return dictlist
-
-
-def queryResultToDictList(results, dictlist=[]) :
-    """
-    this helper func converts pymongo query results into a list of dictionaries
-
-    :param dictlist:
-    :param results: the results of pymongo query
-    :return: returns a list of dictionaries
-    """
-
-    for doc in results :
-        dictlist.append(doc)
-
-    return dictlist
-
-
-def queryResultsToDict(results) :
-    """
-        this helper func converts pymongo query results into a dictionary with _id as key
-
-    :param results:
-    :return:
-    """
-
-    dict = {}
-    for doc in results :
-        dict[doc["_id"]] = doc
-
-    return dict
-
-
-def pointsListToMultiPoint(pointList) :
-    multiPoint = {
-        "type" : "LineString",
-        "coordinates" : pointList
-    }
-    return multiPoint
-
-
-def pointListToMultiLineString(pointList) :
-    multiLine = []
-    for i in range(1, len(pointList)) :
-        line = [pointList[i - 1], pointList[i]]
-        if line not in multiLine :
-            multiLine.append(line)
-
-    multiLineString = {
-        "type" : "MultiLineString",
-        "coordinates" : multiLine
-    }
-    print("------------------", len(multiLine), "------------------")
-    return multiLineString
-
-
-def convertLineStringToPolygon(line, d=0.1) :
-    """
-        This helper func creates a polygon from a linestring geo json
-    :param line: line string geojson
-    :param d: threshold distance (2*d is the width of poly)
-    :return :
-     - geoPolygon polygon geojson,
-     - dilated:shapely outer polygon,
-     - eroded: shapely inner poly
-    """
-
-    line = LineString(line)
-    dilated = line.buffer(d)
-    eroded = dilated.buffer(d / 2)
-
-    geoPolygon = sg.mapping(dilated)
-    print(json.dumps(geoPolygon, sort_keys=False, indent=4))
-
-    return geoPolygon, dilated, eroded
-
-
-def convertLineIntoPolygon(line, d=0.4) :
-    teta = math.atan2(line[1][0] - line[0][0], line[1][1] - line[0][1])
-
-    s = math.sin(teta)
-
-    c = math.cos(teta)
-
-    poly = [
-        [line[0][0] - d * s, line[0][1] - d * c],
-        [line[0][0] - d * c, line[0][1] + d * s],
-        [line[1][0] - d * c, line[1][1] + d * s],
-        [line[1][0] + d * s, line[1][1] + d * c],
-        [line[1][0] + d * c, line[1][1] - d * s],
-        [line[0][0] + d * c, line[0][1] - d * s],
-        [line[0][0] - d * s, line[0][1] - d * c]
-    ]
-
-    return poly
-
-
-def convertMultiLineToPoly(multiLine, d=0.2) :
-    # for each line create a polygon and add it to polyList
-    polyList = []
-
-    for line in multiLine :
-        polyList.append(convertLineIntoPolygon(line))
-
-    geoPolygon = {
-        "type" : "Polygon",
-        "coordinates" : polyList
-    }
-
-    return geoPolygon
-
-
-def get_cmap(n, name='hsv') :
-    """
-    Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
-    RGB color; the keyword argument name must be a standard mpl colormap name.
-    """
-    return plt.cm.get_cmap(name, n)
-
-
-def createAXNFigure() :
-    # geopandas basic world map with out details
-    # world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    world = gpd.read_file("geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
-    world.to_crs(epsg=4326, inplace=True)  # convert axes tou real world coordinates
-
-    ax = world.plot(figsize=(10, 6))
-    plt.axis([-20, 15, 40, 60])  # set plot bounds
-    return ax
-
-
-def plotLineString(ax, json, color=GRAY, alpha=1, label=None) :
-    """
-    :param ax: gets the plot ax as argument
-    :param json: trajectory's json in order to convert it to LineString and plot it
-    :param color: trajectory color
-    :param alpha: trajectory alpha (we use it to show overlapping trajectories)
-    :return: void
-    """
-    line = LineString(json["coordinates"])
-    x, y = line.xy
-    ax.plot(x, y, color=color, linewidth=3, solid_capstyle='round', zorder=1, alpha=alpha, label=label)
-
-
-def insertAISData(insertDoc, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.ais_navigation_shard
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
-
-    # printData(collection)
-
-
-def insertPortData(insertDoc, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.world_port_geo
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
-
-
-def insertFishingPortData(insertDoc, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.fishing_port
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
-
-
-def insertTestPolyData(insertDoc, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.query_polygons
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
-
-
-def insertFullDetailedPortsData(insertDoc, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.world_port_information
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
-
-
-def insertWorldSeas(data, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.world_seas
-
-    # print(len(data["features"][""]))
-    insertDoc = []
-    for sea in data["features"] :
-        properties = sea["properties"]
-        if properties["NAME"] == "Celtic Sea" or properties["NAME"] == "Bay of Biscay" :
-            print(properties["NAME"])
-            insertDoc.append(sea)
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
-
-
-def insertCountries(insertDoc, isMany=True) :
-    connection = connectMongoDB()
-
-    # connecting or switching to the database
-    db = connection.marine_trafic
-
-    # creating or switching to ais_navigation collection
-    collection = db.countries
-
-    # insert data based on whether it is many or not
-    if isMany :
-        collection.insert(insertDoc)
-    else :
-        collection.insert_one(insertDoc)
 
 
 def getAllAisMMSI() :
@@ -395,12 +117,12 @@ def findShipTrajectory(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294, colle
     explain = db.command('aggregate', 'ais_navigation2', pipeline=pipeline, explain=True)
 
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results, dictlist=[])
+    dictlist = utils.queryResultToDictList(results, dictlist=[])
 
     # print(json.dumps(dictlist, sort_keys=False, indent=4))
 
     # convert point list into MultiPoint
-    return pointsListToMultiPoint(dictlist[0]["location"])
+    return utils.pointsListToLineString(dictlist[0]["location"])
 
 
 def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False, withPoly=None, logResponse=False) :
@@ -433,30 +155,30 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
 
     # execute query
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
         print(json.dumps(dictlist, sort_keys=False, indent=4))
 
     # check if plot needed
     if doPlot :
-        ax = createAXNFigure()
+        ax = utils.createAXNFigure()
 
         # plot polygon if exists
         if withPoly is not None :
             # plot poly
             ax.add_patch(
-                PolygonPatch(withPoly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+                PolygonPatch(withPoly, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
 
         # get n (ships) + points list len  random colors
-        cmap = get_cmap(len(dictlist))
+        cmap = utils.get_cmap(len(dictlist))
 
         #  plot trajectories
         for i, ship in enumerate(dictlist) :
-            trajj = pointsListToMultiPoint(ship["location"])
+            trajj = utils.pointsListToLineString(ship["location"])
 
             if 2 < len(trajj["coordinates"]) :
-                plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
+                utils.plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
 
         ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
                   ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
@@ -554,7 +276,7 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
         print(json.dumps(dictlist, sort_keys=False, indent=4))
@@ -563,10 +285,10 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
     if doPlot :
         print("---  PLOTTING ---")
 
-        ax = createAXNFigure()
+        ax = utils.createAXNFigure()
 
         # get n (ships) + 1 (point) random colors
-        cmap = get_cmap(len(dictlist) + 1)
+        cmap = utils.get_cmap(len(dictlist) + 1)
 
         # plot points
         if geoNearAgg is not None:
@@ -619,7 +341,7 @@ def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=No
     else :
         results = collection.find(query)
 
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     print(json.dumps(dictlist, sort_keys=False, indent=4))
@@ -631,10 +353,10 @@ def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=No
     if doPlot :
         print("---  PLOTTING ---")
 
-        ax = createAXNFigure()
+        ax = utils.createAXNFigure()
 
         # get n (ships) + 1 (point) random colors
-        cmap = get_cmap(len(dictlist) + 1)
+        cmap = utils.get_cmap(len(dictlist) + 1)
 
         # plot points
         ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
@@ -671,7 +393,7 @@ def findTrajectoryByVesselsFlag(country='Greece', collection=None) :
 
     # execute query
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     return dictlist
@@ -746,7 +468,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     collection = db.ais_navigation2
 
     # step 1
-    poly, shpOuterPoly, shpInnerPoly = convertLineStringToPolygon(trajectory["coordinates"], d=d)
+    poly, shpOuterPoly, shpInnerPoly = utils.convertLineStringToPolygon(trajectory["coordinates"], d=d)
 
     # create mongo aggregation pipeline
     pipeline = [
@@ -757,7 +479,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
 
     # execute query
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
 
     print(json.dumps(dictlist, sort_keys=False, indent=4))
 
@@ -768,22 +490,22 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # step 2
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
 
-    plotLineString(ax, trajectory, color='k', alpha=0.2, label="Given Trajectory")
+    utils.plotLineString(ax, trajectory, color='k', alpha=0.2, label="Given Trajectory")
     # plot poly
-    ax.add_patch(PolygonPatch(poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectory Polygon with (d=0.2)"))
+    ax.add_patch(PolygonPatch(poly, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Trajectory Polygon with (d=0.2)"))
     # ax.axis('scaled')
 
     # get n (ships) + points list len  random colors
-    cmap = get_cmap(len(dictlist))
+    cmap = utils.get_cmap(len(dictlist))
 
     #  plot trajectories
     for i, ship in enumerate(dictlist) :
-        trajj = pointsListToMultiPoint(ship["location"])
+        trajj = utils.pointsListToLineString(ship["location"])
 
         if 2 < len(trajj["coordinates"]) and trajj["coordinates"] != trajectory["coordinates"] :
-            plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
+            utils.plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
 
     # plot step
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
@@ -834,7 +556,7 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
     # get trajectory grid ids
     target_grid_ids = target_ship_results[0]["grid_ids"]
     target_grid_ids = list(dict.fromkeys(target_grid_ids))
-    target_trajectory = pointsListToMultiPoint(target_ship_results[0]["locations"])
+    target_trajectory = utils.pointsListToLineString(target_ship_results[0]["locations"])
 
     # step 2 get target grids
     collection = db.target_map_grid
@@ -900,7 +622,7 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
     ]
 
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
 
     # filter trajectories
     # step 0 append target trajectory to dictList
@@ -936,9 +658,9 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
     # get n (ships) + points list len  random colors
-    cmap = get_cmap(len(dictlist)+1)
+    cmap = utils.get_cmap(len(dictlist)+1)
 
     # plot poly
     # ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
@@ -946,20 +668,20 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
     #plot grid
     for cell in grid_results :
         ax.add_patch(
-            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.3, zorder=2))
+            PolygonPatch(cell["geometry"], fc=utils.GRAY, ec=utils.GRAY, alpha=0.3, zorder=2))
 
     #  plot trajectories
-    trajj = pointsListToMultiPoint(target_ship_results[0]["locations"])
+    trajj = utils.pointsListToLineString(target_ship_results[0]["locations"])
 
     if 2 < len(trajj["coordinates"]) :
-        plotLineString(ax, trajj, color=cmap(0), alpha=1, label="target_trajectory")
+        utils.plotLineString(ax, trajj, color=cmap(0), alpha=1, label="target_trajectory")
 
     for i, trajectory in enumerate(dictlist):
         if trajectory["_id"] in filtered_similar_trajectories.index:
-            trajj = pointsListToMultiPoint(trajectory["geometry"])
+            trajj = utils.pointsListToLineString(trajectory["geometry"])
 
             if 2 < len(trajj["coordinates"]) :
-                plotLineString(ax, trajj, color=cmap(i), alpha=1, label="target_trajectory")
+                utils.plotLineString(ax, trajj, color=cmap(i), alpha=1, label="target_trajectory")
 
     plt.title("Find threshold based similar trajectories: {}".format(d))
     plt.ylabel("Latitude")
@@ -988,7 +710,7 @@ def findPingsPerPoint(point, collection=None) :
     ]
     # execute query
     results = collection.aggregate(pipeline)
-    dict = queryResultsToDict(results)
+    dict = utils.queryResultsToDict(results)
     return dict
 
 
@@ -1099,9 +821,9 @@ def findTrajectoriesFromPoints(pointsList) :
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # step 5 plot trajectories
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
     # get n (ships) + points list len  random colors
-    cmap = get_cmap(len(trajectories) + len(pointsList))
+    cmap = utils.get_cmap(len(trajectories) + len(pointsList))
 
     # plot points
     for index, point in enumerate(pointsList) :
@@ -1111,7 +833,7 @@ def findTrajectoriesFromPoints(pointsList) :
     # plot trajectories
     for i, trajj in enumerate(trajectories) :
         if 2 < len(trajj["coordinates"]) :
-            plotLineString(ax, trajj, color=cmap(i + 3), alpha=1,
+            utils.plotLineString(ax, trajj, color=cmap(i + 3), alpha=1,
                            label=validMMSITimePair[i]["mmsi"])  # alpha 0.5 gia na doume overlaps
 
     ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
@@ -1338,7 +1060,7 @@ def distanceJoinPolyQuery(p1, p2, theta, timeFrom=None, timeTo=None, allowDiskUs
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+    poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
 
     pipeline = [
         {"$match" : {
@@ -1358,7 +1080,7 @@ def distanceJoinPolyQuery(p1, p2, theta, timeFrom=None, timeTo=None, allowDiskUs
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+    poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
 
     try:
         ps1, ps2 = comparePointSets(poly_dictList[0]["location"], poly_dictList[1]["location"], theta)
@@ -1367,7 +1089,7 @@ def distanceJoinPolyQuery(p1, p2, theta, timeFrom=None, timeTo=None, allowDiskUs
         print("no points found")
 
     # Draw polygons
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
 
     # cmap = get_cmap(len(poly_dictList["location"]))
 
@@ -1391,9 +1113,9 @@ def distanceJoinPolyQuery(p1, p2, theta, timeFrom=None, timeTo=None, allowDiskUs
 
 
     ax.add_patch(PolygonPatch(poly1_expanded, fc="k", ec="k", alpha=0.2, zorder=2, label="Polygon 1 Expanded"))
-    ax.add_patch(PolygonPatch(poly1, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
+    ax.add_patch(PolygonPatch(poly1, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
     ax.add_patch(PolygonPatch(poly2_expanded, fc="r", ec="r", alpha=0.2, zorder=2, label="Polygon 2 Expanded"))
-    ax.add_patch(PolygonPatch(poly2, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2, label="Polygon 2"))
+    ax.add_patch(PolygonPatch(poly2, fc=utils.GRAY, ec=utils.GRAY, alpha=0.5, zorder=2, label="Polygon 2"))
 
     ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
     plt.title("Distance Join Query using Polygons and Theta: {}".format(theta))
@@ -1454,7 +1176,7 @@ def distanceJoinRectQuery(rect1, rect2, theta, timeFrom=None, timeTo=None, allow
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+    poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
 
     pipeline = [
         {"$match" : {
@@ -1474,7 +1196,7 @@ def distanceJoinRectQuery(rect1, rect2, theta, timeFrom=None, timeTo=None, allow
 
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
-    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+    poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
 
     # check if list is not empty
 
@@ -1485,9 +1207,9 @@ def distanceJoinRectQuery(rect1, rect2, theta, timeFrom=None, timeTo=None, allow
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # Draw polygons
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
 
-    cmap = get_cmap(len(poly_dictList))
+    cmap = utils.get_cmap(len(poly_dictList))
 
     # plot pings
     isFirstRed = True
@@ -1524,9 +1246,9 @@ def distanceJoinRectQuery(rect1, rect2, theta, timeFrom=None, timeTo=None, allow
     }
 
     ax.add_patch(PolygonPatch(rect1_expanded, fc="k", ec="k", alpha=0.2, zorder=2, label="Box 1 Expanded"))
-    ax.add_patch(PolygonPatch(rect1_poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Box 1"))
+    ax.add_patch(PolygonPatch(rect1_poly, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Box 1"))
     ax.add_patch(PolygonPatch(rect2_expanded, fc="r", ec="r", alpha=0.2, zorder=2, label="Box 2 Expanded"))
-    ax.add_patch(PolygonPatch(rect2_poly, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2, label="Box 2"))
+    ax.add_patch(PolygonPatch(rect2_poly, fc=utils.GRAY, ec=utils.GRAY, alpha=0.5, zorder=2, label="Box 2"))
 
     ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
     plt.title("Distance Join Query using Boxes and Theta: {}".format(theta))
@@ -1619,7 +1341,7 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
 
     # execute query
     results = list(collection.aggregate(pipeline, allowDiskUse=allowDiskUse))
-    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+    poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
 
 
     # repeat sep1 and 2 for second pointset
@@ -1664,13 +1386,13 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
 
     # execute query
     results = list(collection.aggregate(pipeline, allowDiskUse=allowDiskUse))
-    poly_dictList = queryResultToDictList(results, dictlist=poly_dictList)
+    poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
 
     ps1, ps2 = comparePointSets(poly_dictList[0]["location"], poly_dictList[1]["location"], theta)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # Draw polygons
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
 
     # plot k
     ax.plot(k1["coordinates"][0], k1["coordinates"][1], marker='x', alpha=1, c='y',
@@ -1702,9 +1424,9 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
     circle_poly2_extended = generatePolyFromPoint(k2["coordinates"], r2_extended*1000, 100)
 
     ax.add_patch(PolygonPatch(circle_poly1_extended, fc="k", ec="k", alpha=0.2, zorder=2, label="Sphere 1 Expanded"))
-    ax.add_patch(PolygonPatch(circle_poly1, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Sphere 1"))
+    ax.add_patch(PolygonPatch(circle_poly1, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Sphere 1"))
     ax.add_patch(PolygonPatch(circle_poly2_extended, fc="r", ec="r", alpha=0.2, zorder=2, label="Sphere 2 Expanded"))
-    ax.add_patch(PolygonPatch(circle_poly2, fc=GRAY, ec=GRAY, alpha=0.5, zorder=2, label="Sphere 2"))
+    ax.add_patch(PolygonPatch(circle_poly2, fc=utils.GRAY, ec=utils.GRAY, alpha=0.5, zorder=2, label="Sphere 2"))
 
     ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
     plt.title("Distance Join Query using Spheres and theta: {}".format(theta))
@@ -1735,12 +1457,12 @@ def findTrajectoriesInSpaTemBox(rect1, timeFrom=None, timeTo=None, doPlot=True, 
 
     # execute query
     results = collection.aggregate(pipeline)
-    dictlist = queryResultToDictList(results)
+    dictlist = utils.queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # check if plot needed
     if doPlot :
-        ax = createAXNFigure()
+        ax = utils.createAXNFigure()
 
         # plot poly
         rect1_x, rect1_y = zip(*rect1)
@@ -1753,17 +1475,17 @@ def findTrajectoriesInSpaTemBox(rect1, timeFrom=None, timeTo=None, doPlot=True, 
         }
 
         ax.add_patch(
-            PolygonPatch(rect1_poly, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+            PolygonPatch(rect1_poly, fc=utils.BLUE, ec=utils.BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
 
         # get n (ships) + points list len  random colors
-        cmap = get_cmap(len(dictlist))
+        cmap = utils.get_cmap(len(dictlist))
 
         #  plot trajectories
         for i, ship in enumerate(dictlist) :
-            trajj = pointsListToMultiPoint(ship["location"])
+            trajj = utils.pointsListToLineString(ship["location"])
 
             if 2 < len(trajj["coordinates"]) :
-                plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
+                utils.plotLineString(ax, trajj, color=cmap(i), alpha=0.5, label=ship["_id"])
 
         ax.legend(loc='center left', title='Ship MMSI', bbox_to_anchor=(1, 0.5),
                   ncol=1 if len(dictlist) < 10 else int(len(dictlist) / 10))
@@ -1926,7 +1648,7 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
 
     # plot results
     # Draw polygons
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
 
     # plot poly
     ax.add_patch(PolygonPatch(poly, fc='y', ec='k', alpha=0.1, zorder=2))
@@ -1934,7 +1656,7 @@ def distanceJoinUsingGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, theta=
 
     for cell in grid_results:
         ax.add_patch(
-            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
+            PolygonPatch(cell["geometry"], fc=utils.GRAY, ec=utils.GRAY, alpha=0.5, zorder=2))
 
     for cell in expanded_intersects:
         ax.add_patch(
@@ -2098,7 +1820,7 @@ def distanceJoinUsingGPDGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, the
 
     # plot results
     # Draw polygons
-    ax = createAXNFigure()
+    ax = utils.createAXNFigure()
 
     # plot poly
     ax.add_patch(PolygonPatch(poly, fc='y', ec='k', alpha=0.1, zorder=2))
@@ -2106,7 +1828,7 @@ def distanceJoinUsingGPDGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, the
 
     for cell in grid_results :
         ax.add_patch(
-            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.5, zorder=2))
+            PolygonPatch(cell["geometry"], fc=utils.GRAY, ec=utils.GRAY, alpha=0.5, zorder=2))
 
     # plot non matching points
     isFirstRed = True
@@ -2517,7 +2239,7 @@ if __name__ == '__main__' :
 
     # distanceJoinUsingGPDGrid(poly1, mmsi=305810000) #538003876
     # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
-    distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
+    # distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
 
     # findThresholdBasedSimilarTrajectories(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294)
     # findThresholdBasedSimilarTrajectories(mmsi=227574020, tsFrom=1443676587, tsTo=1443679590, d=0)

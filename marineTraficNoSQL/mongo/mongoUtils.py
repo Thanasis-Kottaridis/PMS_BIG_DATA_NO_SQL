@@ -28,7 +28,7 @@ def createAXNFigure() :
     """
     # geopandas basic world map with out details
     # world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    world = gpd.read_file("geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
+    world = gpd.read_file("../geospatial/EuropeanCoastline/Europe Coastline (Polygone).shp")
     world.to_crs(epsg=4326, inplace=True)  # convert axes tou real world coordinates
 
     ax = world.plot(figsize=(10, 6))

@@ -822,6 +822,7 @@ db.ais_navigation.createIndex({"grid_id": 1})
 db.ais_navigation.createIndex({"ts": 1})
 db.ais_navigation.createIndex( { "ts": 1, "mmsi": "hashed"} )
 
+
 /**
  * @SHARDING
  */

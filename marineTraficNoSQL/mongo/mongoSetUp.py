@@ -1,16 +1,23 @@
 import mongo.mongoConnector as connector
+from geospatial import geoDataPreprocessing
+import dataPreprocessing_2
+import json
 import geopandas as gpd
 from shapely.geometry import shape
 
-def insertAISData(insertDoc, isMany=True) :
+
+def insertAISData(insertDoc, isMany=True, isTemp=False) :
     connection, db = connector.connectMongoDB()
 
     # creating or switching to ais_navigation collection
-    collection = db.ais_navigation_grid
+    if isTemp:
+        collection = db.ais_navigation_temp
+    else:
+        collection = db.ais_navigation
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -25,7 +32,7 @@ def insertPortData(insertDoc, isMany=True) :
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -51,7 +58,7 @@ def insertTestPolyData(insertDoc, isMany=True) :
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -64,7 +71,7 @@ def insertFullDetailedPortsData(insertDoc, isMany=True) :
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -92,7 +99,7 @@ def insertWorldSeas(data, isMany=True) :
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -105,7 +112,7 @@ def insertMapGrid(insertDoc, isMany=True):
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -118,7 +125,7 @@ def insertCountries(insertDoc, isMany=True) :
 
     # insert data based on whether it is many or not
     if isMany :
-        collection.insert(insertDoc)
+        collection.insert_many(insertDoc)
     else :
         collection.insert_one(insertDoc)
 
@@ -140,7 +147,7 @@ def linkGridToDocuments():
     map_grids_df = gpd.GeoDataFrame(map_grids)
 
     # creating or switching to ais_navigation collection
-    collection = db.ais_navigation_shard
+    collection = db.ais_navigation_temp
 
     print("connected")
 
@@ -151,8 +158,12 @@ def linkGridToDocuments():
     step = int((max_ts-min_ts)/50)  # 1 week approximately
     count = 0
 
-    # results = list(collection.find({"ts" : {"$gte" : min_ts, "$lt" : min_ts+step}}))
+    # TODO UNCOMMENT FOR TEST
+    # results = list(collection.find())
+    # count += len(results)
+    # __findGridCalculations__(map_grids_df, results)
 
+    # TODO COMMENT FOR TEST
     for ts in range(min_ts+step, max_ts + step, step):
         results = list(collection.find({"ts": {"$gte": ts - step, "$lt": ts}}))
         count += len(results)
@@ -184,3 +195,131 @@ def __findGridCalculations__(map_grids_df, ais_batch):
 
     # upload data to mongo
     insertAISData(list_of_pings)
+
+
+def mongoSetUp():
+    # insert ais_navigation data to mongo
+    dataPreprocessing_2.preprocessAisDynamic()
+
+    # generate json files from original datasets shp's
+    # geoDataPreprocessing.shpToJson()
+
+    # insert ports geo point data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/port.json") as f :
+        data = json.load(f)
+        insertPortData(data["features"])
+
+    # insert ports full details data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/WPI.json") as f :
+        data = json.load(f)
+        insertFullDetailedPortsData(data["features"])
+
+    # insert world seas data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
+        data = json.load(f)
+        insertWorldSeas(data)
+
+    # insert ports data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/Fishing Ports.json") as f :
+        data = json.load(f)
+        insertFishingPortData(data)
+
+
+    """
+        Create countries collection
+    """
+    # get country data
+    countries = dataPreprocessing_2.fetchMMSICountryData(isForAIS=False)
+    # converting into list
+
+    countries = [countries[key] for key in countries.keys()]
+    print(countries)
+
+    # upload to mongo
+    insertCountries(countries)
+
+    # insert ports data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../json_data/test_poly.json") as f :
+        data = json.load(f)
+        insertTestPolyData(data)
+
+    """
+    Create grid for target seas and link it to ais documents
+    """
+
+    # generate map grid
+    # 1) calculate grids for target seas
+    # 2) upload it
+    grid_list = geoDataPreprocessing.createGridForTargetSeas()
+    insertMapGrid(grid_list)
+
+    # link grid to documents
+    linkGridToDocuments()
+
+
+def mongoSetUpServer():
+    # insert ports geo point data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/port.json") as f :
+        data = json.load(f)
+        insertPortData(data["features"])
+
+    # insert ports full details data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/WPI.json") as f :
+        data = json.load(f)
+        insertFullDetailedPortsData(data["features"])
+
+    # insert world seas data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
+        data = json.load(f)
+        insertWorldSeas(data)
+
+    # insert fishing ports data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../geospatial/datasetJSON/Fishing Ports.json") as f :
+        data = json.load(f)
+        insertFishingPortData(data)
+
+    """
+        Create countries collection
+    """
+    # get country data
+    countries = dataPreprocessing_2.fetchMMSICountryData(isForAIS=False)
+    # converting into list
+
+    countries = [countries[key] for key in countries.keys()]
+    print(countries)
+
+    # upload to mongo
+    insertCountries(countries)
+
+    # insert ports data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../json_data/test_poly.json") as f :
+        data = json.load(f)
+        insertTestPolyData(data)
+
+
+if __name__ == '__main__':
+    if connector.isLocal:
+        mongoSetUp()
+    else:
+        mongoSetUpServer()
+

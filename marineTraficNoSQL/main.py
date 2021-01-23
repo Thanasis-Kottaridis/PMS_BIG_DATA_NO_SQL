@@ -1,42 +1,41 @@
-import dataPreprocessing
+import dataPreprocessing_2
 import json
 import mongo.mongoSetUp as mongoSetUp
 from geospatial import geoDataPreprocessing
-import mongoDBManager
 import mortonCodeManager
 import numpy as np
 
 if __name__ == '__main__' :
     # insert ais_navigation data to mongo
-    #  ais_navigation_json = dataPreprocessing.preprocessAisDynamic()
+    ais_navigation_json = dataPreprocessing_2.preprocessAisDynamic()
 
     # insert ports geo point data in mongo
     # 1) load json file from datasetJSON
     # 2) upload it
-    # with open("geospatial/datasetJSON/port.json") as f :
-    #     data = json.load(f)
-    #     mongoDBManager.insertPortData(data["features"])
+    with open("geospatial/datasetJSON/port.json") as f :
+        data = json.load(f)
+        mongoSetUp.insertPortData(data["features"])
 
     # insert ports full details data in mongo
     # 1) load json file from datasetJSON
     # 2) upload it
-    # with open("geospatial/datasetJSON/WPI.json") as f :
-    #     data = json.load(f)
-    #     mongoDBManager.insertFullDetailedPortsData(data["features"])
+    with open("geospatial/datasetJSON/WPI.json") as f :
+        data = json.load(f)
+        mongoSetUp.insertFullDetailedPortsData(data["features"])
 
     # insert world seas data in mongo
     # 1) load json file from datasetJSON
     # 2) upload it
-    # with open("geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
-    #     data = json.load(f)
-    #     mongoSetUp.insertWorldSeas(data)
+    with open("geospatial/datasetJSON/World_Seas_IHO_v2.json") as f :
+        data = json.load(f)
+        mongoSetUp.insertWorldSeas(data)
 
     # insert ports data in mongo
     # 1) load json file from datasetJSON
     # 2) upload it
-    # with open("geospatial/datasetJSON/Fishing Ports.json") as f :
-    #     data = json.load(f)
-    #     mongoDBManager.insertFishingPortData(data)
+    with open("geospatial/datasetJSON/Fishing Ports.json") as f :
+        data = json.load(f)
+        mongoSetUp.insertFishingPortData(data)
 
     # mongoDBManager.insertData(ais_navigation_json)
 
@@ -50,25 +49,25 @@ if __name__ == '__main__' :
     # print("T", mortonCodeManager.DecodeMorton4Dt(morton))
 
 
-    # """
-    #     Create countries collection
-    # """
-    # # get country data
-    # countries = dataPreprocessing.fetchMMSICountryData(isForAIS=False)
-    # # converting into list
-    #
-    # countries = [countries[key] for key in countries.keys()]
-    # print(countries)
-    #
-    # # upload to mongo
-    # mongoDBManager.insertCountries(countries)
+    """
+        Create countries collection
+    """
+    # get country data
+    countries = dataPreprocessing_2.fetchMMSICountryData(isForAIS=False)
+    # converting into list
+
+    countries = [countries[key] for key in countries.keys()]
+    print(countries)
+
+    # upload to mongo
+    mongoSetUp.insertCountries(countries)
 
     # insert ports data in mongo
     # 1) load json file from datasetJSON
     # 2) upload it
-    # with open("json_data/test_poly.json") as f :
-    #     data = json.load(f)
-    #     mongoDBManager.insertTestPolyData(data)
+    with open("json_data/test_poly.json") as f :
+        data = json.load(f)
+        mongoSetUp.insertTestPolyData(data)
 
     """
     Create grid for target seas and link it to ais documents

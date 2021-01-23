@@ -9,7 +9,7 @@
 
 import psycopg2
 import json
-import mongoDBManager
+from mongo import mongoSetUp
 import mortonCodeManager
 
 jsonFilePath = r'json_data/ais_navigation.json'
@@ -316,7 +316,7 @@ def preprocessAisDynamic() :
     for i in range(0, len(ais_collection), 100000) :
         # update ais_collection by adding on it all extracted metadata
         ais_batch = createAISCollection(ais_collection[i : i + 100000], ship_metadata_dict, mmsi_countries_dict)
-        mongoDBManager.insertAISData(ais_batch)
+        mongoSetUp.insertAISData(ais_batch, isTemp=True)
         # write_json(jsonFilePath_5m, ais_batch, int(i / 1000000))
         # with open(jsonFilePath_5m, 'w', encoding='utf-8') as jsonf :
         #     ais_collection_json = json.dumps(ais_batch, sort_keys=False, indent=4)

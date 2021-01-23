@@ -61,7 +61,7 @@ def createGridForTargetSeas():
     # creating or switching to ais_navigation collection
     collection = db.world_seas
 
-    results =  list(collection.find())
+    results = list(collection.find())
 
     # print sea polygons
     ax = mongoUtils.createAXNFigure()
