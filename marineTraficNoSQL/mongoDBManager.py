@@ -794,7 +794,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     plt.show()
 
 
-def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12):
+def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=None):
     """
     1) Given an mmsi find its trajectory.
     2) find the grids of each trajectory and expand the by d
@@ -851,7 +851,7 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12):
         }
         for i in grid_results :
             expanded_multi_poly["coordinates"].append(
-                getEnrichBoundingBox(i["geometry"]["coordinates"][0], d)["coordinates"])
+                getEnrichBoundingBox(i["geometry"]["coordinates"][0], (d-10) / 2)["coordinates"])
 
 
         # step4 find grids intersecting with this multy poly
@@ -2046,10 +2046,6 @@ def distanceJoinUsingGPDGrid(poly, mmsi=227430000, ts_from=None, ts_to=None, the
 
     # 1) create a multypoligon from expanded grids
     expanded_grid = []
-    expanded_multi_poly = {
-        "type" : "MultiPolygon",
-        "coordinates" : []
-    }
     for i in grid_results:
         if i["_id"] in target_grid_ids:
             expanded_grid.append({
@@ -2519,12 +2515,12 @@ if __name__ == '__main__' :
     # poly1 = findPolyFromSeas(seaName="Bay of Biscay")
     # poly2 = findPolyFromSeas(seaName="Celtic Sea")
 
-    # distanceJoinUsingGPDGrid(poly1["geometry"], mmsi=305810000) #538003876
+    # distanceJoinUsingGPDGrid(poly1, mmsi=305810000) #538003876
     # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
-    # distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
+    distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
 
     # findThresholdBasedSimilarTrajectories(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294)
-    findThresholdBasedSimilarTrajectories(mmsi=227574020, tsFrom=1443676587, tsTo=1443679590, d=0)
+    # findThresholdBasedSimilarTrajectories(mmsi=227574020, tsFrom=1443676587, tsTo=1443679590, d=0)
 
 
 

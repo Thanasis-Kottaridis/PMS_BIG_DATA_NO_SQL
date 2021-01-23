@@ -816,11 +816,11 @@ db.ais_navigation.getIndexes()
  * by default iparxei enas index sto id (morton code)
  */
 
-db.ais_navigation_grid.createIndex({"location":"2dsphere"})
-db.ais_navigation_grid.createIndex({"mmsi": 1})
-db.ais_navigation_grid.createIndex({"grid_id": 1})
-db.ais_navigation_grid.createIndex({"ts": 1})
-db.ais_navigation_grid.createIndex( { "ts": 1, "mmsi": "hashed"} )
+db.ais_navigation.createIndex({"location":"2dsphere"})
+db.ais_navigation.createIndex({"mmsi": 1})
+db.ais_navigation.createIndex({"grid_id": 1})
+db.ais_navigation.createIndex({"ts": 1})
+db.ais_navigation.createIndex( { "ts": 1, "mmsi": "hashed"} )
 
 /**
  * @SHARDING
