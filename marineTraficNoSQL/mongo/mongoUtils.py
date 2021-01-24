@@ -143,7 +143,7 @@ def convertLineStringToPolygon(line, d=0.1) :
     eroded = dilated.buffer(d / 2)
 
     geoPolygon = sg.mapping(dilated)
-    print(json.dumps(geoPolygon, sort_keys=False, indent=4))
+    print(json.dumps(geoPolygon, sort_keys=False, indent=4, default=str))
 
     return geoPolygon, dilated, eroded
 
@@ -180,7 +180,7 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
     dictlist = queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
-        print(json.dumps(dictlist, sort_keys=False, indent=4))
+        print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))
 
     # check if plot needed
     if doPlot :
@@ -258,7 +258,7 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
     dictlist = queryResultToDictList(results)
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
-        print(json.dumps(dictlist, sort_keys=False, indent=4))
+        print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))
 
     # check if plot needed
     if doPlot :

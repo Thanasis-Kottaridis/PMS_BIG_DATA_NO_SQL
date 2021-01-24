@@ -1,4 +1,7 @@
 from mongo.query import relationalQueries
+from mongo.query import spatialQueries
+from mongo.query import spatioTemporalQueries
+
 import dataPreprocessing_2
 import json
 import mongo.mongoSetUp as mongoSetUp
@@ -35,8 +38,10 @@ if __name__ == '__main__' :
             relationalQueries.executeRelationalQuery()
         elif choice == '2':
             print("--------------You choose Spatial queries--------------")
+            spatialQueries.executeRelationalQuery()
         elif choice == '3' :
             print("--------------You choose Spatio-temporal queries--------------")
+            spatioTemporalQueries.executeRelationalQuery()
         elif choice == '4' :
             print("--------------You choose Distance Join Queries--------------")
         elif choice == '5' :

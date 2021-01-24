@@ -30,63 +30,63 @@ from geospatial import geoDataPreprocessing
 nautical_mile_in_meters = 1852
 one_hour_in_unix_time = 3600
 
-def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=None, doPlot=False, logResponse=False,
-                       queryTitle=None) :
-    start_time = time.time()
-    if collection is None :
-        # connecting or switching to the database
-        connection, db = connector.connectMongoDB()
-
-        # creating or switching to ais_navigation collection
-        collection = db.ais_navigation
-
-    query = {"location" : {"$near" : {"$geometry" : point}}}
-
-    # add ts range
-    if tsTo is not None and tsFrom is not None :
-        query["ts"] = {"$gte" : tsFrom, "$lte" : tsTo}
-    elif tsFrom is not None :
-        query["ts"] = {"$gte" : tsFrom}
-    elif tsTo is not None :
-        query["ts"] = {"$lte" : tsTo}
-
-    # set k near range if exist and execute query
-    if k_near is not None :
-        results = collection.find(query).limit(k_near)
-    else :
-        results = collection.find(query)
-
-    dictlist = utils.queryResultToDictList(results)
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    print(json.dumps(dictlist, sort_keys=False, indent=4))
-
-    if logResponse :
-        print(json.dumps(dictlist, sort_keys=False, indent=4))
-
-    # check if plot needed
-    if doPlot :
-        print("---  PLOTTING ---")
-
-        ax = utils.createAXNFigure()
-
-        # get n (ships) + 1 (point) random colors
-        cmap = utils.get_cmap(len(dictlist) + 1)
-
-        # plot points
-        ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
-                label="Target Point")
-
-        # plot pings
-        for index, ship in enumerate(dictlist) :
-            ax.plot(ship["location"]["coordinates"][0], ship["location"]["coordinates"][1], 'ro', alpha=0.5)
-
-        plt.title(queryTitle)
-        plt.y("Latitude")
-        plt.xlabel("Longitude")
-        plt.show()
-
-    return dictlist
+# def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=None, doPlot=False, logResponse=False,
+#                        queryTitle=None) :
+#     start_time = time.time()
+#     if collection is None :
+#         # connecting or switching to the database
+#         connection, db = connector.connectMongoDB()
+#
+#         # creating or switching to ais_navigation collection
+#         collection = db.ais_navigation
+#
+#     query = {"location" : {"$near" : {"$geometry" : point}}}
+#
+#     # add ts range
+#     if tsTo is not None and tsFrom is not None :
+#         query["ts"] = {"$gte" : tsFrom, "$lte" : tsTo}
+#     elif tsFrom is not None :
+#         query["ts"] = {"$gte" : tsFrom}
+#     elif tsTo is not None :
+#         query["ts"] = {"$lte" : tsTo}
+#
+#     # set k near range if exist and execute query
+#     if k_near is not None :
+#         results = collection.find(query).limit(k_near)
+#     else :
+#         results = collection.find(query)
+#
+#     dictlist = utils.queryResultToDictList(results)
+#     print("--- %s seconds ---" % (time.time() - start_time))
+#
+#     print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))
+#
+#     if logResponse :
+#         print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))
+#
+#     # check if plot needed
+#     if doPlot :
+#         print("---  PLOTTING ---")
+#
+#         ax = utils.createAXNFigure()
+#
+#         # get n (ships) + 1 (point) random colors
+#         cmap = utils.get_cmap(len(dictlist) + 1)
+#
+#         # plot points
+#         ax.plot(point["coordinates"][0], point["coordinates"][1], marker='x', alpha=0.5, c=cmap(0),
+#                 label="Target Point")
+#
+#         # plot pings
+#         for index, ship in enumerate(dictlist) :
+#             ax.plot(ship["location"]["coordinates"][0], ship["location"]["coordinates"][1], 'ro', alpha=0.5)
+#
+#         plt.title(queryTitle)
+#         plt.y("Latitude")
+#         plt.xlabel("Longitude")
+#         plt.show()
+#
+#     return dictlist
 
 def ext_givenTrajectoryFindSimilar(dictlist, trajectory, k_most) :
     """
@@ -169,7 +169,7 @@ def givenTrajectoryFindSimilar(trajectory, tsFrom=1448988894, tsTo=1449075294, k
     results = collection.aggregate(pipeline)
     dictlist = utils.queryResultToDictList(results)
 
-    print(json.dumps(dictlist, sort_keys=False, indent=4))
+    print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))
 
     # step 2 checks if it is a k-most query or a threshold based
     if k_most > 0 :
@@ -454,7 +454,7 @@ def findTrajectoriesFromPoints(pointsList) :
         dictlist = findPingsPerPoint(point, collection=collection)
         resultsList.append(dictlist)
 
-    print(json.dumps(resultsList, sort_keys=False, indent=4))
+    print(json.dumps(resultsList, sort_keys=False, indent=4, default=str))
 
     # step 2:
     counter = 0
@@ -503,7 +503,7 @@ def findTrajectoriesFromPoints(pointsList) :
                                collection=collection)
         )
 
-    print(json.dumps(trajectories, sort_keys=False, indent=4))
+    print(json.dumps(trajectories, sort_keys=False, indent=4, default=str))
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # step 5 plot trajectories
@@ -1615,7 +1615,7 @@ if __name__ == '__main__' :
     shipMMSI = relationalQueries.getShipsByCountry(["France"])
     matchAggregation = {"$match" : {'mmsi' : {'$in' : shipMMSI.tolist()},
                                     "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}}}}
-    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
+    utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
 
     # query2 # ARGEI POLI
     port_point = relationalQueries.findPort()
