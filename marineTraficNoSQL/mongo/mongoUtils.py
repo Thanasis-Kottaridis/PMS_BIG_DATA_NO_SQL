@@ -13,6 +13,7 @@ import shapely.geometry as sg
 from shapely.geometry import LineString
 from shapely.geometry import Polygon
 from descartes import PolygonPatch
+import geog
 import json
 import time
 
@@ -291,6 +292,171 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
         plt.show()
 
     return dictlist
+
+
+"""
+    #
+    # Spatial Join Utils
+    #
+"""
+
+
+def calculatePointsDistance(coords_1, coords_2) :
+    """
+    Vectorized helper func for calculating distance between 2 geo points
+
+    source:
+     https://towardsdatascience.com/heres-how-to-calculate-distance-between-2-geolocations-in-python-93ecab5bbba4
+
+    :param coords_1: lat long of first point
+    :param coords_2: lat log of second point
+    :return: distance between points
+    """
+
+    r = 6371
+    lat1 = coords_1[0]
+    lat2 = coords_2[0]
+    lon1 = coords_1[1]
+    lon2 = coords_2[1]
+    phi1 = np.radians(lat1)
+    phi2 = np.radians(lat2)
+    delta_phi = np.radians(lat2 - lat1)
+    delta_lambda = np.radians(lon2 - lon1)
+    a = np.sin(delta_phi / 2) ** 2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2) ** 2
+    res = r * (2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a)))
+    return np.round(res, 2)
+    # approach using geopy
+    # return geopy.distance.geodesic(coords_1, coords_2).km
+
+
+def comparePoints(point1, point2, d):
+    if calculatePointsDistance(point1, point2) <= d:
+        return True
+    else:
+        return False
+
+
+def comparePointSets(pointSet1, pointSet2, d) :
+    """
+    this helper func is calculating the distance per point between 2 point sets
+     (trajectories or points observed in a polygon)
+
+    step 1) create a vectorized 2d numpy array by applying calculatePointsDistance() helper function
+    step 2) find 2d elements with values less than d, create a pair and add it in to a list
+    step 3) calculate average distance for this 2 trajectories
+
+    :param pointSet1: list of lat, log pairs
+    :param pointSet2: list of lat, log pairs
+    :param d: distance threshold in kilometers.
+    :return m: trajectory mean distance. The mean distance for all to all points of 2 point sets
+    """
+    start_time = time.time()
+
+    ps1 = np.array(pointSet1)
+    ps2 = np.array(pointSet2)
+
+    # to signature sto np.vectorize leei gia kathe ena apo ta 2 (2d vectors me to (n),(n)) pare ola ta items (n) tis kathe "gramis"
+    # kai tha epistrepsei ena return me to "()"
+    # fv = np.vectorize(calculatePointsDistance, signature='(n),(n)->()')
+    # r = fv(ps1[:, np.newaxis], ps2)
+    # # r = geopy.distance.geodesic(ps1, ps2).km  #a[:, None] + b * 2
+    #
+    # # calculate mean
+    # # m = np.mean(r)
+    #
+    # # check if tranjectory is closer than threshold
+    # rmatch = np.vectorize(lambda i: i <= d)
+    # r_new = rmatch(r)
+    #
+    # # get i, j of ture values
+    # r = np.argwhere(r_new)# r[r_new]
+    # # rmatch = np.vectorize(lambda i : i <= d)
+    #
+    fv = np.vectorize(lambda i , j: comparePoints(i, j, d), signature='(n),(n)->()')
+    r = fv(ps1[:, np.newaxis], ps2)
+    r = np.argwhere(r)
+
+    p1i, p2i = zip(*r)
+    # r = r[~np.isnan(r)]
+    # r = r[r.astype(bool)]
+
+    # get mean of 2d array
+    print(len(p1i))
+    print("--- %s seconds ---" % (time.time() - start_time))
+    print(len(p2i))
+
+    return p1i, p2i
+
+
+def getEnrichBoundingBox(pointsList, theta=0) :
+    """
+    This helper func calculates the enrich bounding box of a polygon.
+    and returns its bottom left and upper right coordinates
+
+    :param poly:
+    :param theta:
+    :return: the polygon geo json of bounding box
+    """
+    x_coordinates, y_coordinates = zip(*pointsList)
+
+    MBB_points = [
+                [min(x_coordinates), min(y_coordinates)],
+                [min(x_coordinates), max(y_coordinates)],
+                [max(x_coordinates), max(y_coordinates)],
+                [max(x_coordinates), min(y_coordinates)],
+                [min(x_coordinates), min(y_coordinates)],
+            ]
+
+    enritch_MBB_points_x = []
+    enritch_MBB_points_y = []
+    for point in MBB_points:
+        d = theta * 1000  # meters
+        p = sg.Point(point)
+        n_points = 5
+        angles = np.linspace(0, 360, n_points)
+        polygon = geog.propagate(p, angles, d)
+
+        xs, ys = zip(*polygon)
+        print(calculatePointsDistance(point,
+                                      polygon[3]))
+
+        enritch_MBB_points_x.extend([min(xs), max(xs)])
+        enritch_MBB_points_y.extend([min(ys), max(ys)])
+
+    return {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [min(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+                [min(enritch_MBB_points_x), max(enritch_MBB_points_y)],
+                [max(enritch_MBB_points_x), max(enritch_MBB_points_y)],
+                [max(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+                [min(enritch_MBB_points_x), min(enritch_MBB_points_y)],
+            ]
+        ]
+    }
+
+
+def generatePolyFromPoint(p, d, polyPoints):
+    p = sg.Point(p)
+    angles = np.linspace(0, 360, polyPoints)
+    polygon = geog.propagate(p, angles, d)
+
+    # ax.add_patch(PolygonPatch(test, fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Polygon 1"))
+    # plt.ylabel("Latitude")
+    # plt.xlabel("Longitude")
+    # plt.show()
+    return {
+        "type" : "Polygon",
+        "coordinates" : [polygon]
+    }
+
+
+"""
+    #
+    # GRID UTILS
+    #
+"""
 
 
 def getPolyGrid(poly, theta):

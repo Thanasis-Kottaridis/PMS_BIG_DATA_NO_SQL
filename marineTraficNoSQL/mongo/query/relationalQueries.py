@@ -139,7 +139,7 @@ def findShipTrajectory(mmsi, tsFrom=None, tsTo=None, collection=None) :
         {"$group" : {"_id" : "$mmsi", "ts" : {"$push" : "$ts"}, "total" : {"$sum" : 1},
                      "location" : {"$push" : "$location.coordinates"}}}
     ]
-    explain = db.command('aggregate', 'ais_navigation', pipeline=pipeline, explain=True)
+    # explain = db.command('aggregate', 'ais_navigation', pipeline=pipeline, explain=True)
 
     results = collection.aggregate(pipeline)
     dictlist = utils.queryResultToDictList(results, dictlist=[])
@@ -176,6 +176,21 @@ def findPort(portName='Brest') :
     collection = db.world_port_geo
 
     results = collection.find_one({"properties.libelle_po" : portName})
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    return results
+
+
+def findTestPoly(polyId) :
+    start_time = time.time()
+
+    # connecting or switching to the database
+    connection, db = connector.connectMongoDB()
+
+    # creating or switching to ais_navigation collection
+    collection = db.query_polygons
+
+    results = collection.find_one({"_id" : polyId})
     print("--- %s seconds ---" % (time.time() - start_time))
 
     return results

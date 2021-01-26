@@ -1,6 +1,8 @@
 from mongo.query import relationalQueries
 from mongo.query import spatialQueries
 from mongo.query import spatioTemporalQueries
+from mongo.query import distanceJoinQueries
+from mongo.query import trajectoryQueries
 
 import dataPreprocessing_2
 import json
@@ -38,14 +40,16 @@ if __name__ == '__main__' :
             relationalQueries.executeRelationalQuery()
         elif choice == '2':
             print("--------------You choose Spatial queries--------------")
-            spatialQueries.executeRelationalQuery()
+            spatialQueries.executeSpatialQuery()
         elif choice == '3' :
             print("--------------You choose Spatio-temporal queries--------------")
-            spatioTemporalQueries.executeRelationalQuery()
+            spatioTemporalQueries.executeSpatioTemporalQuery()
         elif choice == '4' :
             print("--------------You choose Distance Join Queries--------------")
+            distanceJoinQueries.executeDistanceJoinQuery()
         elif choice == '5' :
             print("--------------You choose Trajectory queries--------------")
+            trajectoryQueries.executeTrajectoryQuery()
 
 
     # # insert ais_navigation data to mongo

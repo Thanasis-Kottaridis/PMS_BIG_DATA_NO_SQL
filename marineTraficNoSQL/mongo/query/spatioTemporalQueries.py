@@ -44,7 +44,7 @@ def spatialQueries_menu():
     return input('Your choice: ')
 
 
-def executeRelationalQuery():
+def executeSpatioTemporalQuery():
     choice = -1
     while choice not in main_options :
         choice = spatialQueries_menu()

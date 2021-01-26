@@ -111,7 +111,7 @@ def findShipsNearPoint(point, tsFrom=None, tsTo=None, k_near=None, collection=No
     return dictlist
 
 
-def executeRelationalQuery():
+def executeSpatialQuery():
     choice = -1
     while choice not in main_options :
         choice = spatialQueries_menu()
