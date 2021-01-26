@@ -1,6 +1,6 @@
 import mongo.mongoConnector as connector
 from geospatial import geoDataPreprocessing
-import dataPreprocessing_2
+from preprocessing import dataPreprocessing_2
 import json
 import geopandas as gpd
 from shapely.geometry import shape
