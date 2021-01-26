@@ -377,8 +377,16 @@ if __name__ == '__main__' :
     """
     # query 1
     # shipMMSI = relationalQueries.getShipsByCountry(["Greece"])
-    # matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()}}}
-    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+
+    """ 
+    Elliniko plio pou kinitw wraia mesa sto bay of biscay
+    mmsi 240031000
+    time from 1449352691,
+    time to 1449659042
+    """
+    shipMMSI = [240031000]
+    matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI}}}
+    utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
 
     # query 2
     # shipMMSI = relationalQueries.getShipsByCountry(["France", "German"])

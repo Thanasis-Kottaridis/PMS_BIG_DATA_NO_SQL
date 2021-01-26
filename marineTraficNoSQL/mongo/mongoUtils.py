@@ -172,7 +172,8 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
     # create mongo aggregation pipeline
     pipeline = [
         matchAggregation,
-        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}},
+        {"$sort" : {"ts" : 1}},
+        {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}, "ts" : {"$push" : "$ts"}}},
         {"$sort" : {'total' : -1}}
     ]
 

@@ -3,7 +3,8 @@
     given 2 A and B polygon or geo areas (circles on point or bounging box)
     find point pairs (a,b) that dictance from a to b is lees than threshold d
     time for poly: --- 4.524019002914429 seconds ---
-    time for box:
+    time for box: --- 414.99709010124207 seconds --- poli kako. --- 240.29256677627563 seconds --- na ferei ta pings apo ta poligona.
+
 
     Stats for circles:
     # WITHOUT OVERLAPPING POLYGONES
@@ -23,7 +24,7 @@
         given 2 A and B polygon or geo areas (circles on point or bounging box)
         find point pairs (a,b) that dictance from a to b is lees than threshold d
         time for poly: --- 4.524019002914429 seconds ---
-        time for box:
+        time for box: --- 4.433316946029663 seconds ---
 
         Stats for circles:
         # WITHOUT OVERLAPPING POLYGONES
@@ -45,7 +46,7 @@ import time
 
 distanceJoin_main_options = ['1', '2', '0']
 distanceJoin_spatial_options = ['1', '2', '3', '4', '5', '6', '0']
-distanceJoin_spatiotemporal_options = ['1', '2', '0']
+distanceJoin_spatiotemporal_options = ['1', '2', '3', '4', '5', '6', '0']
 
 
 
@@ -579,7 +580,8 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     pipeline = [{
         "$match" : {
             "mmsi" : mmsi,
-            "location" : {"$geoWithin": {"$geometry": poly}}
+            "location" : {"$geoWithin": {"$geometry": poly}},
+            **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
         }},
         {"$group" : {"_id": "$mmsi", #"_id" :  "$grid_id",
                      "grid_ids": {"$push" : "$grid_id"},
@@ -658,7 +660,8 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     pipeline = [{
         "$match" : {
             "_id" : {"$nin": target_grid_ids},
-            "geometry" : {"$geoIntersects" : {"$geometry" : poly}}
+            "geometry" : {"$geoIntersects" : {"$geometry" : poly}},
+            **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {})
         }},
         {"$match" : {
             "geometry" : {"$geoIntersects" : {"$geometry" : expanded_multi_poly}}
@@ -751,7 +754,6 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # get target grid ids in list
     grid_ids = [r["_id"] for r in grid_results]
-    print(grid_ids)
     print(len(grid_results))
 
     # step 2
@@ -759,7 +761,8 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     pipeline = [{
         "$match" : {
             "mmsi" : mmsi,
-            "location" : {"$geoWithin": {"$geometry": poly}}
+            "location" : {"$geoWithin": {"$geometry": poly}},
+            **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
         }},
         {"$group" : {"_id": "$grid_id", #"_id" :  "$grid_id",
                      "grid_ids": {"$push" : "$grid_id"},
@@ -781,7 +784,8 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     pipeline = [{
         "$match" : {
             "mmsi" : {"$ne": mmsi},
-            "location" : {"$geoWithin" : {"$geometry" : poly}}
+            "location" : {"$geoWithin" : {"$geometry" : poly}},
+            **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
             # "grid_id" : {"$in": grid_ids}
         }},
         {"$group" :
@@ -837,6 +841,8 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
         t = valid_pings.loc[valid_pings['_id'] == target_id]
         ps = [j.__geo_interface__['coordinates'] for j in t["geometry"].tolist()]  # TODO MAKE THIS QUICKER
         print(target_id)
+        if len(ps) == 0 :
+            continue
         ps1, ps2 = utils.comparePointSets(target_ship_results[i]["locations"], ps, theta)
         # print(ps1)
         # print("--- %s seconds ---" % (time.time() - start_time))
@@ -988,7 +994,7 @@ def executeDistanceJoinQuery():
             # 228336000 229 pings near breast from 1448988894 and 2 hours interval.
 
             spatio_temporal_choice = -1
-            while spatio_temporal_choice not in distanceJoin_main_options :
+            while spatio_temporal_choice not in distanceJoin_spatiotemporal_options :
                 spatio_temporal_choice = distanceJoinSpatial_menu()
 
             if spatio_temporal_choice == '1' :
@@ -1052,7 +1058,15 @@ def executeDistanceJoinQuery():
                     "type" : "Polygon",
                     "coordinates" : [bay_of_biscay_sea['geometry']['coordinates'][0]]
                 }
-                distanceJoinUsingGPDGrid(bay_of_biscay_poly, mmsi=228762000, ts_from=1448988894, ts_to=1448988894 + (72 * utils.one_hour_in_unix_time))  # 530+ pings ship gia bay of biscay
+
+                """ 
+                    before performance update:
+                    test mmsi: 227300000 51 ping, --- 75.34329080581665 seconds ---
+                    mmsi: 228208800 21 pings --- 26.400819778442383 seconds ---
+                    after performance update:
+                """
+
+                distanceJoinUsingGPDGrid(bay_of_biscay_poly, mmsi=228208800, ts_from=1448988894, ts_to=1449075294)  # 530+ pings ship gia bay of biscay
                 # distanceJoinUsingGPDGrid(poly1, mmsi=538003876) # gia test poly 5
 
 

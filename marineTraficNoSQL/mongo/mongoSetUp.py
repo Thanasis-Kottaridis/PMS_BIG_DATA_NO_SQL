@@ -299,6 +299,17 @@ def mongoSetUpServer():
     """
         Create countries collection
     """
+    createCountriesCollection()
+
+    # insert test polygons data in mongo
+    # 1) load json file from datasetJSON
+    # 2) upload it
+    with open("../json_data/test_poly.json") as f :
+        data = json.load(f)
+        insertTestPolyData(data)
+
+
+def createCountriesCollection():
     # get country data
     countries = dataPreprocessing_2.fetchMMSICountryData(isForAIS=False)
     # converting into list
@@ -308,13 +319,6 @@ def mongoSetUpServer():
 
     # upload to mongo
     insertCountries(countries)
-
-    # insert ports data in mongo
-    # 1) load json file from datasetJSON
-    # 2) upload it
-    with open("../json_data/test_poly.json") as f :
-        data = json.load(f)
-        insertTestPolyData(data)
 
 
 if __name__ == '__main__':
