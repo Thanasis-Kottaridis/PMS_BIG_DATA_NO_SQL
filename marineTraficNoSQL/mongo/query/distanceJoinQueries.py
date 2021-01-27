@@ -572,7 +572,6 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # get target grid ids in list
     grid_ids = [r["_id"] for r in grid_results]
-    print(grid_ids)
     print(len(grid_results))
 
     # step 2
@@ -596,6 +595,20 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     target_grid_ids = target_ship_results[0]["grid_ids"]#[i["_id"] for i in target_ship_results]
 
+    # 1) create a multypoligon from expanded grids
+    # expanded_grid = []
+    expanded_multi_poly = {
+        "type" : "MultiPolygon",
+        "coordinates" : []
+    }
+    for i in grid_results :
+        if i["_id"] in target_grid_ids :
+            expanded_multi_poly["coordinates"].append(
+                utils.getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta)["coordinates"])
+            # expanded_grid.append({
+            #     "_id": i["_id"],
+            #     "geometry": sg.shape(getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
+            # })
 
     # step 3
     collection = db.ais_navigation
@@ -603,6 +616,10 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     pipeline = [{
         "$match" : {
             "mmsi" : {"$ne": mmsi},
+            "location" : {"$geoWithin" : {"$geometry" : expanded_multi_poly}},
+            **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
+            # "grid_id" : {"$in": grid_ids}
+        }},{"$match" : {
             "location" : {"$geoWithin" : {"$geometry" : poly}}
             # "grid_id" : {"$in": grid_ids}
         }},
@@ -633,21 +650,6 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
 
     # step 5
-
-    # 1) create a multypoligon from expanded grids
-    # expanded_grid = []
-    expanded_multi_poly = {
-        "type" : "MultiPolygon",
-        "coordinates" : []
-    }
-    for i in grid_results:
-        if i["_id"] in target_grid_ids:
-            expanded_multi_poly["coordinates"].append(utils.getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta)["coordinates"])
-            # expanded_grid.append({
-            #     "_id": i["_id"],
-            #     "geometry": sg.shape(getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
-            # })
-
     # 2) perform geointersects on grids with expanded_multy_poly and initial poly and not in target grids
     # in order to get new target grids
     collection = db.target_map_grid
@@ -683,9 +685,7 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # gets ps1 is the indexes of points of our target rajectory, ps2 are the indexes of target locs
     ps1, ps2 = utils.comparePointSets(target_ship_results[0]["locations"], target_locs, theta)
-    print(ps1)
     print("--- %s seconds ---" % (time.time() - start_time))
-    print(ps2)
     np_locs = np.array(target_locs)
     matching_locs.extend(list(np_locs[list(ps2)]))
     mask = np.ones(np_locs.shape[0], dtype=bool)
@@ -747,10 +747,16 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     # step 1
     collection = db.target_map_grid
 
-    grid_results = list(collection.find(
-        {"geometry" : {"$geoIntersects": {"$geometry": poly}}}
-        # ,{"_id": 1}
-        ))
+    pipeline = [
+        {
+            "$match" :  {"geometry" : {"$geoIntersects": {"$geometry": poly}}}
+        }
+    ]
+
+    grid_results = list(collection.aggregate(pipeline))
+
+    # perform explain if needed
+    utils.queryExplain("target_map_grid", pipeline)
 
     # get target grid ids in list
     grid_ids = [r["_id"] for r in grid_results]
@@ -765,17 +771,33 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
             **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
         }},
         {"$group" : {"_id": "$grid_id", #"_id" :  "$grid_id",
-                     "grid_ids": {"$push" : "$grid_id"},
                      "locations" : {"$push" : "$location.coordinates"},
                      "total" : {"$sum" : 1}
                      }
         }]
+
+    utils.queryExplain("target_map_grid", pipeline)
 
     target_ship_results = list(collection.aggregate(pipeline))
 
     # get target grid ids and locations grouped
 
     target_grid_ids = [i["_id"] for i in target_ship_results]
+
+    # 1) create a multypoligon from expanded grids
+    expanded_grid = []
+    expanded_multi_poly = {
+        "type" : "MultiPolygon",
+        "coordinates" : []
+    }
+    for i in grid_results :
+        if i["_id"] in target_grid_ids :
+            expanded_multi_poly["coordinates"].append(
+                utils.getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta)["coordinates"])
+            expanded_grid.append({
+                "_id" : i["_id"],
+                "geometry" : sg.shape(utils.getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
+            })
 
 
     # step 3
@@ -784,9 +806,13 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     pipeline = [{
         "$match" : {
             "mmsi" : {"$ne": mmsi},
-            "location" : {"$geoWithin" : {"$geometry" : poly}},
+            "location" : {"$geoWithin" : {"$geometry" : expanded_multi_poly}},
             **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
             # "grid_id" : {"$in": grid_ids}
+        }},{
+        "$match" : {
+        "location" : {"$geoWithin" : {"$geometry" : poly}},
+        # "grid_id" : {"$in": grid_ids}
         }},
         {"$group" :
             {"_id": "$grid_id",
@@ -815,16 +841,6 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
             non_matching_locs.extend(i["locations"])
 
     # step 5
-
-    # 1) create a multypoligon from expanded grids
-    expanded_grid = []
-    for i in grid_results:
-        if i["_id"] in target_grid_ids:
-            expanded_grid.append({
-                "_id": i["_id"],
-                "geometry": sg.shape(utils.getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
-            })
-
     # create geo pandas df from grids
     expanded_grid_df = gpd.GeoDataFrame(expanded_grid)
 
@@ -876,7 +892,7 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # plot poly
     ax.add_patch(PolygonPatch(poly, fc='y', ec='k', alpha=0.1, zorder=2))
-    # ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
+    ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
 
     for cell in grid_results :
         ax.add_patch(
@@ -1064,9 +1080,11 @@ def executeDistanceJoinQuery():
                     test mmsi: 227300000 51 ping, --- 75.34329080581665 seconds ---
                     mmsi: 228208800 21 pings --- 26.400819778442383 seconds ---
                     after performance update:
+                    mmsi: 227300000 51 ping, --- 12.190508127212524 seconds ---
+                    mmsi: 228208800 21 pings: --- 7.512688159942627 seconds ---
                 """
 
-                distanceJoinUsingGPDGrid(bay_of_biscay_poly, mmsi=228208800, ts_from=1448988894, ts_to=1449075294)  # 530+ pings ship gia bay of biscay
+                distanceJoinUsingGPDGrid(bay_of_biscay_poly, mmsi=227300000, ts_from=1448988894, ts_to=1449075294)  # 530+ pings ship gia bay of biscay
                 # distanceJoinUsingGPDGrid(poly1, mmsi=538003876) # gia test poly 5
 
 
