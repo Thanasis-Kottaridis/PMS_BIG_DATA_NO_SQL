@@ -822,6 +822,7 @@ db.ais_navigation.createIndex({"grid_id": 1})
 db.ais_navigation.createIndex({"ts": 1})
 db.ais_navigation.createIndex( { "ts": 1, "mmsi": "hashed"} )
 
+db.target_map_grid.createIndex({"geometry":"2dsphere"})
 
 /**
  * @SHARDING

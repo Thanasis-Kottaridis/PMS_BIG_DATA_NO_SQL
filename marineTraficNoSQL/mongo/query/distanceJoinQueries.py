@@ -452,6 +452,7 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
     # execute query
     results = list(collection.aggregate(pipeline, allowDiskUse=allowDiskUse))
     poly_dictList = utils.queryResultToDictList(results, dictlist=poly_dictList)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
     # repeat sep1 and 2 for second pointset
@@ -472,7 +473,10 @@ def distanceJoinSphereQuery(k1, r1, k2, r2, theta, timeFrom=None, timeTo=None, a
 
     # execute query
     results = list(collection.aggregate(pipeline, allowDiskUse=allowDiskUse))
+
     print(len(results[0]["ids"]))
+    print("--- %s seconds ---" % (time.time() - start_time))
+
     idsInK1 = results[0]["ids"]
 
     # pipeline stage1
@@ -557,6 +561,11 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     # step 4 find all points matching with in the same grid with target ship grids. and place them
              into matching list and the rest to the non_matching_list
     # step 5 expand target grids by theta and search non_matching points with spatial join in them
+
+    run 1 --- 616.8660519123077 seconds ---
+    run 2 --- 585.5844461917877 seconds ---
+
+
     """
     start_time = time.time()
 
@@ -565,14 +574,22 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     # step 1
     collection = db.target_map_grid
 
-    grid_results = list(collection.find(
-        {"geometry" : {"$geoIntersects": {"$geometry": poly}}}
-        # ,{"_id": 1}
-        ))
+    pipeline = [
+        {
+            "$match" : {"geometry" : {"$geoIntersects" : {"$geometry" : poly}}}
+        }
+    ]
+
+    grid_results = list(collection.aggregate(pipeline))
+
+    # perform explain if needed
+    utils.queryExplain("target_map_grid", pipeline)
 
     # get target grid ids in list
     grid_ids = [r["_id"] for r in grid_results]
     print(len(grid_results))
+    print("Step 1")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     # step 2
     collection = db.ais_navigation
@@ -582,18 +599,21 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
             "location" : {"$geoWithin": {"$geometry": poly}},
             **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {}),
         }},
-        {"$group" : {"_id": "$mmsi", #"_id" :  "$grid_id",
-                     "grid_ids": {"$push" : "$grid_id"},
+        {"$group" : {"_id" :  "$grid_id",
                      "locations" : {"$push" : "$location.coordinates"},
                      "total" : {"$sum" : 1}
                      }
         }]
 
+    # perform explain if needed
+    utils.queryExplain("ais_navigation", pipeline)
+
     target_ship_results = list(collection.aggregate(pipeline))
-
     # get target grid ids and locations grouped
+    print("Step 2")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
-    target_grid_ids = target_ship_results[0]["grid_ids"]#[i["_id"] for i in target_ship_results]
+    target_grid_ids = [i["_id"] for i in target_ship_results]
 
     # 1) create a multypoligon from expanded grids
     # expanded_grid = []
@@ -609,6 +629,10 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
             #     "_id": i["_id"],
             #     "geometry": sg.shape(getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
             # })
+
+    print("Step 3")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
 
     # step 3
     collection = db.ais_navigation
@@ -634,8 +658,11 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
         }
     }]
 
+    utils.queryExplain("ais_navigation", pipeline)
     results = list(collection.aggregate(pipeline))
     print(len(results))
+    print("--- %s seconds ---" % (time.time() - start_time))
+
 
     # step 4
     # for key in results new check if key is in target mmsi polys and add its pings to matching pings
@@ -647,46 +674,51 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
             matching_locs.extend(i["locations"])
         else:
             non_matching_locs.extend(i["locations"])
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
-    # step 5
-    # 2) perform geointersects on grids with expanded_multy_poly and initial poly and not in target grids
-    # in order to get new target grids
-    collection = db.target_map_grid
-
-    grid_results = list(collection.find(
-        {"geometry" : {"$geoIntersects" : {"$geometry" : poly}}}
-        # ,{"_id": 1}
-    ))
-
-    pipeline = [{
-        "$match" : {
-            "_id" : {"$nin": target_grid_ids},
-            "geometry" : {"$geoIntersects" : {"$geometry" : poly}},
-            **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {})
-        }},
-        {"$match" : {
-            "geometry" : {"$geoIntersects" : {"$geometry" : expanded_multi_poly}}
-        }}
-        # ,{"$project" : {"_id" : 1}}
-        ]
-
-    expanded_intersects = list(collection.aggregate(pipeline))
-    # get target grid ids
-    expanded_grid_ids = [i["_id"] for i in expanded_intersects if i]
+    # # step 5
+    # # 2) perform geointersects on grids with expanded_multy_poly and initial poly and not in target grids
+    # # in order to get new target grids
+    # collection = db.target_map_grid
+    #
+    # grid_results = list(collection.find(
+    #     {"geometry" : {"$geoIntersects" : {"$geometry" : poly}}}
+    #     # ,{"_id": 1}
+    # ))
+    #
+    # pipeline = [{
+    #     "$match" : {
+    #         "_id" : {"$nin": target_grid_ids},
+    #         "geometry" : {"$geoIntersects" : {"$geometry" : poly}},
+    #         **({'ts' : {"$gte" : ts_from, "$lte" : ts_to}} if ts_from is not None and ts_to is not None else {})
+    #     }},
+    #     {"$match" : {
+    #         "geometry" : {"$geoIntersects" : {"$geometry" : expanded_multi_poly}}
+    #     }}
+    #     # ,{"$project" : {"_id" : 1}}
+    #     ]
+    #
+    # expanded_intersects = list(collection.aggregate(pipeline))
+    # # get target grid ids
+    # expanded_grid_ids = [i["_id"] for i in expanded_intersects if i]
 
     # step 6 compare distance of trajectory points with expanded_intersects points
     # for
 
-    target_locs = []
-    for i in results:
-        if i["_id"] in expanded_grid_ids:
-            target_locs.extend(i["locations"])
+    # target_locs = []
+    # for i in results:
+    #     if i["_id"] in expanded_grid_ids:
+    #         target_locs.extend(i["locations"])
 
     # gets ps1 is the indexes of points of our target rajectory, ps2 are the indexes of target locs
-    ps1, ps2 = utils.comparePointSets(target_ship_results[0]["locations"], target_locs, theta)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    np_locs = np.array(target_locs)
+
+    total_target_ship_results = []
+    for i in target_ship_results:
+        total_target_ship_results.extend(i["locations"])
+
+    ps1, ps2 = utils.comparePointSets(total_target_ship_results, non_matching_locs, theta)
+    np_locs = np.array(non_matching_locs)
     matching_locs.extend(list(np_locs[list(ps2)]))
     mask = np.ones(np_locs.shape[0], dtype=bool)
     mask[list(ps2)] = False
@@ -700,15 +732,15 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # plot poly
     ax.add_patch(PolygonPatch(poly, fc='y', ec='k', alpha=0.1, zorder=2))
-    ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2))
+    ax.add_patch(PolygonPatch(expanded_multi_poly, fc='m', ec='k', alpha=0.3, zorder=2, label="Expanded Poly"))
 
     for cell in grid_results:
         ax.add_patch(
             PolygonPatch(cell["geometry"], fc=utils.GRAY, ec=utils.GRAY, alpha=0.5, zorder=2))
 
-    for cell in expanded_intersects:
-        ax.add_patch(
-            PolygonPatch(cell["geometry"],  fc="m", ec="m", alpha=1, zorder=2))
+    # for cell in expanded_intersects:
+    #     ax.add_patch(
+    #         PolygonPatch(cell["geometry"],  fc="m", ec="m", alpha=1, zorder=2))
 
     # plot non matching points
     isFirstRed = True
@@ -727,13 +759,13 @@ def distanceJoinUsingGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     # plot target ship pings
     isFirstBlue = True
     # for grid in target_ship_results:
-    for ping in target_ship_results[0]["locations"]: #grid["locations"] :
+    for ping in total_target_ship_results: #grid["locations"] :
         ax.plot(ping[0], ping[1], marker='o', markersize=2, alpha=1, c='b',
                 label="target points" if isFirstBlue else None)
         isFirstBlue = False
 
     ax.legend(loc='center left', title='Plot Info', bbox_to_anchor=(1, 0.5), ncol=1)
-    plt.title("Distance Join Query using Spheres and theta: {}".format(theta))
+    plt.title("Distance Join Query using Grids and theta: {}".format(theta))
     plt.ylabel("Latitude")
     plt.xlabel("Longitude")
     plt.show()
@@ -757,6 +789,8 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # perform explain if needed
     utils.queryExplain("target_map_grid", pipeline)
+    print("step 1")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     # get target grid ids in list
     grid_ids = [r["_id"] for r in grid_results]
@@ -776,7 +810,9 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
                      }
         }]
 
-    utils.queryExplain("target_map_grid", pipeline)
+    utils.queryExplain("ais_navigation", pipeline)
+    print("step 2")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     target_ship_results = list(collection.aggregate(pipeline))
 
@@ -799,8 +835,11 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
                 "geometry" : sg.shape(utils.getEnrichBoundingBox(i["geometry"]["coordinates"][0], theta))
             })
 
+    print("step 3")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
-    # step 3
+
+    # step 4
     collection = db.ais_navigation
 
     pipeline = [{
@@ -829,7 +868,11 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
     results = list(collection.aggregate(pipeline))
     print(len(results))
 
-    # step 4
+    utils.queryExplain("ais_navigation", pipeline)
+    print("step 4")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    # step 5
     # for key in results new check if key is in target mmsi polys and add its pings to matching pings
     # else add them to non matching pings
     matching_locs = []
@@ -840,7 +883,10 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
         else:
             non_matching_locs.extend(i["locations"])
 
-    # step 5
+    print("step 5")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    # step 6
     # create geo pandas df from grids
     expanded_grid_df = gpd.GeoDataFrame(expanded_grid)
 
@@ -851,6 +897,8 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
 
     # perform s join to find non_matching pings in expanded target grids
     valid_pings = gpd.sjoin(non_matching_df, expanded_grid_df, how="inner", op="intersects")
+    print("step 6")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     non_matching_locs = []
     for i, target_id in enumerate(target_grid_ids):
@@ -859,6 +907,7 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
         print(target_id)
         if len(ps) == 0 :
             continue
+        print("target ship pings in grid: {}, and non_matching_loc in expanded grid: {}".format(len(target_ship_results[i]["locations"]), len(ps)))
         ps1, ps2 = utils.comparePointSets(target_ship_results[i]["locations"], ps, theta)
         # print(ps1)
         # print("--- %s seconds ---" % (time.time() - start_time))
@@ -871,6 +920,7 @@ def distanceJoinUsingGPDGrid(poly, mmsi, ts_from=None, ts_to=None, theta=12):
         mask = np.ones(np_locs.shape[0], dtype=bool)
         mask[list(ps2)] = False
         non_matching_locs.extend(list(np_locs[mask, :]))
+    print("step 7 above")
 
     # # group results per grid.
     # results_new = {}
@@ -1063,7 +1113,7 @@ def executeDistanceJoinQuery():
                     "type" : "Polygon",
                     "coordinates" : [bay_of_biscay_sea['geometry']['coordinates'][0]]
                 }
-                distanceJoinUsingGrid(bay_of_biscay_poly, mmsi=228762000, ts_from=1448988894, ts_to=1448988894 + (72 * utils.one_hour_in_unix_time))  # 538003876
+                distanceJoinUsingGrid(bay_of_biscay_poly, mmsi=227300000, ts_from=1448988894, ts_to=1449075294)  # 538003876
 
             elif spatio_temporal_choice == '6' :
                 # spatio temporal distance join

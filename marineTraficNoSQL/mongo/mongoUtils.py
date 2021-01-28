@@ -7,6 +7,7 @@
 from mongo import mongoConnector as connector
 
 import numpy as np
+import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import shapely.geometry as sg
@@ -27,7 +28,6 @@ one_hour_in_unix_time = 3600
 BLUE = '#6699cc'
 GRAY = '#999999'
 RED = '#B20000'
-
 
 
 def createAXNFigure() :
@@ -491,21 +491,20 @@ def getPolyGrid(poly, theta):
     return valid_grid
     # grid.to_file("grid.shp")
 
-# import geopands as gpd
-# from shapely.geometry.polygon import Polygon
-# from shapely.geometry.multipolygon import MultiPolygon
+
 #
-# def explode(indata):
-#     indf = gpd.GeoDataFrame.from_file(indata)
-#     outdf = gpd.GeoDataFrame(columns=indf.columns)
-#     for idx, row in indf.iterrows():
-#         if type(row.geometry) == Polygon:
-#             outdf = outdf.append(row,ignore_index=True)
-#         if type(row.geometry) == MultiPolygon:
-#             multdf = gpd.GeoDataFrame(columns=indf.columns)
-#             recs = len(row.geometry)
-#             multdf = multdf.append([row]*recs,ignore_index=True)
-#             for geom in range(recs):
-#                 multdf.loc[geom,'geometry'] = row.geometry[geom]
-#             outdf = outdf.append(multdf,ignore_index=True)
-#     return outdf
+# Query explain util
+#
+def queryExplain(collectionStr, pipeline):
+    if connector.showQueryExplain:
+        _, db = connector.connectMongoDB()
+        explain = db.command('aggregate', collectionStr, pipeline=pipeline, explain=True)
+        print("\n----------------- Query Explain -----------------\n")
+
+
+def calculateTotalDocs(dictList):
+    count = 0
+    for result in dictList:
+        count += result["total"]
+
+    return count
