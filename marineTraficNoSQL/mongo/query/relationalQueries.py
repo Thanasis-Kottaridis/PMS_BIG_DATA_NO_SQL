@@ -81,9 +81,10 @@ def getAllAisMMSI() :
     return document_ids
 
 
-def getShipsByCountry(countryName, db=None) :
+def getShipsByCountry(countryName, db=None):
     """
         This Query gets all records from ships that their country is in countryName list
+        :param db: db connection
         :param countryName: list of target country names
         :return:
     """
