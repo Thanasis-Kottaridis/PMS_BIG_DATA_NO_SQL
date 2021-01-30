@@ -70,12 +70,13 @@ def findTrajectoriesInSpaTemBox(rect1, timeFrom=None, timeTo=None, doPlot=True, 
         }
         },
         {"$group" : {"_id" : "$mmsi", "total" : {"$sum" : 1}, "location" : {"$push" : "$location.coordinates"}}},
-        {"$sort" : {'total' : -1}}
+        # {"$sort" : {'total' : -1}}
     ]
 
     # execute query
     results = collection.aggregate(pipeline)
     dictlist = utils.queryResultToDictList(results)
+    utils.queryExplain("ais_navigation", pipeline)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # check if plot needed
@@ -319,6 +320,7 @@ def findThresholdBasedSimilarTrajectories(mmsi, tsFrom=None, tsTo=None, d=12, k=
 
 
 def findPingsPerPoint(point, collection=None) :
+    start_time = time.time()
     if collection is None :
         # connecting or switching to the database
         connection, db = connector.connectMongoDB()
@@ -339,6 +341,11 @@ def findPingsPerPoint(point, collection=None) :
     # execute query
     results = collection.aggregate(pipeline)
     dict = utils.queryResultsToDict(results)
+
+    utils.queryExplain("ais_navigation", pipeline)
+    print("Step 1")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
     return dict
 
 
@@ -395,7 +402,7 @@ def findTrajectoriesFromPoints(pointsList, hoursList) :
         dictlist = findPingsPerPoint(point, collection=collection)
         resultsList.append(dictlist)
 
-    print(json.dumps(resultsList, sort_keys=False, indent=4, default=str))
+    # print(json.dumps(resultsList, sort_keys=False, indent=4, default=str))
 
     # step 2:
     totalHours = sum(hoursList)
@@ -436,6 +443,9 @@ def findTrajectoriesFromPoints(pointsList, hoursList) :
 
             counter += 1
 
+    print("Step 2 and 3 total execution time")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
     # step 4
     trajectories = []
     for pair in validMMSITimePair :
@@ -446,7 +456,7 @@ def findTrajectoriesFromPoints(pointsList, hoursList) :
                                                  collection=collection)
         )
 
-    print(json.dumps(trajectories, sort_keys=False, indent=4, default=str))
+    # print(json.dumps(trajectories, sort_keys=False, indent=4, default=str))
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # step 5 plot trajectories
@@ -483,6 +493,8 @@ def executeTrajectoryQuery() :
             print("--------------You choose 1--------------")
             bottomLeftCorner = input("Give bottom left corner separated by comma ex: -5.084,48.161: ")
             upperRightCorner = input("Give top right corner separated by comma ex: -4.939,48.377: ")
+            # bottomLeftCorner = input("Give bottom left corner separated by comma ex: -8.00,46.62: ")  # -5.084,48.161
+            # upperRightCorner = input("Give top right corner separated by comma ex: -3.76,47.21: ")  # -4.939,48.377
             timeFrom = input("Give Time From eg: 1448988894: ")
             timeTo = input("Give Time To eg: 1449075294: ")
 
@@ -503,6 +515,8 @@ def executeTrajectoryQuery() :
             print("--------------You choose 2--------------")
             bottomLeftCorner = input("Give bottom left corner separated by comma ex: -5.084,48.161: ")
             upperRightCorner = input("Give top right corner separated by comma ex: -4.939,48.377: ")
+            # bottomLeftCorner = input("Give bottom left corner separated by comma ex: -8.00,46.62: ")#-5.084,48.161
+            # upperRightCorner = input("Give top right corner separated by comma ex: -3.76,47.21: ")#-4.939,48.377
             timeFrom = input("Give Time From eg: 1448988894: ")
             timeTo = input("Give Time To eg: 1449075294: ")
 
@@ -526,7 +540,7 @@ def executeTrajectoryQuery() :
                                                 "location" : {"$geoWithin" : {"$geometry" : poly}}}}
 
                 utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly,
-                                                   logResponse=True)
+                                                   logResponse=False)
             except :
                 print("------------------ INVALID ARGUMENTS ------------------")
 

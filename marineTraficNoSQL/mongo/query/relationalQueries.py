@@ -72,12 +72,15 @@ def getAllAisMMSI() :
     This Query gets all mmsi from ais_navigation collection
     :return:
     """
+    start_time = time.time()
     # connecting or switching to the database
     connection, db = connector.connectMongoDB()
 
     # creating or switching to ais_navigation collection
     collection = db.ais_navigation
     document_ids = collection.find().distinct('mmsi')  # list of all ids
+    print("step 2")
+    print("--- %s seconds ---" % (time.time() - start_time))
     return document_ids
 
 
@@ -104,6 +107,8 @@ def getShipsByCountry(countryName, db=None):
         countryCodes.extend(c["country_codes"])
 
     countryCodes = np.array(countryCodes)
+    print("--- %s seconds ---" % (time.time() - start_time))
+
 
     # get all ships by mmsi
     ships = np.array(getAllAisMMSI())
@@ -146,6 +151,7 @@ def findShipTrajectory(mmsi, tsFrom=None, tsTo=None, collection=None) :
     dictlist = utils.queryResultToDictList(results, dictlist=[])
 
     # print(json.dumps(dictlist, sort_keys=False, indent=4))
+    utils.queryExplain("ais_navigation", pipeline)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     # convert point list into MultiPoint
@@ -235,11 +241,11 @@ def executeRelationalQuery():
         elif choice == '2' :
             # query 2
             print("--------------You choose 2--------------")
-            shipMMSI = getShipsByCountry(["France", "German"])
+            shipMMSI = getShipsByCountry(["France", "Greece"])
             matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI.tolist()},
                                             'ship_metadata.ship_type.type_name': 'Dredger',
                                             'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (72 * utils.one_hour_in_unix_time)}}}
-            utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True, allowDiskUse=True)
+            utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=False, allowDiskUse=True)
         elif choice == '3' :
             print("--------------You choose 3--------------")
             print("\n")

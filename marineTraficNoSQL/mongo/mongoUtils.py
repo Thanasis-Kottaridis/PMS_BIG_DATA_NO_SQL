@@ -180,6 +180,8 @@ def findTrajectoriesForMatchAggr(matchAggregation, collection=None, doPlot=False
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
     dictlist = queryResultToDictList(results)
+    queryExplain("ais_navigation", pipeline)
+
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
         print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))
@@ -258,6 +260,7 @@ def findPointsForMatchAggr(geoNearAgg, matchAgg=None, k_near=None, collection=No
     # execute query
     results = collection.aggregate(pipeline, allowDiskUse=allowDiskUse)
     dictlist = queryResultToDictList(results)
+    queryExplain("ais_navigation", pipeline)
     print("--- %s seconds ---" % (time.time() - start_time))
     if logResponse :
         print(json.dumps(dictlist, sort_keys=False, indent=4, default=str))

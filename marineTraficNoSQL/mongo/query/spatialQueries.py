@@ -13,7 +13,7 @@
     query2: find all ships that moved in range from 10 to 30 sea miles from Burst port
     (this query can be used for any point and for any min and max range )
     [-4.47530,48.3827]
-    time on first run --- 335.2350790500641 seconds ---
+    time on first run --- 327.6065671443939 seconds ---
 
     SOS THE ABOVE QUERY CANT BE VISUALIZED SO WE USE A DIFFERENT TEST POINT [-4.1660385,50.334972]
 
@@ -42,10 +42,11 @@ def spatialQueries_menu():
     print('| 1.  find trajectories for all ships                     |')
     print('|     with greek flag in Bay of Biscay                    |')
     print('| 2.  find all ships that moved in range from             |')
-    print('|     10 to 30 sea miles from a point                     |')
-    print('|    (test point:" [-4.1660385,50.334972])                |')
-    print('| 3.  find k closest ship sigmas to a point               |')
-    print('|    (test point:" [-4.1660385,50.334972]) (k=5)          |')
+    print('|     10 to 20 sea miles from a point                     |')
+    print('|     (test point:" Brest Port)                           |')
+    print('| 3.  find k closest ship sigmas in range                 |')
+    print('|     10 to 20 sea miles from a point                     |')
+    print('|    (test point:" Brest Port) (k=100.000)                |')
     print('|                                                         |')
     print('| 0.  Exit                                                |')
     print('|---------------------------------------------------------|')
@@ -125,22 +126,38 @@ def executeSpatialQuery():
                                             "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}}}}
 
             utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"],
-                                               logResponse=True)
+                                               logResponse=False)
 
 
         elif choice == '2' :
             # query 2
             print("--------------You choose 2--------------")
+            port_point = relationalQueries.findPort()
             matchAggregation = {
-                "$geoNear" : {"near" : {"type" : "Point", "coordinates" : [-4.1660385,50.334972]},
+                "$geoNear" : {"near" : {"type" : "Point", "coordinates" : port_point['geometry']['coordinates'][0]},
                               "distanceField" : "dist.calculated",
                               "minDistance" : utils.nautical_mile_in_meters * 10,
-                              "maxDistance" : utils.nautical_mile_in_meters * 30,
+                              "maxDistance" : utils.nautical_mile_in_meters * 20,
                               "spherical" : True, "key" : "location"}}
             # den to kanei plot
             utils.findPointsForMatchAggr(matchAggregation, doPlot=True ,allowDiskUse=True ,queryTitle="Find all ships that moved in range from 10 to 50 sea miles from Burst port")
 
         elif choice == '3' :
-            print("--------------You choose 4--------------")
-            point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
-            findShipsNearPoint(point, doPlot=True, k_near=20)
+            # print("--------------You choose 3--------------")
+            # # point = {"type" : "Point", "coordinates" : [-4.1660385, 50.334972]}
+            # port_point = relationalQueries.findPort()
+            # point = {"type" : "Point", "coordinates" : port_point['geometry']['coordinates'][0]}
+            # findShipsNearPoint(point, doPlot=True, k_near=1000)
+
+            print("--------------You choose 3--------------")
+            port_point = relationalQueries.findPort()
+            matchAggregation = {
+            "$geoNear": {"near" : {"type" : "Point", "coordinates" : port_point['geometry']['coordinates'][0]},
+                         "distanceField" : "dist.calculated",
+                         "minDistance" : utils.nautical_mile_in_meters * 10,
+                         "maxDistance" : utils.nautical_mile_in_meters * 20,
+                         "spherical" : True, "key" : "location"}}
+            # den to kanei plot
+            utils.findPointsForMatchAggr(matchAggregation, doPlot=False, allowDiskUse=True, k_near=100000,
+                                         queryTitle="Find K-nn = 100.000 ships that moved in range\nfrom 10 to 20 sea miles from Burst port")
+

@@ -31,9 +31,8 @@ def spatialQueries_menu():
     print('|---------------- Spatial queries Menu -------------------|')
     print('|                                                         |')
     print('| 1.  Find all ships that moved in range from             |')
-    print('|     10 to 30 sea miles from Burst port                  |')
-    print('|     for one day time range for 2 hours time interval    |')
-    print('|     one day time range for 2 hours time interval        |')
+    print('|     10 to 20 sea miles from Burst port                  |')
+    print('|     for 2 hours time interval                           |')
     print('| 2.  find k closest ship sigmas to Brest                 |')
     print('|     port (k=100) in one day interval                    |')
     print('| 3.  find trajectories for all ships with france         |')
@@ -57,7 +56,7 @@ def executeSpatioTemporalQuery():
                 "$geoNear" : {"near" : {"type" : "Point", "coordinates" : port_point['geometry']['coordinates'][0]},
                               "distanceField" : "dist.calculated",
                               "minDistance" : utils.nautical_mile_in_meters * 10,
-                              "maxDistance" : utils.nautical_mile_in_meters * 30,
+                              "maxDistance" : utils.nautical_mile_in_meters * 20,
                               "spherical" : True, "key" : "location"}}
 
             matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1448988894 + (2 * utils.one_hour_in_unix_time)}}}
@@ -72,8 +71,8 @@ def executeSpatioTemporalQuery():
             point = {"type" : "Point", "coordinates" : port_point['geometry']['coordinates'][0]}
             geoNearAgg = {"$geoNear" : {"near" : point,
                                         "distanceField" : "dist.calculated",
-                                        # "minDistance" : nautical_mile_in_meters * 10,
-                                        "maxDistance" : utils.nautical_mile_in_meters * 30,
+                                        "minDistance" : utils.nautical_mile_in_meters * 10,
+                                        "maxDistance" : utils.nautical_mile_in_meters * 20,
                                         "spherical" : True, "key" : "location"}}
 
             matchAgg = {"$match" : {'ts' : {"$gte" : 1448988894, "$lte" : 1449075294}}}
@@ -89,6 +88,6 @@ def executeSpatioTemporalQuery():
                                             "location" : {"$geoWithin" : {"$geometry" : poly["geometry"]}},
                                             'ts' : {"$gte" : 1448988894,
                                                     "$lte" : 1448988894 + (6 * utils.one_hour_in_unix_time)}}}
-            utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=True)
+            utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, withPoly=poly["geometry"], logResponse=False)
 
 
