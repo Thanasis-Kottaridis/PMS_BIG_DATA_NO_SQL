@@ -495,6 +495,33 @@ def getPolyGrid(poly, theta):
     # grid.to_file("grid.shp")
 
 
+def getGridAndSeas():
+    _, db = connector.connectMongoDB()
+    # creating or switching to ais_navigation collection
+    collection = db.world_seas
+
+    sea_results = list(collection.find())
+
+    collection = db.target_map_grid
+
+    grid_results = list(collection.find())
+
+    ax = createAXNFigure()
+
+    for poly in sea_results:
+        ax.add_patch(
+            PolygonPatch(poly["geometry"], fc=BLUE, ec=BLUE, alpha=0.5, zorder=2, label="Trajectories Within Polygon"))
+
+    # plot grid
+    for cell in grid_results :
+        ax.add_patch(
+            PolygonPatch(cell["geometry"], fc=GRAY, ec=GRAY, alpha=0.3, zorder=2))
+
+    plt.title("Target Seas With Grid")
+    plt.ylabel("Latitude")
+    plt.xlabel("Longitude")
+    plt.show()
+
 #
 # Query explain util
 #

@@ -386,7 +386,7 @@ if __name__ == '__main__' :
     """
     shipMMSI = [240031000]
     matchAggregation = {"$match" : {'mmsi' : {'$in': shipMMSI}}}
-    utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
+    # utils.findTrajectoriesForMatchAggr(matchAggregation, doPlot=True, logResponse=True)
 
     # query 2
     # shipMMSI = relationalQueries.getShipsByCountry(["France", "German"])
@@ -680,7 +680,7 @@ if __name__ == '__main__' :
     ]
 
     hoursList = [3, 3]#, 4, 4]
-    findTrajectoriesFromPoints(pointsList, hoursList)
+    # findTrajectoriesFromPoints(pointsList, hoursList)
 
     #
     #TEST
@@ -753,9 +753,10 @@ if __name__ == '__main__' :
 
     # distanceJoinUsingGPDGrid(poly1, mmsi=305810000) #538003876
     # distanceJoinUsingGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
-    distanceJoinQueries.distanceJoinUsingGPDGrid(poly2, mmsi=538003876)
+    # distanceJoinQueries.distanceJoinUsingGPDGrid(poly2, mmsi=538003876)
     # distanceJoinQueries.distanceJoinUsingGPDGrid(poly2, mmsi=538003876) # 50 kati plia sto poly2 373206000
 
     # findThresholdBasedSimilarTrajectories(mmsi=240266000, tsFrom=1448988894, tsTo=1449075294)
     # findThresholdBasedSimilarTrajectories(mmsi=227574020, tsFrom=1443676587, tsTo=1443679590, d=0)
 
+    utils.getGridAndSeas()
